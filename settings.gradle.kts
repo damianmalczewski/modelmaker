@@ -16,3 +16,6 @@ dependencyResolutionManagement {
 rootProject.name = "modelmaker-build"
 
 include(":modelmaker")
+include(":plugin-gradle")
+
+project(":plugin-gradle").name = "modelmaker-gradle-plugin"
