@@ -328,9 +328,10 @@ Standalone Gradle builds under `examples/`, each applying the plugin from `maven
 ## Building
 
 ```sh
-./gradlew                  # calls configured Gradle default tasks (spotlessApply, build, publishToMavenLocal)
-./gradlew spotlessApply    # format code: ktfmt for *.kt (Kotlin sources), ktlint for *.kts (Gradle buildscript)
-./gradlew build            # compiles the plugin and runs its unit tests
+./gradlew                      # calls configured Gradle default tasks (spotlessApply, build, publishToMavenLocal)
+./gradlew spotlessApply        # format code: ktfmt for *.kt (Kotlin sources), ktlint for *.kts (Gradle buildscript)
+./gradlew build                # compiles the plugin and runs its unit tests
+./gradlew publishToMavenLocal  # publishes artifacts to local ~/.m2 to use local snapshots
 ```
 
 ## License

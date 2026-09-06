@@ -42,5 +42,6 @@ publishing {
 
 internalPublishing {
     displayName = "ModelMaker Core"
-    description = "Schema parsing and source emitters shared by the ModelMaker plugins."
+    description =
+        "Shared core of the ModelMaker build-tool plugins. Generates immutable Java model classes from schema files."
 }

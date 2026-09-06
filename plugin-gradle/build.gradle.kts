@@ -48,15 +48,26 @@ dependencies {
 }
 
 gradlePlugin {
-    website = "https://github.com/damianmalczewski/modelmaker-gradle-plugin"
-    vcsUrl = "https://github.com/damianmalczewski/modelmaker-gradle-plugin.git"
+    website = "https://github.com/damianmalczewski/modelmaker"
+    vcsUrl = "https://github.com/damianmalczewski/modelmaker.git"
     plugins {
         create("modelmaker") {
             id = "io.github.malczuuu.modelmaker"
             implementationClass = "io.github.malczuuu.modelmaker.gradle.ModelMakerPlugin"
             displayName = "ModelMaker Gradle Plugin"
-            description = "Gradle plugin generating Java models based on simple schema."
-            tags = listOf("codegen", "models", "dtos")
+            description = "Generates immutable Java model classes from schema files."
+            tags =
+                listOf(
+                    "code-generation",
+                    "codegen",
+                    "java",
+                    "dto",
+                    "immutable",
+                    "json",
+                    "jackson",
+                    "bean-validation",
+                    "kotlin",
+                )
             compatibility {
                 features {
                     configurationCache = true
@@ -68,5 +79,5 @@ gradlePlugin {
 
 internalPublishing {
     displayName = "ModelMaker Gradle Plugin"
-    description = "Gradle plugin generating Java models based on simple schema."
+    description = "Generates immutable Java model classes from schema files."
 }
