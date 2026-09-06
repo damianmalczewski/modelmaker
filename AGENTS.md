@@ -87,3 +87,5 @@ generating.
   (examples excluded — each example has its own Spotless config). Wildcard imports are forbidden in Java.
 - `:plugin-gradle` has `explicitApi()` on: every public declaration needs an explicit visibility modifier and return
   type.
+- Tests use global `junit.jupiter.testinstance.lifecycle.default=per_class` convention, so proper `@Before...` and
+  `@After...` setup is required.

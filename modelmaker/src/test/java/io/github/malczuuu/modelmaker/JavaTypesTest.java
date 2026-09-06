@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 class JavaTypesTest {
@@ -31,6 +32,11 @@ class JavaTypesTest {
   }
 
   private final Set<String> imports = new HashSet<>();
+
+  @AfterEach
+  void beforeEach() {
+    imports.clear();
+  }
 
   @Test
   void boxedScalarsAreAlwaysTheWrapperType() {
