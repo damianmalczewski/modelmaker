@@ -81,3 +81,9 @@ internalPublishing {
     displayName = "ModelMaker Gradle Plugin"
     description = "Generates immutable Java model classes from schema files."
 }
+
+tasks.withType<Jar>().configureEach {
+    if (name == "javadocJar") {
+        enabled = false
+    }
+}
