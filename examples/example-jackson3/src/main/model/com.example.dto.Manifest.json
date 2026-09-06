@@ -1,0 +1,14 @@
+{
+  "$modelmaker": "v1.0",
+  "title": "com.example.dto.Manifest",
+  "description": "A type with a nested list of objects.",
+  "type": "object",
+  "required": ["id", "items"],
+  "properties": {
+    "id": { "type": "string" },
+    "items": { "type": "array", "items": { "$ref": "com.example.dto.LineItem" } }
+  },
+  "features": {
+    "jackson": true
+  }
+}

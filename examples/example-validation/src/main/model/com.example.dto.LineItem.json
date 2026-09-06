@@ -1,0 +1,10 @@
+{
+  "$modelmaker": "v1.0",
+  "title": "com.example.dto.LineItem",
+  "type": "object",
+  "required": ["sku", "quantity"],
+  "properties": {
+    "sku": { "type": "string", "pattern": "^[A-Z0-9]+$" },
+    "quantity": { "type": "integer", "minimum": 1 }
+  }
+}

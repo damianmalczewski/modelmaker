@@ -1,0 +1,14 @@
+{
+  "$modelmaker": "v1.0",
+  "title": "com.example.dto.Person",
+  "description": "Combines @NotNull, @Pattern, @Email, @Min/@Max and @Size on one type.",
+  "type": "object",
+  "required": ["id", "email"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^P\\d+$" },
+    "email": { "type": "string", "format": "email" },
+    "age": { "type": "integer", "minimum": 0, "maximum": 120 },
+    "bio": { "type": "string", "maxLength": 200 },
+    "active": { "type": "boolean", "default": true }
+  }
+}

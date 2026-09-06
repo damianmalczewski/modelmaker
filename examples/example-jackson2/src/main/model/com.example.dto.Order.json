@@ -1,0 +1,11 @@
+{
+  "$modelmaker": "v1.0",
+  "title": "com.example.dto.Order",
+  "description": "A type with a nested object.",
+  "type": "object",
+  "required": ["id", "shippingAddress"],
+  "properties": {
+    "id": { "type": "string" },
+    "shippingAddress": { "$ref": "com.example.dto.Address" }
+  }
+}

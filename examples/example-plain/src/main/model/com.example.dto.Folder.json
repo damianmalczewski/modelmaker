@@ -1,0 +1,13 @@
+{
+  "$modelmaker": "v1.0",
+  "title": "com.example.dto.Folder",
+  "type": "object",
+  "required": ["id", "name"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" }
+  },
+  "features": {
+    "withers": true
+  }
+}

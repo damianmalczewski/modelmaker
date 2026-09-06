@@ -1,0 +1,34 @@
+{
+  "type": "record",
+  "namespace": "com.example.dto",
+  "name": "Invoice",
+  "doc": "Exercises an inline nested record (billTo) and an array of inline nested records (notes), as opposed to Order's cross-file references.",
+  "fields": [
+    { "name": "id", "type": "string" },
+    {
+      "name": "billTo",
+      "type": {
+        "type": "record",
+        "name": "Contact",
+        "fields": [
+          { "name": "name", "type": "string" },
+          { "name": "email", "type": "string" }
+        ]
+      }
+    },
+    {
+      "name": "notes",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "Note",
+          "fields": [
+            { "name": "author", "type": "string" },
+            { "name": "text", "type": "string" }
+          ]
+        }
+      }
+    }
+  ]
+}

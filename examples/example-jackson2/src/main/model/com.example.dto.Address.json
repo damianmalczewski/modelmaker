@@ -1,0 +1,10 @@
+{
+  "$modelmaker": "v1.0",
+  "title": "com.example.dto.Address",
+  "type": "object",
+  "required": ["street", "city"],
+  "properties": {
+    "street": { "type": "string" },
+    "city": { "type": "string" }
+  }
+}

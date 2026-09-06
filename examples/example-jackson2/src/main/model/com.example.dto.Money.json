@@ -1,0 +1,13 @@
+{
+  "$modelmaker": "v1.0",
+  "title": "com.example.dto.Money",
+  "description": "A bunch of non-nullable params, one of each scalar type.",
+  "type": "object",
+  "required": ["currency", "amount", "scale", "taxable"],
+  "properties": {
+    "currency": { "type": "string" },
+    "amount": { "type": "number" },
+    "scale": { "type": "integer" },
+    "taxable": { "type": "boolean" }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "namespace": "com.example.dto",
+  "name": "LineItem",
+  "doc": "Referenced by Order.items; quantity is \"long\" (LONG scalar), unit's enum-as-pattern is what a @Valid cascade into a List<LineItem> catches.",
+  "fields": [
+    { "name": "sku", "type": "string" },
+    { "name": "quantity", "type": "long" },
+    { "name": "unit", "type": { "type": "enum", "name": "Unit", "symbols": ["EACH", "CASE", "PALLET"] } }
+  ]
+}

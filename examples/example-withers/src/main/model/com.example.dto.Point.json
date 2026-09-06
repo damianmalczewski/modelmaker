@@ -1,0 +1,13 @@
+{
+  "$modelmaker": "v1.0",
+  "title": "com.example.dto.Point",
+  "type": "object",
+  "required": ["x", "y"],
+  "properties": {
+    "x": { "type": "integer" },
+    "y": { "type": "integer" }
+  },
+  "features": {
+    "preferPrimitives": true
+  }
+}

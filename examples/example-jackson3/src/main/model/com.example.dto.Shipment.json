@@ -1,0 +1,17 @@
+{
+  "$modelmaker": "v1.0",
+  "title": "com.example.dto.Shipment",
+  "description": "Demonstrates enum-as-pattern, the integer/number \"format\" keyword (long, float), and an optional enum with a default value.",
+  "type": "object",
+  "required": ["id", "status", "distance", "weight"],
+  "properties": {
+    "id": { "type": "string" },
+    "status": { "type": "string", "enum": ["NEW", "IN_TRANSIT", "DELIVERED"] },
+    "distance": { "type": "integer", "format": "long" },
+    "weight": { "type": "number", "format": "float" },
+    "priority": { "type": "string", "enum": ["LOW", "NORMAL", "HIGH"], "default": "NORMAL" }
+  },
+  "features": {
+    "jackson": true
+  }
+}

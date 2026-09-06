@@ -1,0 +1,11 @@
+{
+  "$modelmaker": "v1.0",
+  "title": "com.example.dto.Kit",
+  "description": "A nested object, to prove the Mutator interface is generated for nested types too.",
+  "type": "object",
+  "required": ["id", "widget"],
+  "properties": {
+    "id": { "type": "string" },
+    "widget": { "$ref": "com.example.dto.Widget" }
+  }
+}

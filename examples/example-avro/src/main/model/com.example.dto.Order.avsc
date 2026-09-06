@@ -1,0 +1,27 @@
+{
+  "type": "record",
+  "namespace": "com.example.dto",
+  "name": "Order",
+  "doc": "Exercises enum-as-pattern, a cross-file reference, an array of references, a nullable float with a default, and a nullable enum with a non-null default.",
+  "fields": [
+    { "name": "id", "type": "string" },
+    {
+      "name": "status",
+      "type": { "type": "enum", "name": "Status", "symbols": ["NEW", "PAID", "SHIPPED"] }
+    },
+    { "name": "shippingAddress", "type": "com.example.dto.Address" },
+    {
+      "name": "items",
+      "type": { "type": "array", "items": "com.example.dto.LineItem" }
+    },
+    { "name": "discountRate", "type": ["null", "float"], "default": null },
+    {
+      "name": "priority",
+      "type": [
+        { "type": "enum", "name": "Priority", "symbols": ["LOW", "NORMAL", "HIGH"] },
+        "null"
+      ],
+      "default": "NORMAL"
+    }
+  ]
+}

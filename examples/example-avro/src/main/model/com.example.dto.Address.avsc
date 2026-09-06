@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "namespace": "com.example.dto",
+  "name": "Address",
+  "doc": "Referenced by Order.shippingAddress across files; kind's enum-as-pattern @Pattern is what a jakarta.validation @Valid cascade catches.",
+  "fields": [
+    { "name": "street", "type": "string" },
+    { "name": "city", "type": "string" },
+    { "name": "kind", "type": { "type": "enum", "name": "Kind", "symbols": ["RESIDENTIAL", "COMMERCIAL"] } }
+  ]
+}

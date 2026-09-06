@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "namespace": "com.example.dto",
+  "name": "Money",
+  "doc": "One of each remaining scalar type: double, int, boolean.",
+  "fields": [
+    { "name": "currency", "type": "string" },
+    { "name": "amount", "type": "double" },
+    { "name": "scale", "type": "int" },
+    { "name": "taxable", "type": "boolean" }
+  ]
+}
