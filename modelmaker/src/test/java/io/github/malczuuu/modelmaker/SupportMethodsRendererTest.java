@@ -1,0 +1,135 @@
+/*
+ * Copyright 2026-present the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.github.malczuuu.modelmaker;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
+class SupportMethodsRendererTest {
+
+  private static final ModelOptions OPTIONS = ModelOptions.builder().build();
+
+  private static ModelType type(String name, Property... properties) {
+    return new ModelType(
+        name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
+  }
+
+  private static final ModelType WIDGET =
+      type(
+          "Widget",
+          new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+          new Property(
+              "note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
+
+  @Test
+  void rendersEqualsHashCodeAndToString() {
+    RenderResult result = new SupportMethodsRenderer().init("", WIDGET, OPTIONS).render();
+
+    assertThat(result.getCode())
+        .isEqualTo(
+            "@Override\n"
+                + "public boolean equals(@Nullable Object obj) {\n"
+                + "  if (this == obj) {\n"
+                + "    return true;\n"
+                + "  }\n"
+                + "  if (!(obj instanceof Widget other)) {\n"
+                + "    return false;\n"
+                + "  }\n"
+                + "  return Objects.equals(id, other.id)\n"
+                + "    && Objects.equals(note, other.note);\n"
+                + "}\n\n"
+                + "@Override\n"
+                + "public int hashCode() {\n"
+                + "  return Objects.hash(id, note);\n"
+                + "}\n\n"
+                + "@Override\n"
+                + "public String toString() {\n"
+                + "  return \"Widget[\"\n"
+                + "    + \"id=\" + id\n"
+                + "    + \", note=\" + note\n"
+                + "    + \"]\";\n"
+                + "}\n");
+    assertThat(result.getImports())
+        .containsExactlyInAnyOrder("java.util.Objects", "org.jspecify.annotations.Nullable");
+  }
+
+  @Test
+  void aFieldLessTypeComparesTrueAndPrintsAnEmptyBody() {
+    RenderResult result = new SupportMethodsRenderer().init("", type("Empty"), OPTIONS).render();
+
+    assertThat(result.getCode())
+        .contains("return true;")
+        .contains("return Objects.hash();")
+        .contains("return \"Empty[]\";");
+  }
+
+  @Test
+  void alwaysReportsObjectsAndNullableRegardlessOfProperties() {
+    RenderResult result = new SupportMethodsRenderer().init("", type("Empty"), OPTIONS).render();
+
+    assertThat(result.getImports())
+        .containsExactlyInAnyOrder("java.util.Objects", "org.jspecify.annotations.Nullable");
+  }
+
+  @Test
+  void comparesPrimitiveScalarFieldsWithDoubleEqualsWhenPreferPrimitivesIsOn() {
+    ModelOptions preferPrimitives = ModelOptions.builder().preferPrimitives(true).build();
+    ModelType type =
+        type(
+            "Widget",
+            new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+            new Property(
+                "count", PropType.ScalarType.INTEGER, true, Constraints.none(), "count", null),
+            new Property(
+                "ratio", PropType.ScalarType.NUMBER, true, Constraints.none(), "ratio", null),
+            new Property("on", PropType.ScalarType.BOOLEAN, true, Constraints.none(), "on", null));
+
+    RenderResult result = new SupportMethodsRenderer().init("", type, preferPrimitives).render();
+
+    assertThat(result.getCode())
+        .contains("Objects.equals(id, other.id)")
+        .contains("count == other.count")
+        .contains("ratio == other.ratio")
+        .contains("on == other.on")
+        .doesNotContain("Objects.equals(count, other.count)")
+        .doesNotContain("Objects.equals(ratio, other.ratio)")
+        .doesNotContain("Objects.equals(on, other.on)");
+  }
+
+  @Test
+  void comparesOptionalScalarFieldsWithObjectsEqualsEvenWhenPreferPrimitivesIsOn() {
+    ModelOptions preferPrimitives = ModelOptions.builder().preferPrimitives(true).build();
+    ModelType type =
+        type(
+            "Widget",
+            new Property(
+                "count", PropType.ScalarType.INTEGER, false, Constraints.none(), "count", null));
+
+    RenderResult result = new SupportMethodsRenderer().init("", type, preferPrimitives).render();
+
+    assertThat(result.getCode()).contains("Objects.equals(count, other.count)");
+  }
+
+  @Test
+  void prependsTheIndentToEveryLine() {
+    RenderResult result = new SupportMethodsRenderer().init("  ", WIDGET, OPTIONS).render();
+
+    assertThat(result.getCode().lines()).allMatch(line -> line.isEmpty() || line.startsWith("  "));
+  }
+}
