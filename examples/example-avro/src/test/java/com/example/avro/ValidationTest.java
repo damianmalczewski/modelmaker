@@ -10,6 +10,7 @@ import com.example.dto.Order;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,12 +31,13 @@ class ValidationTest {
 
   @BeforeEach
   void beforeEach() {
-    validator =
+    try (ValidatorFactory factory =
         Validation.byDefaultProvider()
             .configure()
             .messageInterpolator(new ParameterMessageInterpolator())
-            .buildValidatorFactory()
-            .getValidator();
+            .buildValidatorFactory()) {
+      validator = factory.getValidator();
+    }
   }
 
   private static Set<String> paths(Set<? extends ConstraintViolation<?>> violations) {
