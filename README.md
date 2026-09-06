@@ -4,14 +4,44 @@ An **opinionated** Java/Kotlin source code generator for DTO/model classes, for 
 schema files into simple, **immutable POJO** classes, with optional support for **Jackson** deserialization and
 **Jakarta Bean Validation**.
 
+The recommended way to use it is the `io.github.malczuuu.modelmaker` Gradle plugin, which applies an opinionated project
+layout and wires code generation into the `main` source set.
+
 ## Table of Contents
 
+- [Modules](#modules)
+- [Quick Start](#quick-start)
 - [Generated Java Classes](#generated-java-classes)
 - [Generated Kotlin Code](#generated-kotlin-code)
-- [Usage](#usage)
+- [Gradle Plugin](#gradle-plugin)
+  - [Schema files](#schema-files)
+  - [Tasks](#tasks)
+  - [Configuration](#configuration)
 - [Simple Schema Format](#simple-schema-format)
 - [Apache Avro Format](#apache-avro-format)
+- [Library Usage](#library-usage)
+- [Examples](#examples)
 - [Building](#building)
+- [License](#license)
+
+## Modules
+
+| Module          | Artifact                                         | Description                                                                       |
+|-----------------|--------------------------------------------------|-----------------------------------------------------------------------------------|
+| `modelmaker`    | `io.github.malczuuu:modelmaker`                  | Core generator library: schema loaders, `JavaModelMaker`, `KotlinExtensionMaker`. |
+| `plugin-gradle` | Gradle plugin ID `io.github.malczuuu.modelmaker` | Applies ModelMaker conventions and wires generation into the build.               |
+
+## Quick Start
+
+```kotlin
+plugins {
+    id("io.github.malczuuu.modelmaker") version "..."
+}
+```
+
+Place schema files under `src/main/model`, one type per file (see [Simple Schema Format](#simple-schema-format) and
+[Apache Avro Format](#apache-avro-format)). Building the project generates one immutable Java class per schema, wired
+into the `main` source set.
 
 ## Generated Java Classes
 
@@ -48,37 +78,56 @@ public inline fun Person.mutate(block: Person.BuilderMutator.() -> Unit): Person
     this.mutate().also { it.block() }.build()
 ```
 
-## Usage
+## Gradle Plugin
 
-Scan schema directories, create `JavaModelMaker` and use it to generate Java code for each schema.
+Gradle plugin that applies ModelMaker conventions and generates immutable Java model classes (and, opt-in, Kotlin
+extensions) from schema files, wired into the `main` source set.
 
-```java
-File schemasDir = ...;
-File outputDir = ...;
-
-List<Path> schemas = Files.walk(schemasDir.toPath())
-    .filter(path -> Files.isRegularFile(path))
-    .filter(path -> {
-        String fileName = path.getFileName().toString();
-        return fileName.endsWith(".json") || fileName.endsWith(".avsc");
-    })
-    .collect(Collectors.toList());
-
-if (schemas.isEmpty()) {
-    return;
+```kotlin
+plugins {
+    id("io.github.malczuuu.modelmaker") version "..."
 }
-
-JavaModelMaker javaModelMaker = new JavaModelMaker(ModelOptions.builder().build());
-
-SchemaLoaders.createDelegatingSchemaLoader().load(schemas).forEach(
-    type -> {
-        String javaSrc = javaModelMaker.emit(type);
-        write(outputDir, type.getPackageName(), type.getName() + ".java", javaSrc);
-    });
 ```
 
-The recommended way however is to use `io.github.malczuuu.modelmaker` plugin for Gradle and benefit from an opinionated
-project layout.
+### Schema files
+
+Place schema files under `src/main/model`, one type per file:
+
+- **Simple Schema** (`.json`) - this project's own lightweight JSON-Schema-alike format.
+- **Apache Avro** (`.avsc`) - accepted alongside Simple Schema. It does **not** produce Avro-generated classes: an
+  `.avsc` record renders to the exact same kind of plain immutable POJO/DTO as a Simple Schema file, with the same
+  optional Jackson and/or Jakarta Validation support.
+
+### Tasks
+
+- `generateModelJava` - one `.java` class per schema file.
+- `generateModelKotlin` - depends on `generateModelJava`; one `mutate { }` Kotlin extension per type, only when
+  `kotlin.enabled` is on **and** the Kotlin JVM plugin is applied.
+
+### Configuration
+
+```kotlin
+modelmaker {
+    src {
+        enabled = true  // default: write into src/main/model/{java,kotlin} (checked in);
+    }                   // false writes into build/generated/sources/modelmaker instead
+    kotlin {
+        enabled = false  // default off
+    }
+    features {
+        jackson          = false  // @JsonCreator / @JsonProperty / ...
+        validation       = false  // jakarta.validation annotations, @Valid cascades
+        withers          = false  // withXyz(value) per property
+        preferPrimitives = false  // int/double/boolean instead of boxed types
+    }
+}
+```
+
+Any `features` flag can be overridden per schema file via a top-level `"features"` object in that file, taking
+precedence over the project default for that type only.
+
+The plugin adds `org.jspecify:jspecify` on `compileOnly` unless the build already declares it, as generated classes are
+`@NullMarked`.
 
 ## Simple Schema Format
 
@@ -191,7 +240,7 @@ accepted as an alternate input alongside Simple Schema.
 
 > [!IMPORTANT]
 >
-> This module does **not** produce Avro-generated classes. An `.avsc` file renders to the exact same plain immutable
+> This does **not** produce Avro-generated classes. An `.avsc` file renders to the exact same plain immutable
 > POJO/DTO as Simple Schema, with the same support for Jackson and Jakarta Bean Validation. It's simply an alternative
 > input for projects that already have their models defined as Avro schemas.
 
@@ -229,45 +278,57 @@ The same example as above can be generated using the following Avro, with `jacks
 
 It renders to the exact same `Person.java` shown above.
 
+</details>
+
+## Library Usage
+
+If you cannot use the Gradle plugin, scan schema directories, create a `JavaModelMaker`, and use it to generate Java
+code for each schema.
+
 ```java
-@NullMarked
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder({"id", "age"})
-public final class Person {
+File schemasDir = ...;
+File outputDir = ...;
 
-  @NotNull(message = "must not be null")
-  private final String id;
+List<Path> schemas = Files.walk(schemasDir.toPath())
+    .filter(path -> Files.isRegularFile(path))
+    .filter(path -> {
+        String fileName = path.getFileName().toString();
+        return fileName.endsWith(".json") || fileName.endsWith(".avsc");
+    })
+    .collect(Collectors.toList());
 
-  private final @Nullable Integer age;
-
-  @JsonCreator
-  Person(
-      @JsonProperty("id") String id,
-      @JsonProperty("age") @Nullable Integer age) {
-    this.id = id;
-    this.age = age;
-  }
-
-  @JsonProperty("id")
-  public String getId() {
-    return id;
-  }
-
-  @JsonProperty("age")
-  public @Nullable Integer getAge() {
-    return age;
-  }
-
-  // builder utilities and equals, hashCode, toString
+if (schemas.isEmpty()) {
+    return;
 }
+
+JavaModelMaker javaModelMaker = new JavaModelMaker(ModelOptions.builder().build());
+
+SchemaLoaders.createDelegatingSchemaLoader().load(schemas).forEach(
+    type -> {
+        String javaSrc = javaModelMaker.emit(type);
+        write(outputDir, type.getPackageName(), type.getName() + ".java", javaSrc);
+    });
 ```
 
-</details>
+## Examples
+
+Standalone Gradle builds under `examples/`, each applying the plugin from `mavenLocal()`. Run all of them with
+`examples/buildAll <tasks>` (e.g. `examples/buildAll build`) after `./gradlew publishToMavenLocal`.
+
+| Example              | Shows                                                                    |
+|----------------------|--------------------------------------------------------------------------|
+| `example-plain`      | Minimal setup; generation into `build/` (`src.enabled = false`).         |
+| `example-jackson2`   | `jackson` feature with Jackson 2 (`com.fasterxml.jackson`).              |
+| `example-jackson3`   | `jackson` feature with Jackson 3 (`tools.jackson`) plus Kotlin `mutate`. |
+| `example-validation` | `validation` feature and `jakarta.validation` constraints.               |
+| `example-withers`    | `withers` feature - per-property copy methods.                           |
+| `example-mutator`    | Kotlin `mutate { }` extensions.                                          |
+| `example-avro`       | `.avsc` schema input.                                                    |
 
 ## Building
 
 ```sh
-./gradlew                  # calls configured Gradle default tasks (spotlessApply and build)
+./gradlew                  # calls configured Gradle default tasks (spotlessApply, build, publishToMavenLocal)
 ./gradlew spotlessApply    # format code: ktfmt for *.kt (Kotlin sources), ktlint for *.kts (Gradle buildscript)
 ./gradlew build            # compiles the plugin and runs its unit tests
 ```
@@ -275,3 +336,6 @@ public final class Person {
 ## License
 
 This project is licensed under the Apache License, Version 2.0.
+
+This project is not affiliated with, sponsored by, or endorsed by Gradle. All product names, logos, and brands are
+property of their respective owners.
