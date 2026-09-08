@@ -46,7 +46,10 @@ into the `main` source set.
 ## Generated Java Classes
 
 The `JavaModelMaker` emits a `final`, immutable Java POJO/DTO class with a `private` (or `package-private`)
-constructor, instantiated via its builder, plus `equals`, `hashCode`, and `toString`.
+constructor, instantiated via its builder, plus `equals`, `hashCode`, and `toString`. A `List<T>` field is copied on
+the way in and returned as an unmodifiable view; a `bytes` (`byte[]`) field is cloned by the builder setter, by every
+getter, and by a `withXyz` replacement, so a caller's array is never aliased by the DTO; `equals`/`hashCode` compare it
+by content and `toString` prints it as its base64 string.
 
 Features configurable via `ModelOptions` and `"features"` section in schema files:
 
@@ -149,6 +152,7 @@ Each entry under `properties` is itself a small schema, either a `"type"` or a `
 | `type`    | Renders as          | Notes                                                                                                                        |
 |-----------|---------------------|------------------------------------------------------------------------------------------------------------------------------|
 | `string`  | `String`            |                                                                                                                              |
+| `bytes`   | `byte[]`            | stored and returned as a defensive copy; serialized by Jackson as a base64 string; no `"default"` support                    |
 | `integer` | `Integer`/`int`     | `"format"`: `"int"` (default) or `"long"` -> `Long`/`long`                                                                   |
 | `number`  | `Double`/`double`   | `"format"`: `"float"` -> `Float`/`float`                                                                                     |
 | `boolean` | `Boolean`/`boolean` |                                                                                                                              |
@@ -245,7 +249,8 @@ accepted as an alternate input alongside Simple Schema.
 > input for projects that already have their models defined as Avro schemas.
 
 1. A record's `namespace`/`name` map to package/class name (file must be named `<namespace>.<name>.avsc`);
-2. Types `int`/`long`, `float`/`double`, `string`/`bytes`, `boolean` map to their Simple Schema equivalents;
+2. Types `int`/`long`, `float`/`double`, `string`, `bytes`, `boolean` map to their Simple Schema equivalents
+   (`bytes` -> `byte[]`, base64 on the wire);
 3. A nested `record` becomes a nested class;
 4. An `array` needs `items`;
 5. A field is optional only through a `["null", T]` union, with `"default"` applied the same way;

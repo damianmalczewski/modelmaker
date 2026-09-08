@@ -132,4 +132,26 @@ class SupportMethodsRendererTest {
 
     assertThat(result.getCode().lines()).allMatch(line -> line.isEmpty() || line.startsWith("  "));
   }
+
+  @Test
+  void bytesFieldsCompareAndHashByContentAndPrintAsBase64() {
+    ModelType blob =
+        type(
+            "Blob",
+            new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+            new Property(
+                "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
+            new Property("sig", PropType.ScalarType.BYTES, false, Constraints.none(), "sig", null));
+
+    RenderResult result = new SupportMethodsRenderer().init("", blob, OPTIONS).render();
+
+    assertThat(result.getCode())
+        .contains("&& Arrays.equals(payload, other.payload)")
+        .contains("&& Arrays.equals(sig, other.sig);")
+        .contains("return Objects.hash(id, Arrays.hashCode(payload), Arrays.hashCode(sig));")
+        .contains("+ \", payload=\" + Base64.getEncoder().encodeToString(payload)")
+        .contains(
+            "+ \", sig=\" + (sig != null ? Base64.getEncoder().encodeToString(sig) : \"null\")");
+    assertThat(result.getImports()).contains("java.util.Arrays", "java.util.Base64");
+  }
 }

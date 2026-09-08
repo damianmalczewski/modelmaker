@@ -134,4 +134,31 @@ class ConstructorRendererTest {
 
     assertThat(result.getCode().lines()).allMatch(line -> line.isEmpty() || line.startsWith("  "));
   }
+
+  @Test
+  void bytesParametersAreStoredRawTheCopyIsTheBuildersAndWithersJob() {
+    ModelType blob =
+        type(
+            "Blob",
+            new Property(
+                "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
+            new Property(
+                "signature",
+                PropType.ScalarType.BYTES,
+                false,
+                Constraints.none(),
+                "signature",
+                null));
+
+    RenderResult result = new ConstructorRenderer().init("", blob, OPTIONS).render();
+
+    assertThat(result.getCode())
+        .isEqualTo(
+            "private Blob(\n"
+                + "    byte[] payload,\n"
+                + "    @Nullable byte[] signature) {\n"
+                + "  this.payload = payload;\n"
+                + "  this.signature = signature;\n"
+                + "}\n");
+  }
 }

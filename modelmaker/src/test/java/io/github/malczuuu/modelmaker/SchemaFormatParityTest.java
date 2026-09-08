@@ -53,11 +53,12 @@ class SchemaFormatParityTest {
             "x.Widget.json",
             """
             { "$modelmaker": "v1.0", "title": "x.Widget", "type": "object",
-              "required": ["id", "count"],
+              "required": ["id", "count", "payload"],
               "properties": {
                 "id": { "type": "string" },
                 "count": { "type": "integer", "format": "long" },
-                "label": { "type": "string" }
+                "label": { "type": "string" },
+                "payload": { "type": "bytes" }
               }
             }
             """);
@@ -69,7 +70,8 @@ class SchemaFormatParityTest {
               "fields": [
                 { "name": "id", "type": "string" },
                 { "name": "count", "type": "long" },
-                { "name": "label", "type": ["null", "string"], "default": null }
+                { "name": "label", "type": ["null", "string"], "default": null },
+                { "name": "payload", "type": "bytes" }
               ]
             }
             """);

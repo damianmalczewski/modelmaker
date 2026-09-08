@@ -243,6 +243,29 @@ class SimpleSchemaLoaderTest {
   }
 
   @Test
+  void parsesABytesProperty() {
+    Path f =
+        schema(
+            "x.Blob",
+            "\"required\": [\"payload\"], \"properties\": { \"payload\": { \"type\": \"bytes\" },"
+                + " \"signature\": { \"type\": \"bytes\" } }");
+    ModelType m = loader.load(List.of(f)).get(0);
+
+    assertThat(prop(m, "payload").getType()).isEqualTo(PropType.ScalarType.BYTES);
+    assertThat(prop(m, "payload").isRequired()).isTrue();
+    assertThat(prop(m, "signature").getType()).isEqualTo(PropType.ScalarType.BYTES);
+    assertThat(prop(m, "signature").isRequired()).isFalse();
+  }
+
+  @Test
+  void rejectsADefaultOnABytesProperty() {
+    Path f =
+        schema("x.D", "\"properties\": { \"b\": { \"type\": \"bytes\", \"default\": \"AA==\" } }");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("default is not supported for \"bytes\"");
+  }
+
+  @Test
   void parsesAValidIntegerDefault() {
     Path f = schema("x.D", "\"properties\": { \"n\": { \"type\": \"integer\", \"default\": 42 } }");
     ModelType m = loader.load(List.of(f)).get(0);

@@ -69,6 +69,15 @@ final class WithersRenderer extends AbstractSnippetRenderer {
         }
         if (i != pi) {
           args.append("this.").append(it.getName());
+        } else if (it.getType() == PropType.ScalarType.BYTES) {
+          // The replacement array is the caller's - copy it, since the constructor stores it raw.
+          if (it.nonNull()) {
+            imports.add(OBJECTS_IMPORT);
+            args.append("Objects.requireNonNull(").append(p.getName()).append(").clone()");
+          } else {
+            args.append(p.getName()).append(" != null ? ").append(p.getName()).append(".clone()");
+            args.append(" : null");
+          }
         } else if (it.nonNull() && !isPrimitiveScalar(it)) {
           imports.add(OBJECTS_IMPORT);
           args.append("Objects.requireNonNull(").append(p.getName()).append(")");

@@ -250,6 +250,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
     }
     return switch (t) {
       case "string" -> PropType.ScalarType.STRING;
+      case "bytes" -> PropType.ScalarType.BYTES;
       case "integer" -> integerFormat(file, nameHint, node);
       case "number" -> numberFormat(file, nameHint, node);
       case "boolean" -> PropType.ScalarType.BOOLEAN;
@@ -283,7 +284,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
                   + nameHint
                   + "\": unsupported type \""
                   + t
-                  + "\" (allowed: string, integer, number, boolean, object, array, $ref)");
+                  + "\" (allowed: string, bytes, integer, number, boolean, object, array, $ref)");
     };
   }
 
@@ -372,6 +373,9 @@ public final class SimpleSchemaLoader implements SchemaLoader {
         throw fail(file, "property \"" + prop + "\": default must be a boolean");
       }
       return DefaultValue.Bool.of(node.getAsBoolean());
+    }
+    if (type == PropType.ScalarType.BYTES) {
+      throw fail(file, "property \"" + prop + "\": default is not supported for \"bytes\"");
     }
     if (type instanceof PropType.ArrayType array) {
       if (!node.isJsonArray()) {

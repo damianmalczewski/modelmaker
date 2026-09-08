@@ -32,7 +32,7 @@ class WithersTest {
 
   @Test
   void witherWorksOnAnOptionalFieldToo() {
-    Profile profile = Profile.builder().id("U1").build();
+    Profile profile = Profile.builder().id("U1").avatar(new byte[] {0}).build();
     assertThat(profile.getNickname()).isNull();
 
     Profile withNickname = profile.withNickname("neo");
@@ -40,5 +40,21 @@ class WithersTest {
     assertThat(withNickname.getNickname()).isEqualTo("neo");
     assertThat(profile.getNickname()).isNull();
     assertThat(withNickname).isNotSameAs(profile).isNotEqualTo(profile);
+  }
+
+  @Test
+  void aWitherOnAByteArrayFieldDefensivelyCopiesTheReplacement() {
+    byte[] first = {1, 2, 3};
+    Profile profile = Profile.builder().id("U1").avatar(first).build();
+
+    byte[] replacement = {9, 9};
+    Profile updated = profile.withAvatar(replacement);
+
+    // the replacement was copied: mutating the caller's array can't reach the DTO
+    replacement[0] = 0;
+    assertThat(updated.getAvatar()).containsExactly(9, 9);
+    // the original instance is untouched, and its own array still stands
+    assertThat(profile.getAvatar()).containsExactly(1, 2, 3);
+    assertThat(updated).isNotSameAs(profile).isNotEqualTo(profile);
   }
 }

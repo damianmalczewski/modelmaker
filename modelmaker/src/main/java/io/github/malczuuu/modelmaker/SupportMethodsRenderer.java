@@ -71,6 +71,10 @@ final class SupportMethodsRenderer implements SnippetRenderer {
     Set<String> imports = new TreeSet<>();
     imports.add("java.util.Objects");
     imports.add("org.jspecify.annotations.Nullable");
+    if (properties.stream().anyMatch(p -> p.getType() == PropType.ScalarType.BYTES)) {
+      imports.add("java.util.Arrays");
+      imports.add("java.util.Base64");
+    }
     String code = equalsMethod() + hashCodeMethod() + toStringMethod();
     return new RenderResult(imports, code);
   }
@@ -103,6 +107,9 @@ final class SupportMethodsRenderer implements SnippetRenderer {
    */
   private String equalsComparison(Property prop) {
     String n = prop.getName();
+    if (prop.getType() == PropType.ScalarType.BYTES) {
+      return "Arrays.equals(" + n + ", other." + n + ")";
+    }
     return isPrimitiveScalar(prop)
         ? n + " == other." + n
         : "Objects.equals(" + n + ", other." + n + ")";
@@ -125,11 +132,41 @@ final class SupportMethodsRenderer implements SnippetRenderer {
   }
 
   private String hashCodeMethod() {
-    String names = properties.stream().map(Property::getName).collect(joining(", "));
+    String names = properties.stream().map(this::hashCodeTerm).collect(joining(", "));
     return (indent + "@Override\n")
         + (indent + "public int hashCode() {\n")
         + (indent + "  return Objects.hash(" + names + ");\n")
         + (indent + "}\n\n");
+  }
+
+  /**
+   * The {@code hashCode()} term for one property: a {@code byte[]} field folds in its content hash
+   * via {@code Arrays.hashCode} (a bare reference would hash by identity), any other field goes in
+   * by name.
+   *
+   * @param prop the property to hash.
+   * @return the rendered term.
+   */
+  private String hashCodeTerm(Property prop) {
+    return prop.getType() == PropType.ScalarType.BYTES
+        ? "Arrays.hashCode(" + prop.getName() + ")"
+        : prop.getName();
+  }
+
+  /**
+   * The {@code toString()} term for one property: a {@code byte[]} field is rendered as its base64
+   * string (the same form it serializes as), null-guarded; any other field goes in by name.
+   *
+   * @param prop the property to render.
+   * @return the rendered term.
+   */
+  private static String toStringTerm(Property prop) {
+    if (prop.getType() != PropType.ScalarType.BYTES) {
+      return prop.getName();
+    }
+    String n = prop.getName();
+    String base64 = "Base64.getEncoder().encodeToString(" + n + ")";
+    return prop.nonNull() ? base64 : "(" + n + " != null ? " + base64 + " : \"null\")";
   }
 
   private String toStringMethod() {
@@ -138,8 +175,12 @@ final class SupportMethodsRenderer implements SnippetRenderer {
       if (i > 0) {
         parts.append("\n").append(indent).append("    + ");
       }
-      String n = properties.get(i).getName();
-      parts.append(i == 0 ? "\"" + n + "=\"" : "\", " + n + "=\"").append(" + ").append(n);
+      Property p = properties.get(i);
+      String n = p.getName();
+      parts
+          .append(i == 0 ? "\"" + n + "=\"" : "\", " + n + "=\"")
+          .append(" + ")
+          .append(toStringTerm(p));
     }
     String body =
         properties.isEmpty()

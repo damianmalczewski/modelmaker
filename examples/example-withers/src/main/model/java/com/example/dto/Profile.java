@@ -1,5 +1,7 @@
 package com.example.dto;
 
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 import javax.annotation.processing.Generated;
 import org.jspecify.annotations.NullMarked;
@@ -15,11 +17,15 @@ public final class Profile {
 
   private final @Nullable String nickname;
 
+  private final byte[] avatar;
+
   private Profile(
       String id,
-      @Nullable String nickname) {
+      @Nullable String nickname,
+      byte[] avatar) {
     this.id = id;
     this.nickname = nickname;
+    this.avatar = avatar;
   }
 
   public String getId() {
@@ -30,18 +36,27 @@ public final class Profile {
     return nickname;
   }
 
+  public byte[] getAvatar() {
+    return avatar.clone();
+  }
+
   public Profile withId(String id) {
-    return new Profile(Objects.requireNonNull(id), this.nickname);
+    return new Profile(Objects.requireNonNull(id), this.nickname, this.avatar);
   }
 
   public Profile withNickname(@Nullable String nickname) {
-    return new Profile(this.id, nickname);
+    return new Profile(this.id, nickname, this.avatar);
+  }
+
+  public Profile withAvatar(byte[] avatar) {
+    return new Profile(this.id, this.nickname, Objects.requireNonNull(avatar).clone());
   }
 
   public Builder mutate() {
     return builder()
         .id(id)
-        .nickname(nickname);
+        .nickname(nickname)
+        .avatar(avatar);
   }
 
   @Override
@@ -53,12 +68,13 @@ public final class Profile {
       return false;
     }
     return Objects.equals(id, other.id)
-      && Objects.equals(nickname, other.nickname);
+      && Objects.equals(nickname, other.nickname)
+      && Arrays.equals(avatar, other.avatar);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, nickname);
+    return Objects.hash(id, nickname, Arrays.hashCode(avatar));
   }
 
   @Override
@@ -66,6 +82,7 @@ public final class Profile {
     return "Profile["
       + "id=" + id
       + ", nickname=" + nickname
+      + ", avatar=" + Base64.getEncoder().encodeToString(avatar)
       + "]";
   }
 
@@ -80,6 +97,7 @@ public final class Profile {
 
     private @Nullable String id;
     private @Nullable String nickname;
+    private @Nullable byte[] avatar;
 
     @Override
     public Builder id(@Nullable String id) {
@@ -94,17 +112,25 @@ public final class Profile {
     }
 
     @Override
+    public Builder avatar(@Nullable byte[] avatar) {
+      this.avatar = avatar != null ? avatar.clone() : null;
+      return this;
+    }
+
+    @Override
     public String toString() {
       return "Profile.Builder["
         + "id=" + id
         + ", nickname=" + nickname
+        + ", avatar=" + (avatar != null ? Base64.getEncoder().encodeToString(avatar) : "null")
         + "]";
     }
 
     public Profile build() {
       return new Profile(
           Objects.requireNonNull(id, "id is required"),
-          nickname);
+          nickname,
+          Objects.requireNonNull(avatar, "avatar is required"));
     }
   }
 
@@ -114,5 +140,7 @@ public final class Profile {
     BuilderMutator id(@Nullable String id);
 
     BuilderMutator nickname(@Nullable String nickname);
+
+    BuilderMutator avatar(@Nullable byte[] avatar);
   }
 }

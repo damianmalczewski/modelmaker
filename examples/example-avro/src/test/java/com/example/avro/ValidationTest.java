@@ -3,6 +3,7 @@ package com.example.avro;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.dto.Address;
+import com.example.dto.Blob;
 import com.example.dto.Invoice;
 import com.example.dto.LineItem;
 import com.example.dto.Money;
@@ -115,6 +116,15 @@ class ValidationTest {
 
     assertThat(paths(violations)).contains("priority");
     assertThat(violations).anyMatch(v -> v.getMessage().equals("must be one of LOW, NORMAL, HIGH"));
+  }
+
+  @Test
+  void aBlobWithABytesPayloadValidatesWithNoViolations() {
+    // validation = true puts @NotNull on the byte[] field - this proves that annotation compiles
+    // and resolves on an array type, and that a populated Blob is clean.
+    Blob blob = Blob.builder().id("B1").payload(new byte[] {1, 2, 3}).build();
+
+    assertThat(validator.validate(blob)).isEmpty();
   }
 
   @Test

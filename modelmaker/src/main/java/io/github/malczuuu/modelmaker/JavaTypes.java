@@ -69,6 +69,7 @@ final class JavaTypes {
         case NUMBER -> options.isPreferPrimitives() ? "double" : "Double";
         case FLOAT -> options.isPreferPrimitives() ? "float" : "Float";
         case BOOLEAN -> options.isPreferPrimitives() ? "boolean" : "Boolean";
+        case BYTES -> "byte[]";
       };
     }
     if (type instanceof PropType.RefType ref) {
@@ -96,6 +97,7 @@ final class JavaTypes {
         case NUMBER -> "Double";
         case FLOAT -> "Float";
         case BOOLEAN -> "Boolean";
+        case BYTES -> "byte[]";
       };
     }
     if (type instanceof PropType.RefType ref) {
@@ -148,6 +150,7 @@ final class JavaTypes {
         case NUMBER -> "Double";
         case FLOAT -> "Float";
         case BOOLEAN -> "Boolean";
+        case BYTES -> "byte[]";
       };
     }
     if (type instanceof PropType.RefType ref) {

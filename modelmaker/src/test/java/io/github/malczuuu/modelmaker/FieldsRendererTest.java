@@ -120,4 +120,26 @@ class FieldsRendererTest {
 
     assertThat(result.getCode().lines()).allMatch(line -> line.isEmpty() || line.startsWith("  "));
   }
+
+  @Test
+  void bytesRenderAsAByteArrayField() {
+    ModelType blob =
+        type(
+            "Blob",
+            new Property(
+                "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
+            new Property(
+                "signature",
+                PropType.ScalarType.BYTES,
+                false,
+                Constraints.none(),
+                "signature",
+                null));
+
+    RenderResult result = new FieldsRenderer().init("", blob, OPTIONS).render();
+
+    assertThat(result.getCode())
+        .isEqualTo(
+            "private final byte[] payload;\n\nprivate final @Nullable byte[] signature;\n\n");
+  }
 }

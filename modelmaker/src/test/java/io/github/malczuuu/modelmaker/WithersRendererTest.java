@@ -84,4 +84,31 @@ class WithersRendererTest {
 
     assertThat(result.getCode().lines()).allMatch(line -> line.isEmpty() || line.startsWith("  "));
   }
+
+  @Test
+  void bytesWithersCopyTheReplacementArraySinceTheConstructorStoresItRaw() {
+    ModelType blob =
+        type(
+            "Blob",
+            new Property(
+                "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
+            new Property(
+                "signature",
+                PropType.ScalarType.BYTES,
+                false,
+                Constraints.none(),
+                "signature",
+                null));
+
+    RenderResult result = new WithersRenderer().init("", blob, OPTIONS).render();
+
+    assertThat(result.getCode())
+        .isEqualTo(
+            "public Blob withPayload(byte[] payload) {\n"
+                + "  return new Blob(Objects.requireNonNull(payload).clone(), this.signature);\n"
+                + "}\n\n"
+                + "public Blob withSignature(@Nullable byte[] signature) {\n"
+                + "  return new Blob(this.payload, signature != null ? signature.clone() : null);\n"
+                + "}\n\n");
+  }
 }

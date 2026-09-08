@@ -1,11 +1,13 @@
 package com.example.avro
 
 import com.example.dto.Address
+import com.example.dto.Blob
 import com.example.dto.Invoice
 import com.example.dto.LineItem
 import com.example.dto.Money
 import com.example.dto.Order
 import com.example.dto.mutate
+import java.util.Base64
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import tools.jackson.databind.json.JsonMapper
@@ -100,5 +102,31 @@ class JacksonRoundTripTest {
     assertThat(back).isNotSameAs(invoice).isEqualTo(invoice)
     assertThat(back.billTo).isNotSameAs(billTo).isEqualTo(billTo)
     assertThat(back.notes).isNotSameAs(notes).isEqualTo(notes)
+  }
+
+  @Test
+  fun `an Avro bytes field serializes as base64, round trips, and every accessor is a defensive copy`() {
+    val payload = byteArrayOf(1, 2, 3, 4, 5)
+    val blob = Blob.builder().id("B1").payload(payload).build()
+
+    val json = mapper.writeValueAsString(blob)
+    val node = mapper.readTree(json)
+    assertThat(node.get("payload").asString())
+        .isEqualTo(Base64.getEncoder().encodeToString(payload))
+    assertThat(node.get("signature").isNull).isTrue()
+
+    val back = mapper.readValue(json, Blob::class.java)
+    assertThat(back).isNotSameAs(blob).isEqualTo(blob)
+    assertThat(back.payload).containsExactly(1, 2, 3, 4, 5)
+
+    // mutating the caller's array can't reach into the DTO, and each getter hands back a fresh copy
+    payload[0] = 99
+    assertThat(blob.payload).containsExactly(1, 2, 3, 4, 5)
+    assertThat(blob.payload).isNotSameAs(blob.payload)
+
+    // the generated Kotlin `mutate { }` extension goes through the same defensive builder
+    val rotated = blob.mutate { payload(byteArrayOf(9, 9)) }
+    assertThat(rotated.payload).containsExactly(9, 9)
+    assertThat(blob.payload).containsExactly(1, 2, 3, 4, 5)
   }
 }

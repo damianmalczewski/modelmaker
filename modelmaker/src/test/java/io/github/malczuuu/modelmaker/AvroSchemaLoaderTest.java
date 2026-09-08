@@ -123,7 +123,7 @@ class AvroSchemaLoaderTest {
   }
 
   @Test
-  void bytesMapsToStringAndBooleanMapsToBoolean() {
+  void bytesMapsToBytesAndBooleanMapsToBoolean() {
     Path f =
         schema(
             "x",
@@ -136,8 +136,25 @@ class AvroSchemaLoaderTest {
             """);
     ModelType m = loader.load(List.of(f)).get(0);
 
-    assertThat(prop(m, "a").getType()).isEqualTo(PropType.ScalarType.STRING);
+    assertThat(prop(m, "a").getType()).isEqualTo(PropType.ScalarType.BYTES);
     assertThat(prop(m, "b").getType()).isEqualTo(PropType.ScalarType.BOOLEAN);
+  }
+
+  @Test
+  void aNullableBytesUnionParsesToAnOptionalBytesField() {
+    Path f =
+        schema(
+            "x",
+            "N",
+            """
+            "fields": [
+              { "name": "a", "type": ["null", "bytes"], "default": null }
+            ]
+            """);
+
+    ModelType m = loader.load(List.of(f)).get(0);
+    assertThat(prop(m, "a").getType()).isEqualTo(PropType.ScalarType.BYTES);
+    assertThat(prop(m, "a").isRequired()).isFalse();
   }
 
   @Test

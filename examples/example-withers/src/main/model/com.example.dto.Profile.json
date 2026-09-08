@@ -2,9 +2,10 @@
   "$modelmaker": "v1.0",
   "title": "com.example.dto.Profile",
   "type": "object",
-  "required": ["id"],
+  "required": ["id", "avatar"],
   "properties": {
     "id": { "type": "string" },
-    "nickname": { "type": "string" }
+    "nickname": { "type": "string" },
+    "avatar": { "type": "bytes" }
   }
 }

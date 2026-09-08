@@ -1,7 +1,6 @@
 import com.diffplug.spotless.LineEnding
 
 plugins {
-    base
     alias(libs.plugins.spotless)
 }
 

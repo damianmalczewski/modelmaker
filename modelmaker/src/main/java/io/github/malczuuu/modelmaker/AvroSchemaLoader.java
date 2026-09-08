@@ -273,7 +273,8 @@ public final class AvroSchemaLoader implements SchemaLoader {
 
   private static PropType scalarOrRef(String t) {
     return switch (t) {
-      case "string", "bytes" -> PropType.ScalarType.STRING;
+      case "string" -> PropType.ScalarType.STRING;
+      case "bytes" -> PropType.ScalarType.BYTES;
       case "int" -> PropType.ScalarType.INTEGER;
       case "long" -> PropType.ScalarType.LONG;
       case "float" -> PropType.ScalarType.FLOAT;
@@ -333,6 +334,9 @@ public final class AvroSchemaLoader implements SchemaLoader {
         throw fail(file, "field \"" + fieldName + "\": default must be a boolean");
       }
       return DefaultValue.Bool.of(node.getAsBoolean());
+    }
+    if (type == PropType.ScalarType.BYTES) {
+      throw fail(file, "field \"" + fieldName + "\": default is not supported for \"bytes\"");
     }
     if (type instanceof PropType.ArrayType array) {
       if (!node.isJsonArray()) {

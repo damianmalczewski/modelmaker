@@ -34,6 +34,7 @@ final class BuilderRenderer extends AbstractSnippetRenderer {
   private static final String NULLABLE_IMPORT = "org.jspecify.annotations.Nullable";
   private static final String OBJECTS_IMPORT = "java.util.Objects";
   private static final String ARRAY_LIST_IMPORT = "java.util.ArrayList";
+  private static final String BASE64_IMPORT = "java.util.Base64";
 
   private String builtType = "";
 
@@ -62,6 +63,9 @@ final class BuilderRenderer extends AbstractSnippetRenderer {
     String inner = indent + "  ";
     Set<String> imports = new TreeSet<>();
     imports.add(GENERATED_IMPORT);
+    if (properties.stream().anyMatch(p -> p.getType() == PropType.ScalarType.BYTES)) {
+      imports.add(BASE64_IMPORT);
+    }
 
     StringBuilder code = new StringBuilder();
     code.append(indent).append("@Generated(\"").append(Constants.GENERATOR_NAME).append("\")\n");
@@ -91,11 +95,17 @@ final class BuilderRenderer extends AbstractSnippetRenderer {
           .append(' ')
           .append(property.getName())
           .append(") {\n");
+      String name = property.getName();
+      String assigned = name;
+      if (property.getType() == PropType.ScalarType.BYTES) {
+        // Defensive copy on the way in, so a later change to the caller's array can't leak through.
+        assigned = name + " != null ? " + name + ".clone() : null";
+      }
       code.append(inner)
           .append("  this.")
-          .append(property.getName())
+          .append(name)
           .append(" = ")
-          .append(property.getName())
+          .append(assigned)
           .append(";\n");
       code.append(inner).append("  return this;\n");
       code.append(inner).append("}\n\n");
@@ -149,8 +159,21 @@ final class BuilderRenderer extends AbstractSnippetRenderer {
       if (i > 0) {
         parts.append("\n").append(indent).append("    + ");
       }
-      String name = properties.get(i).getName();
-      parts.append(i == 0 ? "\"" + name + "=\"" : "\", " + name + "=\"").append(" + ").append(name);
+      Property property = properties.get(i);
+      String name = property.getName();
+      // The builder field is always a @Nullable byte[], so the base64 term is null-guarded.
+      String value =
+          property.getType() == PropType.ScalarType.BYTES
+              ? "("
+                  + name
+                  + " != null ? Base64.getEncoder().encodeToString("
+                  + name
+                  + ") : \"null\")"
+              : name;
+      parts
+          .append(i == 0 ? "\"" + name + "=\"" : "\", " + name + "=\"")
+          .append(" + ")
+          .append(value);
     }
     String label = builtType + ".Builder";
     String body =

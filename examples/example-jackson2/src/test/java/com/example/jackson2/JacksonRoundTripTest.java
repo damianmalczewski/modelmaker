@@ -3,6 +3,7 @@ package com.example.jackson2;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.dto.Address;
+import com.example.dto.Blob;
 import com.example.dto.LineItem;
 import com.example.dto.Manifest;
 import com.example.dto.Money;
@@ -10,6 +11,7 @@ import com.example.dto.Order;
 import com.example.dto.Tag;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Base64;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -91,5 +93,46 @@ class JacksonRoundTripTest {
     Manifest back = mapper.readValue(json, Manifest.class);
     assertThat(back).isNotSameAs(manifest).isEqualTo(manifest);
     assertThat(back.getItems()).isNotSameAs(items).isEqualTo(items);
+  }
+
+  @Test
+  void aBytesFieldSerializesAsABase64StringAndRoundTrips() throws Exception {
+    byte[] payload = {1, 2, 3, 4, 5};
+    byte[] signature = "sig".getBytes();
+    Blob blob = Blob.builder().id("B1").payload(payload).signature(signature).build();
+
+    String json = mapper.writeValueAsString(blob);
+    JsonNode node = mapper.readTree(json);
+    // Jackson renders byte[] as a base64 string out of the box - no custom serializer needed.
+    assertThat(node.get("payload").isTextual()).isTrue();
+    assertThat(node.get("payload").asText()).isEqualTo(Base64.getEncoder().encodeToString(payload));
+    assertThat(node.get("signature").asText())
+        .isEqualTo(Base64.getEncoder().encodeToString(signature));
+
+    Blob back = mapper.readValue(json, Blob.class);
+    assertThat(back).isNotSameAs(blob).isEqualTo(blob);
+    assertThat(back.getPayload()).isNotSameAs(payload).containsExactly(payload);
+
+    // toString prints the same base64, not a byte-array dump
+    assertThat(blob.toString())
+        .contains("payload=" + Base64.getEncoder().encodeToString(payload))
+        .contains("signature=" + Base64.getEncoder().encodeToString(signature));
+  }
+
+  @Test
+  void bytesAccessorsAllReturnAndStoreDefensiveCopies() throws Exception {
+    byte[] source = {10, 20, 30};
+    Blob blob = Blob.builder().id("B2").payload(source).build();
+
+    // mutating the array passed to the builder must not affect the built DTO
+    source[0] = 99;
+    assertThat(blob.getPayload()).containsExactly(10, 20, 30);
+
+    // the getter hands back a fresh copy every time
+    byte[] first = blob.getPayload();
+    byte[] second = blob.getPayload();
+    assertThat(first).isNotSameAs(second);
+    first[0] = 42;
+    assertThat(blob.getPayload()).containsExactly(10, 20, 30);
   }
 }

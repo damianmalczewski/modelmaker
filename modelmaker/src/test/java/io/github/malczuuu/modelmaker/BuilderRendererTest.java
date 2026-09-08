@@ -152,4 +152,27 @@ class BuilderRendererTest {
 
     assertThat(result.getCode().lines()).allMatch(line -> line.isEmpty() || line.startsWith("  "));
   }
+
+  @Test
+  void bytesSettersDefensivelyCopyAndToStringUsesBase64() {
+    ModelType blob =
+        type(
+            "Blob",
+            new Property(
+                "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null));
+
+    RenderResult result = new BuilderRenderer().init("", blob, OPTIONS).render();
+
+    assertThat(result.getCode())
+        .contains("private @Nullable byte[] payload;")
+        .contains(
+            "public Builder payload(@Nullable byte[] payload) {\n"
+                + "    this.payload = payload != null ? payload.clone() : null;\n")
+        .contains(
+            "+ \"payload=\""
+                + " + (payload != null ? Base64.getEncoder().encodeToString(payload) : \"null\")")
+        .contains(
+            "return new Blob(\n        Objects.requireNonNull(payload, \"payload is required\"));");
+    assertThat(result.getImports()).contains("java.util.Base64");
+  }
 }

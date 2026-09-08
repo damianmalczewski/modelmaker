@@ -32,6 +32,8 @@ public sealed interface PropType {
    *   <li>{@link #NUMBER} - JSON {@code "number"}, {@code format: "double"} (the default) or absent
    *   <li>{@link #FLOAT} - JSON {@code "number"}, {@code format: "float"}
    *   <li>{@link #BOOLEAN} - JSON {@code "boolean"}
+   *   <li>{@link #BYTES} - JSON {@code "bytes"} / Avro {@code "bytes"}; a {@code byte[]},
+   *       serialized as a base64 string
    * </ul>
    */
   enum ScalarType implements PropType {
@@ -52,7 +54,13 @@ public sealed interface PropType {
     FLOAT,
 
     /** JSON {@code "boolean"}. */
-    BOOLEAN
+    BOOLEAN,
+
+    /**
+     * JSON {@code "bytes"} / Avro {@code "bytes"}. Emitted as a {@code byte[]} field with defensive
+     * copies in every accessor, and serialized as a base64 string by Jackson.
+     */
+    BYTES
   }
 
   /** JSON {@code "array"}. */

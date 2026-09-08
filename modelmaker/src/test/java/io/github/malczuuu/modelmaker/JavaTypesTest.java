@@ -69,6 +69,17 @@ class JavaTypesTest {
   }
 
   @Test
+  void bytesAlwaysRenderAsAByteArrayRegardlessOfBoxedOrPreferPrimitives() {
+    JavaTypes plain = types(ALL_OFF);
+    assertThat(plain.nonNull(PropType.ScalarType.BYTES, imports)).isEqualTo("byte[]");
+    assertThat(plain.boxed(PropType.ScalarType.BYTES, imports)).isEqualTo("byte[]");
+
+    JavaTypes primitives = types(ModelOptions.builder().preferPrimitives(true).build());
+    assertThat(primitives.nonNull(PropType.ScalarType.BYTES, imports)).isEqualTo("byte[]");
+    assertThat(imports).isEmpty();
+  }
+
+  @Test
   void aRefInTheTargetPackageIsStrippedToItsSimpleName() {
     String name = types(ALL_OFF).boxed(PropType.RefType.of("com.example.dto.Address"), imports);
 

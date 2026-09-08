@@ -94,6 +94,10 @@ final class GettersRenderer extends AbstractSnippetRenderer {
    * @return the rendered return expression.
    */
   private static String getterReturn(Property prop, Set<String> imports) {
+    if (prop.getType() == PropType.ScalarType.BYTES) {
+      String copy = prop.getName() + ".clone()";
+      return prop.nonNull() ? copy : prop.getName() + " != null ? " + copy + " : null";
+    }
     if (!(prop.getType() instanceof PropType.ArrayType)) {
       return prop.getName();
     }

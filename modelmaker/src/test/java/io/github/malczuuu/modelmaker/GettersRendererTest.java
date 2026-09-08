@@ -126,4 +126,31 @@ class GettersRendererTest {
 
     assertThat(result.getCode().lines()).allMatch(line -> line.isEmpty() || line.startsWith("  "));
   }
+
+  @Test
+  void bytesGettersReturnADefensiveCopy() {
+    ModelType blob =
+        type(
+            "Blob",
+            new Property(
+                "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
+            new Property(
+                "signature",
+                PropType.ScalarType.BYTES,
+                false,
+                Constraints.none(),
+                "signature",
+                null));
+
+    RenderResult result = new GettersRenderer().init("", blob, OPTIONS).render();
+
+    assertThat(result.getCode())
+        .isEqualTo(
+            "public byte[] getPayload() {\n"
+                + "  return payload.clone();\n"
+                + "}\n\n"
+                + "public @Nullable byte[] getSignature() {\n"
+                + "  return signature != null ? signature.clone() : null;\n"
+                + "}\n\n");
+  }
 }

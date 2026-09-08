@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "namespace": "com.example.dto",
+  "name": "Blob",
+  "doc": "An Avro bytes field: rendered as byte[] with defensive copies, base64 on the wire.",
+  "fields": [
+    { "name": "id", "type": "string" },
+    { "name": "payload", "type": "bytes" },
+    { "name": "signature", "type": ["null", "bytes"], "default": null }
+  ]
+}

@@ -654,4 +654,86 @@ class JavaModelMakerTest {
     assertThat(out).doesNotContain("enum Status");
     assertThat(out).doesNotContain("public enum");
   }
+
+  @Test
+  void bytesRenderAsAByteArrayFieldWithDefensiveCopiesEverywhere() {
+    ModelType type =
+        new ModelType(
+            "Blob",
+            "x",
+            null,
+            List.of(
+                new Property(
+                    "payload",
+                    PropType.ScalarType.BYTES,
+                    true,
+                    Constraints.none(),
+                    "payload",
+                    null),
+                new Property(
+                    "signature",
+                    PropType.ScalarType.BYTES,
+                    false,
+                    Constraints.none(),
+                    "signature",
+                    null)),
+            List.of(),
+            FeatureOverrides.none());
+
+    String out = new JavaModelMaker(opts().build()).emit(type);
+
+    assertThat(out).contains("import java.util.Arrays;");
+    assertThat(out).contains("import java.util.Base64;");
+    assertThat(out).contains("private final byte[] payload;");
+    assertThat(out).contains("private final @Nullable byte[] signature;");
+    // constructor: stores the array raw - the copy is the builder's / wither's job
+    assertThat(out).contains("this.payload = payload;");
+    assertThat(out).contains("this.signature = signature;");
+    // getters: defensive copy out
+    assertThat(out).contains("public byte[] getPayload() {\n    return payload.clone();\n  }");
+    assertThat(out)
+        .contains(
+            "public @Nullable byte[] getSignature() {\n"
+                + "    return signature != null ? signature.clone() : null;\n"
+                + "  }");
+    // wither: the caller's replacement array is copied
+    assertThat(out)
+        .contains("return new Blob(Objects.requireNonNull(payload).clone(), this.signature);");
+    assertThat(out)
+        .contains("return new Blob(this.payload, signature != null ? signature.clone() : null);");
+    // builder: defensive copy in
+    assertThat(out).contains("this.payload = payload != null ? payload.clone() : null;");
+    // equals / hashCode compare by content; toString prints base64
+    assertThat(out).contains("Arrays.equals(payload, other.payload)");
+    assertThat(out).contains("+ \"payload=\" + Base64.getEncoder().encodeToString(payload)");
+    assertThat(out)
+        .contains(
+            "+ \", signature=\""
+                + " + (signature != null ? Base64.getEncoder().encodeToString(signature) :"
+                + " \"null\")");
+    assertThat(out).contains("Objects.hash(Arrays.hashCode(payload), Arrays.hashCode(signature));");
+  }
+
+  @Test
+  void bytesUseAByteArrayEvenWhenPreferPrimitivesIsOn() {
+    ModelType type =
+        new ModelType(
+            "Blob",
+            "x",
+            null,
+            List.of(
+                new Property(
+                    "payload",
+                    PropType.ScalarType.BYTES,
+                    true,
+                    Constraints.none(),
+                    "payload",
+                    null)),
+            List.of(),
+            FeatureOverrides.none());
+
+    String out = new JavaModelMaker(opts().preferPrimitives(true).build()).emit(type);
+
+    assertThat(out).contains("private final byte[] payload;");
+  }
 }
