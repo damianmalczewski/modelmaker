@@ -163,6 +163,31 @@ Each entry under `properties` is itself a small schema, either a `"type"` or a `
 A property not listed in `required` is optional (`@Nullable` in the generated field/parameter).
 `"default"` gives it a value applied by the builder when left unset.
 
+**Property key naming.** A property key must be one of these forms, **optionally prefixed with one or more
+underscores** (e.g. `__metadata`):
+
+| Form             | Example      | Regex (after the underscore prefix) |
+|------------------|--------------|-------------------------------------|
+| `camelCase`      | `firstName`  | `[a-z][a-zA-Z0-9]*`                 |
+| `snake_case`     | `first_name` | `[a-z][a-z0-9]*(_[a-z0-9]+)*`       |
+| `UpperCamelCase` | `FirstName`  | `[A-Z][a-zA-Z0-9]*`                 |
+
+The key is normalized to a `camelCase` field name: `snake_case` segments are joined and capitalized, an
+`UpperCamelCase` key is lower-cased on its first letter, and any leading-underscore prefix is **kept** as-is. So
+`first_name`, `FirstName` and `firstName` all become the field `firstName`, while `_first_name` becomes `_firstName`
+(distinct from `firstName`). The original key is preserved for `@JsonProperty` / `@JsonPropertyOrder`.
+
+The getter / builder-method / wither names are derived from the field name by capitalizing its first letter, so an
+underscore-prefixed field `_firstName` yields `get_firstName()` / `_firstName(...)` / `with_firstName(...)` - valid
+Java, but not a JavaBeans-style accessor.
+
+Rejected at load time (not left to fail `javac`):
+
+- a key that matches none of the forms above - e.g. a trailing or doubled underscore (`name_`, `first__name`),
+  `kebab-case`, or a leading digit;
+- two keys in the same object that normalize to the same field name (`first_name` + `firstName`, or
+  `_first_name` + `_firstName`).
+
 Validation keywords, translated to `jakarta.validation` annotations when the `validation` feature is on (see
 [Generated Java Classes](#generated-java-classes)); ignored otherwise:
 
@@ -256,6 +281,8 @@ accepted as an alternate input alongside Simple Schema.
 5. A field is optional only through a `["null", T]` union, with `"default"` applied the same way;
 6. Types `map`, `fixed`, and multi-branch unions are not supported;
 7. A `logicalType` is ignored (the field maps to its base Avro type).
+8. A field `name` is used verbatim as the Java field name - no `camelCase` normalization, unlike Simple Schema - so it
+   must already be a valid Java identifier; a record that declares the same field `name` twice is rejected at load time.
 
 An Avro schema passed to ModelMaker can carry the same additional `"features"` section as Simple Schema: a per-file
 override of `ModelOptions`.

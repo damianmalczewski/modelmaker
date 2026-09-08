@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -210,12 +211,27 @@ public final class SimpleSchemaLoader implements SchemaLoader {
 
     List<ModelType> nested = new ArrayList<>();
     List<Property> properties = new ArrayList<>();
+    Map<String, String> identifiers = new LinkedHashMap<>();
     for (Map.Entry<String, JsonElement> entry : propertiesNode.getAsJsonObject().entrySet()) {
       String jsonKey = entry.getKey();
       JsonElement propValue = entry.getValue();
       JsonObject propNode =
           propValue.isJsonObject() ? propValue.getAsJsonObject() : new JsonObject();
       String identifier = toIdentifier(file, name, jsonKey);
+      String clashingKey = identifiers.putIfAbsent(identifier, jsonKey);
+      if (clashingKey != null) {
+        throw fail(
+            file,
+            "type \""
+                + name
+                + "\": properties \""
+                + clashingKey
+                + "\" and \""
+                + jsonKey
+                + "\" both map to the field name \""
+                + identifier
+                + "\"");
+      }
       PropType type = parseType(file, identifier, packageName, propNode, nested);
       boolean isRequired = required.contains(jsonKey);
       DefaultValue defaultValue =

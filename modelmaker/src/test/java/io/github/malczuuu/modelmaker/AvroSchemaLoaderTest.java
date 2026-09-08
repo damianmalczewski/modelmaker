@@ -141,6 +141,23 @@ class AvroSchemaLoaderTest {
   }
 
   @Test
+  void rejectsARecordThatDeclaresTheSameFieldTwice() {
+    Path f =
+        schema(
+            "x",
+            "N",
+            """
+            "fields": [
+              { "name": "a", "type": "string" },
+              { "name": "a", "type": "int" }
+            ]
+            """);
+
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("field \"a\" is declared twice");
+  }
+
+  @Test
   void aNullableBytesUnionParsesToAnOptionalBytesField() {
     Path f =
         schema(

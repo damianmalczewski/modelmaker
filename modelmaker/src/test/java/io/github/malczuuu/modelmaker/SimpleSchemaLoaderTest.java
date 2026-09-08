@@ -258,6 +258,19 @@ class SimpleSchemaLoaderTest {
   }
 
   @Test
+  void rejectsTwoPropertiesThatMapToTheSameFieldName() {
+    Path f =
+        schema(
+            "x.Person",
+            "\"properties\": { \"first_name\": { \"type\": \"string\" },"
+                + " \"firstName\": { \"type\": \"string\" } }");
+
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("\"first_name\" and \"firstName\" both map to the field name")
+        .hasMessageContaining("\"firstName\"");
+  }
+
+  @Test
   void rejectsADefaultOnABytesProperty() {
     Path f =
         schema("x.D", "\"properties\": { \"b\": { \"type\": \"bytes\", \"default\": \"AA==\" } }");

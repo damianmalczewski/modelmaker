@@ -28,8 +28,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 
@@ -125,11 +127,18 @@ public final class AvroSchemaLoader implements SchemaLoader {
 
     List<Property> properties = new ArrayList<>();
     List<ModelType> nested = new ArrayList<>();
+    Set<String> fieldNames = new HashSet<>();
     for (JsonElement fieldElement : fieldsNode.getAsJsonArray()) {
       if (!fieldElement.isJsonObject()) {
         throw fail(file, "type \"" + name + "\": each field must be an object");
       }
-      properties.add(parseField(file, name, packageName, fieldElement.getAsJsonObject(), nested));
+      Property property =
+          parseField(file, name, packageName, fieldElement.getAsJsonObject(), nested);
+      if (!fieldNames.add(property.getName())) {
+        throw fail(
+            file, "type \"" + name + "\": field \"" + property.getName() + "\" is declared twice");
+      }
+      properties.add(property);
     }
 
     String doc = stringOrNull(node, "doc");
