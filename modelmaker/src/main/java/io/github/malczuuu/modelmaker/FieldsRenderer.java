@@ -16,6 +16,7 @@
 
 package io.github.malczuuu.modelmaker;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -74,17 +75,58 @@ final class FieldsRenderer extends AbstractSnippetRenderer {
 
   /**
    * Type of the stored field: non-null when the value is always set, and a primitive scalar only
-   * when {@link ModelOptions#isPreferPrimitives()} is on.
+   * when {@link ModelOptions#isPreferPrimitives()} is on. A {@code List} field carries its
+   * element's {@code jakarta.validation} constraints (and {@code @Valid} for a DTO element) in the
+   * container-element position - the field is the only position that does.
    *
    * @param prop the property to type.
    * @param imports import set to add any needed type to.
    * @return the rendered field type, including a leading {@code @Nullable} when applicable.
    */
   private String fieldType(Property prop, Set<String> imports) {
+    if (prop.getType() instanceof PropType.ArrayType array) {
+      String list = types.listType(array, elementAnnotations(prop, array, imports), imports);
+      if (prop.nonNull()) {
+        return list;
+      }
+      imports.add(NULLABLE_IMPORT);
+      return "@Nullable " + list;
+    }
     if (prop.nonNull()) {
       return types.nonNull(prop.getType(), imports);
     }
     imports.add(NULLABLE_IMPORT);
     return "@Nullable " + types.boxed(prop.getType(), imports);
+  }
+
+  /**
+   * Element annotations for a {@code List} field: {@code @Valid} for a generated-DTO element, then
+   * the element's value constraints. Empty unless {@link ModelOptions#isValidation()} is on.
+   *
+   * @param prop the array property.
+   * @param array its type.
+   * @param imports import set to add each annotation's type to.
+   * @return the rendered element annotations, in a stable order.
+   */
+  private List<String> elementAnnotations(
+      Property prop, PropType.ArrayType array, Set<String> imports) {
+    if (!options.isValidation()) {
+      return List.of();
+    }
+    List<String> out = new ArrayList<>();
+    if (array.getItems() instanceof PropType.RefType) {
+      imports.add("jakarta.validation.Valid");
+      out.add("@Valid");
+    }
+    for (AnnotationSpec spec :
+        ConstraintUtils.elementConstraintAnnotationsOf(
+            prop.getConstraints().getElementConstraints())) {
+      imports.add(spec.getImportName());
+      out.add(
+          spec.getArgs().isEmpty()
+              ? "@" + spec.getSimpleName()
+              : "@" + spec.getSimpleName() + "(" + String.join(", ", spec.getArgs()) + ")");
+    }
+    return out;
   }
 }

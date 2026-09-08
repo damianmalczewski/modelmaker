@@ -19,6 +19,7 @@ package io.github.malczuuu.modelmaker;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -134,17 +135,28 @@ class JavaTypesTest {
   }
 
   @Test
-  void anArrayOfRefsCascadesValidOnlyWhenValidationIsOn() {
+  void aListTypeIsPlainRegardlessOfValidation() {
     PropType type = PropType.ArrayType.of(PropType.RefType.of("com.example.dto.Address"));
 
-    Set<String> off = new HashSet<>();
-    assertThat(types(ALL_OFF).boxed(type, off)).isEqualTo("List<Address>");
-    assertThat(off).containsExactly("java.util.List");
+    assertThat(types(ALL_OFF).boxed(type, imports)).isEqualTo("List<Address>");
+    assertThat(types(ModelOptions.builder().validation(true).build()).boxed(type, new HashSet<>()))
+        .isEqualTo("List<Address>");
+  }
 
-    Set<String> on = new HashSet<>();
-    JavaTypes validating = types(ModelOptions.builder().validation(true).build());
-    assertThat(validating.boxed(type, on)).isEqualTo("List<@Valid Address>");
-    assertThat(on).containsExactlyInAnyOrder("java.util.List", "jakarta.validation.Valid");
+  @Test
+  void listTypePlacesGivenAnnotationsOnTheElement() {
+    PropType.ArrayType type = PropType.ArrayType.of(PropType.RefType.of("com.example.dto.Address"));
+
+    assertThat(types(ALL_OFF).listType(type, List.of("@Valid"), imports))
+        .isEqualTo("List<@Valid Address>");
+    assertThat(
+            types(ALL_OFF)
+                .listType(
+                    PropType.ArrayType.of(PropType.ScalarType.STRING),
+                    List.of("@Size(min = 1)", "@Pattern(regexp = \"^x\")"),
+                    imports))
+        .isEqualTo("List<@Size(min = 1) @Pattern(regexp = \"^x\") String>");
+    assertThat(imports).contains("java.util.List");
   }
 
   @Test

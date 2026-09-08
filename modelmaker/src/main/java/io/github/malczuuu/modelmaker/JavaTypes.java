@@ -16,6 +16,7 @@
 
 package io.github.malczuuu.modelmaker;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
@@ -23,7 +24,9 @@ import org.jspecify.annotations.Nullable;
 /**
  * Resolves a {@link PropType} to the Java type name it is emitted as, adding any needed import to a
  * caller-supplied set. Bound to one target package and one {@link ModelOptions} - the settings that
- * decide primitive vs boxed scalars and the {@code @Valid} cascade into list elements.
+ * decide primitive vs boxed scalars. Container-element annotations ({@code @Valid} and element
+ * constraints) are the caller's job - see {@link #listType(PropType.ArrayType, java.util.List,
+ * java.util.Set)}.
  */
 final class JavaTypes {
 
@@ -37,7 +40,7 @@ final class JavaTypes {
    *
    * @param targetPackage the package the resolved model lives in, used to strip same-package {@link
    *     PropType.RefType} names down to their simple name.
-   * @param options settings deciding primitive vs boxed scalars and the {@code @Valid} cascade.
+   * @param options settings deciding primitive vs boxed scalars.
    */
   JavaTypes(String targetPackage, ModelOptions options) {
     this.targetPackage = targetPackage;
@@ -125,23 +128,34 @@ final class JavaTypes {
   }
 
   private String listType(PropType.ArrayType type, Set<String> imports) {
-    imports.add("java.util.List");
-    boolean cascade = options.isValidation() && containsDto(type.getItems());
-    if (cascade) {
-      imports.add("jakarta.validation.Valid");
-    }
-    return "List<" + elementType(type.getItems(), imports, cascade) + ">";
+    return listType(type, List.of(), imports);
   }
 
   /**
-   * Element type, with {@code @Valid} on a DTO element (when {@code cascade}).
+   * {@code List<...>}, with the given annotations placed on the element (container-element
+   * position), e.g. {@code List<@Size(min = 1) @Valid Foo>}. Only {@link FieldsRenderer} passes
+   * annotations - every other position renders the plain {@code List<T>}.
+   *
+   * @param type the array type to resolve.
+   * @param elementAnnotations pre-rendered annotations (e.g. {@code "@Size(min = 1)"}) for the
+   *     element, or empty.
+   * @param imports import set to add any needed type to.
+   * @return the rendered {@code List<...>} type.
+   */
+  String listType(PropType.ArrayType type, List<String> elementAnnotations, Set<String> imports) {
+    imports.add("java.util.List");
+    String prefix = elementAnnotations.isEmpty() ? "" : String.join(" ", elementAnnotations) + " ";
+    return "List<" + prefix + elementType(type.getItems(), imports) + ">";
+  }
+
+  /**
+   * Element type of a {@code List<...>}.
    *
    * @param type the element type to resolve.
    * @param imports import set to add any needed type to.
-   * @param cascade whether to prefix a DTO element with {@code @Valid}.
    * @return the rendered element type.
    */
-  private String elementType(PropType type, Set<String> imports, boolean cascade) {
+  private String elementType(PropType type, Set<String> imports) {
     if (type instanceof PropType.ScalarType scalar) {
       return switch (scalar) {
         case STRING -> "String";
@@ -154,23 +168,13 @@ final class JavaTypes {
       };
     }
     if (type instanceof PropType.RefType ref) {
-      return (cascade ? "@Valid " : "") + removePrefix(ref.getName(), targetPackage + ".");
+      return removePrefix(ref.getName(), targetPackage + ".");
     }
     if (type instanceof PropType.ExternalType external) {
       return externalType(external, imports);
     }
     PropType.ArrayType array = (PropType.ArrayType) type;
-    return "List<" + elementType(array.getItems(), imports, cascade) + ">";
-  }
-
-  private static boolean containsDto(PropType type) {
-    if (type instanceof PropType.RefType) {
-      return true;
-    }
-    if (type instanceof PropType.ArrayType array) {
-      return containsDto(array.getItems());
-    }
-    return false;
+    return "List<" + elementType(array.getItems(), imports) + ">";
   }
 
   private static String removePrefix(String value, String prefix) {

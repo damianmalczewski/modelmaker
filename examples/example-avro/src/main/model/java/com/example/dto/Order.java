@@ -48,7 +48,7 @@ public final class Order {
       @JsonProperty("id") String id,
       @JsonProperty("status") String status,
       @JsonProperty("shippingAddress") Address shippingAddress,
-      @JsonProperty("items") List<@Valid LineItem> items,
+      @JsonProperty("items") List<LineItem> items,
       @JsonProperty("discountRate") @Nullable Float discountRate,
       @JsonProperty("priority") @Nullable String priority) {
     this.id = id;
@@ -75,7 +75,7 @@ public final class Order {
   }
 
   @JsonProperty("items")
-  public List<@Valid LineItem> getItems() {
+  public List<LineItem> getItems() {
     return Collections.unmodifiableList(items);
   }
 
@@ -144,7 +144,7 @@ public final class Order {
     private @Nullable String id;
     private @Nullable String status;
     private @Nullable Address shippingAddress;
-    private @Nullable List<@Valid LineItem> items;
+    private @Nullable List<LineItem> items;
     private @Nullable Float discountRate;
     private @Nullable String priority;
 
@@ -167,7 +167,7 @@ public final class Order {
     }
 
     @Override
-    public Builder items(@Nullable List<@Valid LineItem> items) {
+    public Builder items(@Nullable List<LineItem> items) {
       this.items = items;
       return this;
     }
@@ -216,7 +216,7 @@ public final class Order {
 
     BuilderMutator shippingAddress(@Nullable Address shippingAddress);
 
-    BuilderMutator items(@Nullable List<@Valid LineItem> items);
+    BuilderMutator items(@Nullable List<LineItem> items);
 
     BuilderMutator discountRate(@Nullable Float discountRate);
 

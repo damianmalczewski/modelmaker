@@ -47,6 +47,41 @@ final class ConstraintUtils {
     if (prop.getType() instanceof PropType.RefType) {
       out.add(new AnnotationSpec("Valid", "jakarta.validation.Valid", List.of()));
     }
+    AnnotationSpec items = sizeConstraint(c.getMinItems(), c.getMaxItems());
+    if (items != null) {
+      out.add(items);
+    }
+    appendValueConstraints(c, out);
+    return out;
+  }
+
+  /**
+   * Maps the constraints applied to each element of an {@code array} property to their {@code
+   * jakarta.validation} annotations, for a container-element position (e.g. {@code List<@Size(...)
+   * String>}). Never emits {@code @NotNull} or {@code @Valid}.
+   *
+   * @param elementConstraints the element constraints, or {@code null} when unset.
+   * @return the element annotations, in a stable order; empty when {@code elementConstraints} is
+   *     {@code null} or carries no facet.
+   */
+  static List<AnnotationSpec> elementConstraintAnnotationsOf(
+      @Nullable Constraints elementConstraints) {
+    List<AnnotationSpec> out = new ArrayList<>();
+    if (elementConstraints != null) {
+      appendValueConstraints(elementConstraints, out);
+    }
+    return out;
+  }
+
+  /**
+   * Appends the value constraints shared by a property and a list element - {@code @Email},
+   * {@code @Pattern}, {@code @Size} (from {@code minLength}/{@code maxLength}),
+   * {@code @Min}/{@code @Max} and {@code @DecimalMin}/{@code @DecimalMax} - in a stable order.
+   *
+   * @param c the constraints to map.
+   * @param out the list to append to.
+   */
+  private static void appendValueConstraints(Constraints c, List<AnnotationSpec> out) {
     if (c.isEmail()) {
       out.add(constraint("Email", "must be a well-formed email address"));
     }
@@ -62,10 +97,6 @@ final class ConstraintUtils {
     AnnotationSpec length = sizeConstraint(c.getMinLength(), c.getMaxLength());
     if (length != null) {
       out.add(length);
-    }
-    AnnotationSpec items = sizeConstraint(c.getMinItems(), c.getMaxItems());
-    if (items != null) {
-      out.add(items);
     }
     Long minimum = c.getMinimum();
     if (minimum != null) {
@@ -92,7 +123,6 @@ final class ConstraintUtils {
               "must be less than or equal to " + decimalMaximum,
               "value = \"" + decimalMaximum + "\""));
     }
-    return out;
   }
 
   /**

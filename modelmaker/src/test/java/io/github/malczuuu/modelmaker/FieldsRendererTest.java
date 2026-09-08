@@ -115,6 +115,75 @@ class FieldsRendererTest {
   }
 
   @Test
+  void validationOnPutsElementConstraintsOnTheListField() {
+    ModelType type =
+        type(
+            "Bag",
+            new Property(
+                "tags",
+                PropType.ArrayType.of(PropType.ScalarType.STRING),
+                false,
+                Constraints.builder()
+                    .maxItems(3)
+                    .elementConstraints(Constraints.builder().minLength(1).maxLength(255).build())
+                    .build(),
+                "tags",
+                null));
+    ModelOptions validation = ModelOptions.builder().validation(true).build();
+
+    RenderResult result = new FieldsRenderer().init("", type, validation).render();
+
+    assertThat(result.getCode())
+        .contains("@Size(max = 3, message = \"size must be at most 3\")")
+        .contains(
+            "private final @Nullable List<@Size(min = 1, max = 255, message = \"size must be"
+                + " between 1 and 255\") String> tags;");
+    assertThat(result.getImports()).contains("jakarta.validation.constraints.Size");
+  }
+
+  @Test
+  void validationOnCascadesValidToADtoListElementOnTheFieldOnly() {
+    ModelType type =
+        type(
+            "Bag",
+            new Property(
+                "addresses",
+                PropType.ArrayType.of(PropType.RefType.of("Address")),
+                true,
+                Constraints.none(),
+                "addresses",
+                null));
+    ModelOptions validation = ModelOptions.builder().validation(true).build();
+
+    RenderResult result = new FieldsRenderer().init("", type, validation).render();
+
+    assertThat(result.getCode()).contains("private final List<@Valid Address> addresses;");
+    assertThat(result.getImports()).contains("jakarta.validation.Valid");
+  }
+
+  @Test
+  void validationOffLeavesTheListElementPlain() {
+    ModelType type =
+        type(
+            "Bag",
+            new Property(
+                "tags",
+                PropType.ArrayType.of(PropType.ScalarType.STRING),
+                false,
+                Constraints.builder()
+                    .elementConstraints(Constraints.builder().minLength(1).build())
+                    .build(),
+                "tags",
+                null));
+
+    RenderResult result = new FieldsRenderer().init("", type, OPTIONS).render();
+
+    assertThat(result.getCode())
+        .doesNotContain("@Size")
+        .contains("private final @Nullable List<String> tags;");
+  }
+
+  @Test
   void prependsTheIndentToEveryLine() {
     RenderResult result = new FieldsRenderer().init("  ", WIDGET, OPTIONS).render();
 

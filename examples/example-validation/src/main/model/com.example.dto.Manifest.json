@@ -1,7 +1,7 @@
 {
   "$modelmaker": "v1.0",
   "title": "com.example.dto.Manifest",
-  "description": "@Valid cascades into each element of a list, @Size bounds the list itself.",
+  "description": "@Valid cascades into each element of a list, @Size bounds the list itself, and an item's own keywords become element annotations.",
   "type": "object",
   "required": ["id", "items"],
   "properties": {
@@ -11,6 +11,11 @@
       "items": { "$ref": "com.example.dto.LineItem" },
       "minItems": 1,
       "maxItems": 5
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 40, "pattern": "^[a-z-]+$" },
+      "maxItems": 10
     }
   }
 }

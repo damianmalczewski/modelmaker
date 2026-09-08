@@ -36,7 +36,7 @@ public final class Invoice {
   Invoice(
       @JsonProperty("id") String id,
       @JsonProperty("billTo") Contact billTo,
-      @JsonProperty("notes") List<@Valid Note> notes) {
+      @JsonProperty("notes") List<Note> notes) {
     this.id = id;
     this.billTo = billTo;
     this.notes = notes;
@@ -53,7 +53,7 @@ public final class Invoice {
   }
 
   @JsonProperty("notes")
-  public List<@Valid Note> getNotes() {
+  public List<Note> getNotes() {
     return Collections.unmodifiableList(notes);
   }
 
@@ -102,7 +102,7 @@ public final class Invoice {
 
     private @Nullable String id;
     private @Nullable Contact billTo;
-    private @Nullable List<@Valid Note> notes;
+    private @Nullable List<Note> notes;
 
     @Override
     public Builder id(@Nullable String id) {
@@ -117,7 +117,7 @@ public final class Invoice {
     }
 
     @Override
-    public Builder notes(@Nullable List<@Valid Note> notes) {
+    public Builder notes(@Nullable List<Note> notes) {
       this.notes = notes;
       return this;
     }
@@ -362,6 +362,6 @@ public final class Invoice {
 
     BuilderMutator billTo(@Nullable Contact billTo);
 
-    BuilderMutator notes(@Nullable List<@Valid Note> notes);
+    BuilderMutator notes(@Nullable List<Note> notes);
   }
 }

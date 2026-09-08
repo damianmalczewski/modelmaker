@@ -108,6 +108,55 @@ class SimpleSchemaLoaderTest {
   }
 
   @Test
+  void readsElementConstraintsFromItemsAndCollectionConstraintsFromTheArrayNode() {
+    Path f =
+        schema(
+            "x.DeviceRequest",
+            "\"properties\": { \"tags\": { \"type\": \"array\", \"minItems\": 1, \"maxItems\": 8,"
+                + " \"items\": { \"type\": \"string\", \"minLength\": 1, \"maxLength\": 255,"
+                + " \"pattern\": \"^[a-z]+$\" } } }");
+
+    Constraints c = prop(loader.load(List.of(f)).get(0), "tags").getConstraints();
+
+    assertThat(c.getMinItems()).isEqualTo(1);
+    assertThat(c.getMaxItems()).isEqualTo(8);
+    Constraints element = c.getElementConstraints();
+    assertThat(element).isNotNull();
+    assertThat(element.getMinLength()).isEqualTo(1);
+    assertThat(element.getMaxLength()).isEqualTo(255);
+    assertThat(element.getPattern()).isEqualTo("^[a-z]+$");
+  }
+
+  @Test
+  void scalarFacetsOnTheArrayNodeItselfAreIgnored() {
+    Path f =
+        schema(
+            "x.Bag",
+            "\"properties\": { \"tags\": { \"type\": \"array\", \"minLength\": 2, \"pattern\":"
+                + " \"^x$\", \"items\": { \"type\": \"string\" } } }");
+
+    Constraints c = prop(loader.load(List.of(f)).get(0), "tags").getConstraints();
+
+    assertThat(c.getMinLength()).isNull();
+    assertThat(c.getPattern()).isNull();
+    assertThat(c.getElementConstraints()).isNull();
+  }
+
+  @Test
+  void anArrayWithNoItemFacetsHasNoElementConstraints() {
+    Path f =
+        schema(
+            "x.Bag",
+            "\"properties\": { \"tags\": { \"type\": \"array\", \"maxItems\": 3, \"items\": {"
+                + " \"type\": \"string\" } } }");
+
+    Constraints c = prop(loader.load(List.of(f)).get(0), "tags").getConstraints();
+
+    assertThat(c.getMaxItems()).isEqualTo(3);
+    assertThat(c.getElementConstraints()).isNull();
+  }
+
+  @Test
   void parsesAnInlineObjectAsANestedTypePlainTitleAllowed() {
     Path f =
         schema(

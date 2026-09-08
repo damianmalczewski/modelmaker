@@ -26,7 +26,7 @@ import org.jspecify.annotations.Nullable;
 public final class Constraints {
 
   private static final Constraints NONE =
-      new Constraints(null, null, null, null, false, null, null, null, null, null, null);
+      new Constraints(null, null, null, null, false, null, null, null, null, null, null, null);
 
   private final @Nullable String pattern;
   private final @Nullable String patternMessage;
@@ -39,6 +39,7 @@ public final class Constraints {
   private final @Nullable String decimalMaximum;
   private final @Nullable Integer minItems;
   private final @Nullable Integer maxItems;
+  private final @Nullable Constraints elementConstraints;
 
   private Constraints(
       @Nullable String pattern,
@@ -51,7 +52,8 @@ public final class Constraints {
       @Nullable String decimalMinimum,
       @Nullable String decimalMaximum,
       @Nullable Integer minItems,
-      @Nullable Integer maxItems) {
+      @Nullable Integer maxItems,
+      @Nullable Constraints elementConstraints) {
     this.pattern = pattern;
     this.patternMessage = patternMessage;
     this.minLength = minLength;
@@ -63,6 +65,7 @@ public final class Constraints {
     this.decimalMaximum = decimalMaximum;
     this.minItems = minItems;
     this.maxItems = maxItems;
+    this.elementConstraints = elementConstraints;
   }
 
   /**
@@ -182,6 +185,18 @@ public final class Constraints {
     return maxItems;
   }
 
+  /**
+   * Constraints applied to each element of an {@code array} property (from the facets inside its
+   * {@code items} schema), emitted as container-element annotations on the field. Its own {@link
+   * #getMinItems()} / {@link #getMaxItems()} and {@code #getElementConstraints()} are always unset.
+   *
+   * @return the element constraints, or {@code null} when the property is not an array or its
+   *     {@code items} carried no facets.
+   */
+  public @Nullable Constraints getElementConstraints() {
+    return elementConstraints;
+  }
+
   @Override
   public boolean equals(@Nullable Object obj) {
     if (this == obj) {
@@ -200,7 +215,8 @@ public final class Constraints {
         && Objects.equals(decimalMinimum, other.decimalMinimum)
         && Objects.equals(decimalMaximum, other.decimalMaximum)
         && Objects.equals(minItems, other.minItems)
-        && Objects.equals(maxItems, other.maxItems);
+        && Objects.equals(maxItems, other.maxItems)
+        && Objects.equals(elementConstraints, other.elementConstraints);
   }
 
   @Override
@@ -216,7 +232,8 @@ public final class Constraints {
         decimalMinimum,
         decimalMaximum,
         minItems,
-        maxItems);
+        maxItems,
+        elementConstraints);
   }
 
   @Override
@@ -233,6 +250,7 @@ public final class Constraints {
         + (", decimalMaximum=" + decimalMaximum)
         + (", minItems=" + minItems)
         + (", maxItems=" + maxItems)
+        + (", elementConstraints=" + elementConstraints)
         + "]";
   }
 
@@ -250,6 +268,7 @@ public final class Constraints {
     private @Nullable String decimalMaximum = null;
     private @Nullable Integer minItems = null;
     private @Nullable Integer maxItems = null;
+    private @Nullable Constraints elementConstraints = null;
 
     private Builder() {}
 
@@ -377,6 +396,17 @@ public final class Constraints {
     }
 
     /**
+     * Sets the constraints applied to each element of an {@code array} property.
+     *
+     * @param value the element constraints, or {@code null} when unset.
+     * @return {@code this}.
+     */
+    public Builder elementConstraints(@Nullable Constraints value) {
+      this.elementConstraints = value;
+      return this;
+    }
+
+    /**
      * Builds the constraint set from the accumulated fields.
      *
      * @return a new {@link Constraints}.
@@ -393,7 +423,8 @@ public final class Constraints {
           decimalMinimum,
           decimalMaximum,
           minItems,
-          maxItems);
+          maxItems,
+          elementConstraints);
     }
 
     @Override
@@ -410,6 +441,7 @@ public final class Constraints {
           + (", decimalMaximum=" + decimalMaximum)
           + (", minItems=" + minItems)
           + (", maxItems=" + maxItems)
+          + (", elementConstraints=" + elementConstraints)
           + "]";
     }
   }

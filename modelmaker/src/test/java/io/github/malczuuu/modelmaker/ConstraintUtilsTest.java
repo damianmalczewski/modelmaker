@@ -65,4 +65,30 @@ class ConstraintUtilsTest {
                 .getArgs())
         .isEmpty();
   }
+
+  @Test
+  void elementConstraintsMapToValueAnnotationsWithoutNotNullOrValid() {
+    List<String> rendered =
+        ConstraintUtils.elementConstraintAnnotationsOf(
+                Constraints.builder().minLength(1).maxLength(255).pattern("^x").build())
+            .stream()
+            .map(
+                it ->
+                    it.getArgs().isEmpty()
+                        ? it.getSimpleName()
+                        : it.getSimpleName() + "(" + String.join(", ", it.getArgs()) + ")")
+            .toList();
+
+    assertThat(rendered)
+        .containsExactly(
+            "Pattern(regexp = \"^x\", message = \"must match \\\"^x\\\"\")",
+            "Size(min = 1, max = 255, message = \"size must be between 1 and 255\")");
+    assertThat(rendered).noneMatch(it -> it.startsWith("NotNull") || it.startsWith("Valid"));
+  }
+
+  @Test
+  void elementConstraintsAreEmptyWhenNullOrBlank() {
+    assertThat(ConstraintUtils.elementConstraintAnnotationsOf(null)).isEmpty();
+    assertThat(ConstraintUtils.elementConstraintAnnotationsOf(Constraints.none())).isEmpty();
+  }
 }

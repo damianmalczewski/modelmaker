@@ -412,12 +412,49 @@ public final class SimpleSchemaLoader implements SchemaLoader {
         file, "property \"" + prop + "\": default is not supported for object / $ref properties");
   }
 
+  /**
+   * Constraints for one property. An {@code array} node contributes only {@code minItems} / {@code
+   * maxItems} (as {@code @Size} on the {@code List}); the facets inside its {@code items} schema
+   * become {@link Constraints#getElementConstraints()}, rendered as container-element annotations
+   * on the field.
+   *
+   * @param node the property node.
+   * @param type the property's resolved type.
+   * @return the constraint set.
+   */
   private static Constraints parseConstraints(JsonObject node, PropType type) {
-    PropType base = type instanceof PropType.ArrayType a ? a.getItems() : type;
-    boolean isString = base == PropType.ScalarType.STRING;
-    boolean isInteger = base == PropType.ScalarType.INTEGER || base == PropType.ScalarType.LONG;
-    boolean isNumber = base == PropType.ScalarType.NUMBER || base == PropType.ScalarType.FLOAT;
-    boolean isArray = type instanceof PropType.ArrayType;
+    if (type instanceof PropType.ArrayType array) {
+      JsonElement itemsNode = get(node, "items");
+      Constraints elementConstraints =
+          itemsNode != null && itemsNode.isJsonObject()
+              ? nonEmptyOrNull(parseValueConstraints(itemsNode.getAsJsonObject(), array.getItems()))
+              : null;
+      return Constraints.builder()
+          .minItems(intOrNull(node, "minItems"))
+          .maxItems(intOrNull(node, "maxItems"))
+          .elementConstraints(elementConstraints)
+          .build();
+    }
+    return parseValueConstraints(node, type);
+  }
+
+  private static @Nullable Constraints nonEmptyOrNull(Constraints constraints) {
+    return constraints.equals(Constraints.none()) ? null : constraints;
+  }
+
+  /**
+   * The {@code string} / {@code integer} / {@code number} value facets ({@code pattern}, {@code
+   * enum}, {@code format}, {@code minLength} / {@code maxLength}, {@code minimum} / {@code
+   * maximum}) of a scalar schema node - a property's own, or an {@code array}'s {@code items}.
+   *
+   * @param node the schema node carrying the facets.
+   * @param type the resolved scalar type of that node.
+   * @return the constraint set ({@link Constraints#none()} when no facet is present).
+   */
+  private static Constraints parseValueConstraints(JsonObject node, PropType type) {
+    boolean isString = type == PropType.ScalarType.STRING;
+    boolean isInteger = type == PropType.ScalarType.INTEGER || type == PropType.ScalarType.LONG;
+    boolean isNumber = type == PropType.ScalarType.NUMBER || type == PropType.ScalarType.FLOAT;
 
     String format = stringOrNull(node, "format");
     String stringFormat = isString ? format : null;
@@ -442,8 +479,6 @@ public final class SimpleSchemaLoader implements SchemaLoader {
         .maximum(isInteger ? longOrNull(node, "maximum") : null)
         .decimalMinimum(isNumber || stringDecimal ? numberStringOrNull(node, "minimum") : null)
         .decimalMaximum(isNumber || stringDecimal ? numberStringOrNull(node, "maximum") : null)
-        .minItems(isArray ? intOrNull(node, "minItems") : null)
-        .maxItems(isArray ? intOrNull(node, "maxItems") : null)
         .build();
   }
 

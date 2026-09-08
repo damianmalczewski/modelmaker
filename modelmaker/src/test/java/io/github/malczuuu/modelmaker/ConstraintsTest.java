@@ -35,6 +35,7 @@ class ConstraintsTest {
         .decimalMaximum("99.9")
         .minItems(1)
         .maxItems(5)
+        .elementConstraints(Constraints.builder().minLength(1).maxLength(255).build())
         .build();
   }
 
@@ -70,6 +71,18 @@ class ConstraintsTest {
   }
 
   @Test
+  void notEqualWhenElementConstraintsDiffer() {
+    assertThat(
+            Constraints.builder()
+                .elementConstraints(Constraints.builder().minLength(1).build())
+                .build())
+        .isNotEqualTo(
+            Constraints.builder()
+                .elementConstraints(Constraints.builder().minLength(2).build())
+                .build());
+  }
+
+  @Test
   void notEqualToNullOrAnotherType() {
     assertThat(full()).isNotEqualTo(null).isNotEqualTo("Constraints");
   }
@@ -90,6 +103,9 @@ class ConstraintsTest {
                 + ", decimalMaximum=99.9"
                 + ", minItems=1"
                 + ", maxItems=5"
+                + ", elementConstraints=Constraints[pattern=null, patternMessage=null, minLength=1,"
+                + " maxLength=255, email=false, minimum=null, maximum=null, decimalMinimum=null,"
+                + " decimalMaximum=null, minItems=null, maxItems=null, elementConstraints=null]"
                 + "]");
   }
 }

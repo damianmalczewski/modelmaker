@@ -149,16 +149,16 @@ a JSON object:
 
 Each entry under `properties` is itself a small schema, either a `"type"` or a `"$ref"`:
 
-| `type`    | Renders as          | Notes                                                                                                                        |
-|-----------|---------------------|------------------------------------------------------------------------------------------------------------------------------|
-| `string`  | `String`            |                                                                                                                              |
-| `bytes`   | `byte[]`            | stored and returned as a defensive copy; serialized by Jackson as a base64 string; no `"default"` support                    |
-| `integer` | `Integer`/`int`     | `"format"`: `"int"` (default) or `"long"` -> `Long`/`long`                                                                   |
-| `number`  | `Double`/`double`   | `"format"`: `"float"` -> `Float`/`float`                                                                                     |
-| `boolean` | `Boolean`/`boolean` |                                                                                                                              |
-| `object`  | a nested class      | inline; `"title"` names it (plain class name, no package), else the capitalized property name                                |
-| `array`   | `List<T>`           | needs `"items"`, a nested property schema; arrays of arrays are not supported                                                |
-| `$ref`    | another type        | a schema `title` in the same directory, or a `java.*`/`javax.*` type such as `"java.time.Instant"` (imported, not generated) |
+| `type`    | Renders as          | Notes                                                                                                                          |
+|-----------|---------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| `string`  | `String`            |                                                                                                                                |
+| `bytes`   | `byte[]`            | stored and returned as a defensive copy; serialized by Jackson as a base64 string; no `"default"` support                      |
+| `integer` | `Integer`/`int`     | `"format"`: `"int"` (default) or `"long"` -> `Long`/`long`                                                                     |
+| `number`  | `Double`/`double`   | `"format"`: `"float"` -> `Float`/`float`                                                                                       |
+| `boolean` | `Boolean`/`boolean` |                                                                                                                                |
+| `object`  | a nested class      | inline; `"title"` names it (plain class name, no package), else the capitalized property name                                  |
+| `array`   | `List<T>`           | needs `"items"`, a nested property schema; arrays of arrays are not supported; `"items"` may carry its own validation keywords |
+| `$ref`    | another type        | a schema `title` in the same directory, or a `java.*`/`javax.*` type such as `"java.time.Instant"` (imported, not generated)   |
 
 A property not listed in `required` is optional (`@Nullable` in the generated field/parameter).
 `"default"` gives it a value applied by the builder when left unset.
@@ -200,7 +200,14 @@ Validation keywords, translated to `jakarta.validation` annotations when the `va
 | `minLength` / `maxLength`                            | `string`   | `@Size`                                                                                              |
 | `minimum` / `maximum`                                | `integer`  | `@Min` / `@Max`                                                                                      |
 | `minimum` / `maximum`                                | `number`   | `@DecimalMin` / `@DecimalMax`                                                                        |
-| `minItems` / `maxItems`                              | `array`    | `@Size`                                                                                              |
+| `minItems` / `maxItems`                              | `array`    | `@Size` on the `List`                                                                                |
+
+**List elements.** The `string` / `integer` / `number` keywords above (`pattern`, `enum`, `format`, `minLength` /
+`maxLength`, `minimum` / `maximum`) also apply when written **inside an array's `"items"`**, and are emitted as
+container-element annotations, e.g. `List<@Size(min = 1, max = 255) String> tags`. `minItems` / `maxItems` stay on the
+array node and size the `List` itself. Element annotations - and the `@Valid` cascade into a `List` of generated types -
+render on the **field only** (the getter, constructor and builder keep the plain `List<T>`); with field-access
+validation that is enough, and it avoids Hibernate Validator visiting each element twice.
 
 The `features` section (`jackson`, `validation`, `withers`, `preferPrimitives`) allows overriding the global
 `ModelOptions` on a per-file basis.

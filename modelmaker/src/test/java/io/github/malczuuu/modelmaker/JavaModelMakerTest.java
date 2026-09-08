@@ -261,11 +261,46 @@ class JavaModelMakerTest {
     assertThat(out).contains("private final @Nullable List<@Valid Address> extras;");
     assertThat(out).doesNotContain("@Valid\n  @Size");
     assertThat(out).contains("import jakarta.validation.Valid;");
+    // the @Valid cascade is on the field only - the getter returns a plain List
+    assertThat(out).doesNotContain("List<@Valid Address> getExtras");
 
     String plain = new JavaModelMaker(opts().validation(false).build()).emit(type);
     assertThat(plain).doesNotContain("@Valid");
     assertThat(plain).doesNotContain("jakarta.validation");
     assertThat(plain).contains("private final @Nullable List<Address> extras;");
+  }
+
+  @Test
+  void javaPutsElementConstraintsOnTheListFieldOnly() {
+    ModelType type =
+        new ModelType(
+            "CreateDeviceRequest",
+            "com.example.rest",
+            null,
+            List.of(
+                new Property(
+                    "tags",
+                    PropType.ArrayType.of(PropType.ScalarType.STRING),
+                    false,
+                    Constraints.builder()
+                        .elementConstraints(
+                            Constraints.builder().minLength(1).maxLength(255).build())
+                        .build(),
+                    "tags",
+                    null)),
+            List.of(),
+            FeatureOverrides.none());
+
+    String out = new JavaModelMaker(opts().build()).emit(type);
+
+    assertThat(out)
+        .contains(
+            "private final @Nullable List<@Size(min = 1, max = 255, message = \"size must be"
+                + " between 1 and 255\") String> tags;");
+    assertThat(out).contains("import jakarta.validation.constraints.Size;");
+    // getter, constructor param and builder keep the plain List<String>
+    assertThat(out).contains("public @Nullable List<String> getTags() {");
+    assertThat(out).containsOnlyOnce("List<@Size");
   }
 
   @Test
