@@ -97,6 +97,66 @@ class FieldsRendererTest {
   }
 
   @Test
+  void openapiOnPrependsSchemaAnnotationWithDescriptionAndExample() {
+    ModelType type =
+        type(
+            "Person",
+            new Property(
+                "id",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.none(),
+                "id",
+                null,
+                "the identifier",
+                "P123"));
+    ModelOptions openapi = ModelOptions.builder().openapi(true).build();
+
+    RenderResult result = new FieldsRenderer().init("", type, openapi).render();
+
+    assertThat(result.getCode())
+        .contains(
+            "@Schema(description = \"the identifier\", example = \"P123\","
+                + " requiredMode = Schema.RequiredMode.REQUIRED)")
+        .contains("private final String id;");
+    assertThat(result.getImports()).contains("io.swagger.v3.oas.annotations.media.Schema");
+  }
+
+  @Test
+  void openapiOnEmitsNoSchemaAnnotationWithoutDescriptionOrExample() {
+    ModelType type =
+        type(
+            "Person",
+            new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null));
+    ModelOptions openapi = ModelOptions.builder().openapi(true).build();
+
+    RenderResult result = new FieldsRenderer().init("", type, openapi).render();
+
+    assertThat(result.getCode()).doesNotContain("@Schema");
+    assertThat(result.getImports()).doesNotContain("io.swagger.v3.oas.annotations.media.Schema");
+  }
+
+  @Test
+  void openapiOffEmitsNoSchemaAnnotations() {
+    ModelType type =
+        type(
+            "Person",
+            new Property(
+                "id",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.none(),
+                "id",
+                null,
+                "the identifier",
+                null));
+
+    RenderResult result = new FieldsRenderer().init("", type, OPTIONS).render();
+
+    assertThat(result.getCode()).doesNotContain("@Schema");
+  }
+
+  @Test
   void validationOffEmitsNoConstraintAnnotations() {
     ModelType type =
         type(

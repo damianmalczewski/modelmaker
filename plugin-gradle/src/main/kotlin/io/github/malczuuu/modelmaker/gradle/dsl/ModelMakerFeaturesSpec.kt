@@ -28,6 +28,9 @@ import org.gradle.api.provider.Property
  * @property withers emit a `withXyz(value)` single-field copy method per property.
  * @property preferPrimitives always-set scalar fields (`integer`, `number`, `boolean`) use the
  *   primitive type (`int`, `double`, `boolean`) instead of the boxed default.
+ * @property openapi emit OpenAPI (`io.swagger.v3.oas.annotations.media.Schema`) annotations on the
+ *   models, carrying each schema's `description` / `example` and, for a required property,
+ *   `requiredMode`.
  */
 public abstract class ModelMakerFeaturesSpec {
 
@@ -38,4 +41,6 @@ public abstract class ModelMakerFeaturesSpec {
   public abstract val withers: Property<Boolean>
 
   public abstract val preferPrimitives: Property<Boolean>
+
+  public abstract val openapi: Property<Boolean>
 }

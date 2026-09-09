@@ -98,6 +98,7 @@ public abstract class ModelMakerExtension @Inject constructor(objects: ObjectFac
    *     validation       = true | false
    *     withers          = true | false
    *     preferPrimitives = true | false
+   *     openapi          = true | false
    *   }
    * }
    * ```

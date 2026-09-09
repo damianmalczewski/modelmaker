@@ -104,6 +104,13 @@ public final class JavaModelMaker implements ModelMaker {
     if (topLevel) {
       b.append(indent).append("@NullMarked\n");
     }
+    if (options.isOpenapi()) {
+      AnnotationSpec schema = OpenApiUtils.schemaAnnotationForType(type);
+      if (schema != null) {
+        imports.add(schema.getImportName());
+        b.append(indent).append(OpenApiUtils.render(schema)).append('\n');
+      }
+    }
     if (options.isJackson()) {
       b.append(indent).append("@JsonIgnoreProperties(ignoreUnknown = true)\n");
     }

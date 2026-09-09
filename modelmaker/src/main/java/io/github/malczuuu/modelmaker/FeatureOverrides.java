@@ -27,22 +27,25 @@ import org.jspecify.annotations.Nullable;
  */
 public final class FeatureOverrides {
 
-  private static final FeatureOverrides NONE = new FeatureOverrides(null, null, null, null);
+  private static final FeatureOverrides NONE = new FeatureOverrides(null, null, null, null, null);
 
   private final @Nullable Boolean jackson;
   private final @Nullable Boolean validation;
   private final @Nullable Boolean withers;
   private final @Nullable Boolean preferPrimitives;
+  private final @Nullable Boolean openapi;
 
   private FeatureOverrides(
       @Nullable Boolean jackson,
       @Nullable Boolean validation,
       @Nullable Boolean withers,
-      @Nullable Boolean preferPrimitives) {
+      @Nullable Boolean preferPrimitives,
+      @Nullable Boolean openapi) {
     this.jackson = jackson;
     this.validation = validation;
     this.withers = withers;
     this.preferPrimitives = preferPrimitives;
+    this.openapi = openapi;
   }
 
   /**
@@ -100,6 +103,15 @@ public final class FeatureOverrides {
   }
 
   /**
+   * The {@code features.openapi} override.
+   *
+   * @return the override, or empty when unset.
+   */
+  public Optional<Boolean> getOpenapi() {
+    return Optional.ofNullable(openapi);
+  }
+
+  /**
    * Applies every set flag over {@code baseOptions}, leaving unset flags at the base value.
    *
    * @param baseOptions the project's default options.
@@ -111,6 +123,7 @@ public final class FeatureOverrides {
     getWithers().ifPresent(builder::withers);
     getJackson().ifPresent(builder::jackson);
     getValidation().ifPresent(builder::validation);
+    getOpenapi().ifPresent(builder::openapi);
     return builder.build();
   }
 
@@ -125,12 +138,13 @@ public final class FeatureOverrides {
     return Objects.equals(jackson, other.jackson)
         && Objects.equals(validation, other.validation)
         && Objects.equals(withers, other.withers)
-        && Objects.equals(preferPrimitives, other.preferPrimitives);
+        && Objects.equals(preferPrimitives, other.preferPrimitives)
+        && Objects.equals(openapi, other.openapi);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(jackson, validation, withers, preferPrimitives);
+    return Objects.hash(jackson, validation, withers, preferPrimitives, openapi);
   }
 
   @Override
@@ -140,6 +154,7 @@ public final class FeatureOverrides {
         + (", validation=" + validation)
         + (", withers=" + withers)
         + (", preferPrimitives=" + preferPrimitives)
+        + (", openapi=" + openapi)
         + "]";
   }
 
@@ -150,6 +165,7 @@ public final class FeatureOverrides {
     private @Nullable Boolean validation = null;
     private @Nullable Boolean withers = null;
     private @Nullable Boolean preferPrimitives = null;
+    private @Nullable Boolean openapi = null;
 
     private Builder() {}
 
@@ -198,12 +214,23 @@ public final class FeatureOverrides {
     }
 
     /**
+     * Sets the {@code features.openapi} override.
+     *
+     * @param value the override, or {@code null} to leave it unset.
+     * @return {@code this}.
+     */
+    public Builder openapi(@Nullable Boolean value) {
+      this.openapi = value;
+      return this;
+    }
+
+    /**
      * Builds the overrides from the accumulated flags.
      *
      * @return a new {@link FeatureOverrides}.
      */
     public FeatureOverrides build() {
-      return new FeatureOverrides(jackson, validation, withers, preferPrimitives);
+      return new FeatureOverrides(jackson, validation, withers, preferPrimitives, openapi);
     }
 
     @Override
@@ -213,6 +240,7 @@ public final class FeatureOverrides {
           + (", validation=" + validation)
           + (", withers=" + withers)
           + (", preferPrimitives=" + preferPrimitives)
+          + (", openapi=" + openapi)
           + "]";
     }
   }

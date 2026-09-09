@@ -344,6 +344,74 @@ class JavaModelMakerTest {
     assertThat(out).doesNotContain("databind");
   }
 
+  private final ModelType documented =
+      new ModelType(
+          "Account",
+          "com.example.dto",
+          "A billing account.",
+          List.of(
+              new Property(
+                  "id",
+                  PropType.ScalarType.STRING,
+                  true,
+                  Constraints.none(),
+                  "id",
+                  null,
+                  "the account identifier",
+                  "A-42"),
+              new Property(
+                  "nickname",
+                  PropType.ScalarType.STRING,
+                  false,
+                  Constraints.none(),
+                  "nickname",
+                  null,
+                  null,
+                  null)),
+          List.of(),
+          FeatureOverrides.none());
+
+  @Test
+  void openapiEmitsSchemaOnTheClassAndOnDocumentedFieldsOnly() {
+    String out =
+        new JavaModelMaker(opts().jackson(false).validation(false).openapi(true).build())
+            .emit(documented);
+
+    assertThat(out).contains("import io.swagger.v3.oas.annotations.media.Schema;");
+    assertThat(out).contains("@Schema(description = \"A billing account.\")");
+    assertThat(out)
+        .contains(
+            "@Schema(description = \"the account identifier\", example = \"A-42\","
+                + " requiredMode = Schema.RequiredMode.REQUIRED)");
+    // the undocumented "nickname" field gets no @Schema
+    assertThat(out).doesNotContain("@Schema(description = \"\")");
+  }
+
+  @Test
+  void openapiOffEmitsNoSchemaAnnotations() {
+    String out =
+        new JavaModelMaker(opts().jackson(false).validation(false).openapi(false).build())
+            .emit(documented);
+
+    assertThat(out).doesNotContain("@Schema");
+    assertThat(out).doesNotContain("io.swagger");
+  }
+
+  @Test
+  void aSchemasOpenapiOverrideWinsOverTheProjectDefaultInBothDirections() {
+    JavaModelMaker offByDefault = new JavaModelMaker(opts().openapi(false).build());
+    JavaModelMaker onByDefault = new JavaModelMaker(opts().openapi(true).build());
+
+    assertThat(
+            offByDefault.emit(
+                documented.withFeatureOverrides(FeatureOverrides.builder().openapi(true).build())))
+        .contains("@Schema(description = \"A billing account.\")");
+    assertThat(
+            onByDefault.emit(
+                documented.withFeatureOverrides(FeatureOverrides.builder().openapi(false).build())))
+        .doesNotContain("@Schema");
+  }
+
   @Test
   void emitsAPlainModelWithNeitherJacksonNorValidationWhenBothAreOff() {
     String out = new JavaModelMaker(opts().jackson(false).validation(false).build()).emit(person);

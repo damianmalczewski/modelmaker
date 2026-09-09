@@ -154,6 +154,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
             .validation(parseFeatureFlag(file, features, "validation"))
             .withers(parseFeatureFlag(file, features, "withers"))
             .preferPrimitives(parseFeatureFlag(file, features, "preferPrimitives"))
+            .openapi(parseFeatureFlag(file, features, "openapi"))
             .build();
 
     return parseObject(
@@ -243,7 +244,9 @@ public final class SimpleSchemaLoader implements SchemaLoader {
               isRequired,
               parseConstraints(propNode, type),
               jsonKey,
-              defaultValue));
+              defaultValue,
+              stringOrNull(propNode, "description"),
+              exampleStringOrNull(propNode)));
     }
     return new ModelType(
         name,
@@ -612,6 +615,22 @@ public final class SimpleSchemaLoader implements SchemaLoader {
   private static @Nullable String stringOrNull(JsonObject node, String field) {
     JsonElement n = get(node, field);
     return n != null && isString(n) ? n.getAsString() : null;
+  }
+
+  /**
+   * Reads a property's {@code "example"} as a string, for {@code @Schema(example = "...")}. A
+   * scalar ({@code string}, number or boolean) is taken verbatim; an object / array example is
+   * ignored.
+   *
+   * @param node the property node.
+   * @return the example rendered as a string, or {@code null} when absent or not a scalar.
+   */
+  private static @Nullable String exampleStringOrNull(JsonObject node) {
+    JsonElement n = get(node, "example");
+    if (n == null || !n.isJsonPrimitive()) {
+      return null;
+    }
+    return n.getAsString();
   }
 
   private static @Nullable Integer intOrNull(JsonObject node, String field) {

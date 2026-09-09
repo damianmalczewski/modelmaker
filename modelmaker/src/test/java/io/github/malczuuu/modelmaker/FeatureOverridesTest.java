@@ -55,6 +55,13 @@ class FeatureOverridesTest {
   }
 
   @Test
+  void openapiOverrideIsApplied() {
+    assertThat(FeatureOverrides.builder().openapi(true).build().applyOn(base()).isOpenapi())
+        .isTrue();
+    assertThat(FeatureOverrides.none().applyOn(base()).isOpenapi()).isFalse();
+  }
+
+  @Test
   void anExplicitTrueOverridesAFalseBase() {
     ModelOptions result = FeatureOverrides.builder().preferPrimitives(true).build().applyOn(base());
 
@@ -147,6 +154,6 @@ class FeatureOverridesTest {
     assertThat(FeatureOverrides.builder().jackson(true).build().toString())
         .isEqualTo(
             "FeatureOverrides[jackson=true, validation=null, withers=null,"
-                + " preferPrimitives=null]");
+                + " preferPrimitives=null, openapi=null]");
   }
 }

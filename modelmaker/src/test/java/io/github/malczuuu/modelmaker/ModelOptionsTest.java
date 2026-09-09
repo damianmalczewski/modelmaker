@@ -24,11 +24,21 @@ class ModelOptionsTest {
 
   private static ModelOptions options(
       boolean preferPrimitives, boolean withers, boolean jackson, boolean validation) {
+    return options(preferPrimitives, withers, jackson, validation, false);
+  }
+
+  private static ModelOptions options(
+      boolean preferPrimitives,
+      boolean withers,
+      boolean jackson,
+      boolean validation,
+      boolean openapi) {
     return ModelOptions.builder()
         .preferPrimitives(preferPrimitives)
         .withers(withers)
         .jackson(jackson)
         .validation(validation)
+        .openapi(openapi)
         .build();
   }
 
@@ -47,7 +57,13 @@ class ModelOptionsTest {
         .isNotEqualTo(options(false, false, true, false))
         .isNotEqualTo(options(true, true, true, false))
         .isNotEqualTo(options(true, false, false, false))
-        .isNotEqualTo(options(true, false, true, true));
+        .isNotEqualTo(options(true, false, true, true))
+        .isNotEqualTo(options(true, false, true, false, true));
+  }
+
+  @Test
+  void mutateCarriesOpenapi() {
+    assertThat(options(false, false, false, false, true).mutate().build().isOpenapi()).isTrue();
   }
 
   @Test
@@ -59,6 +75,7 @@ class ModelOptionsTest {
   void toStringReportsEveryFlag() {
     assertThat(options(true, false, true, false).toString())
         .isEqualTo(
-            "ModelOptions[preferPrimitives=true, withers=false, jackson=true, validation=false]");
+            "ModelOptions[preferPrimitives=true, withers=false, jackson=true, validation=false,"
+                + " openapi=false]");
   }
 }

@@ -80,6 +80,10 @@ public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFacto
   public val preferPrimitives: Provider<Boolean>
     get() = featuresSpec.preferPrimitives
 
+  @get:Input
+  public val openapi: Provider<Boolean>
+    get() = featuresSpec.openapi
+
   /**
    * Configures which features this task emits, overriding the `modelmaker { features { } }`
    * defaults for this task only, see [ModelMakerFeaturesSpec]:
@@ -109,6 +113,7 @@ public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFacto
     featuresSpec.validation.convention(features.validation)
     featuresSpec.withers.convention(features.withers)
     featuresSpec.preferPrimitives.convention(features.preferPrimitives)
+    featuresSpec.openapi.convention(features.openapi)
   }
 
   @TaskAction
@@ -136,6 +141,7 @@ public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFacto
                 .withers(withers.get())
                 .jackson(jackson.get())
                 .validation(validation.get())
+                .openapi(openapi.get())
                 .build()
         )
 

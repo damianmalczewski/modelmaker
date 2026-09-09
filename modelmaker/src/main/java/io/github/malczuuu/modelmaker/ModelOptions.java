@@ -32,13 +32,19 @@ public final class ModelOptions {
   private final boolean withers;
   private final boolean jackson;
   private final boolean validation;
+  private final boolean openapi;
 
   private ModelOptions(
-      boolean preferPrimitives, boolean withers, boolean jackson, boolean validation) {
+      boolean preferPrimitives,
+      boolean withers,
+      boolean jackson,
+      boolean validation,
+      boolean openapi) {
     this.preferPrimitives = preferPrimitives;
     this.withers = withers;
     this.jackson = jackson;
     this.validation = validation;
+    this.openapi = openapi;
   }
 
   /**
@@ -96,6 +102,16 @@ public final class ModelOptions {
   }
 
   /**
+   * Whether OpenAPI ({@code io.swagger.v3.oas.annotations}) {@code @Schema} annotations are
+   * emitted.
+   *
+   * @return {@code true} when on.
+   */
+  public boolean isOpenapi() {
+    return openapi;
+  }
+
+  /**
    * Starts a new {@link Builder} pre-filled with this instance's flags, for producing a modified
    * copy.
    *
@@ -106,7 +122,8 @@ public final class ModelOptions {
         .preferPrimitives(preferPrimitives)
         .withers(withers)
         .jackson(jackson)
-        .validation(validation);
+        .validation(validation)
+        .openapi(openapi);
   }
 
   @Override
@@ -120,12 +137,13 @@ public final class ModelOptions {
     return preferPrimitives == other.preferPrimitives
         && withers == other.withers
         && jackson == other.jackson
-        && validation == other.validation;
+        && validation == other.validation
+        && openapi == other.openapi;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(preferPrimitives, withers, jackson, validation);
+    return Objects.hash(preferPrimitives, withers, jackson, validation, openapi);
   }
 
   @Override
@@ -135,6 +153,7 @@ public final class ModelOptions {
         + (", withers=" + withers)
         + (", jackson=" + jackson)
         + (", validation=" + validation)
+        + (", openapi=" + openapi)
         + "]";
   }
 
@@ -145,6 +164,7 @@ public final class ModelOptions {
     private boolean withers = false;
     private boolean jackson = false;
     private boolean validation = false;
+    private boolean openapi = false;
 
     private Builder() {}
 
@@ -194,12 +214,24 @@ public final class ModelOptions {
     }
 
     /**
+     * Emit OpenAPI ({@code io.swagger.v3.oas.annotations}) {@code @Schema} annotations when {@code
+     * true}.
+     *
+     * @param value {@code true} to turn it on.
+     * @return {@code this}.
+     */
+    public Builder openapi(boolean value) {
+      this.openapi = value;
+      return this;
+    }
+
+    /**
      * Builds the options from the accumulated flags.
      *
      * @return a new {@link ModelOptions}.
      */
     public ModelOptions build() {
-      return new ModelOptions(preferPrimitives, withers, jackson, validation);
+      return new ModelOptions(preferPrimitives, withers, jackson, validation, openapi);
     }
 
     @Override
@@ -209,6 +241,7 @@ public final class ModelOptions {
           + (", withers=" + withers)
           + (", jackson=" + jackson)
           + (", validation=" + validation)
+          + (", openapi=" + openapi)
           + "]";
     }
   }

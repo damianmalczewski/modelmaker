@@ -123,6 +123,38 @@ class ModelMakerPluginFunctionalTest {
   }
 
   @Test
+  fun `openapi opt-in emits Schema annotations and compiles against declared swagger annotations`() {
+    project.writeStandardBuild(
+        modelMakerBlock = "modelmaker { features { openapi = true } }",
+        dependencies = "implementation(\"io.swagger.core.v3:swagger-annotations-jakarta:2.2.30\")",
+    )
+    project.write(
+        "src/main/model/com.example.dto.Account.json",
+        $$"""
+      { "$modelmaker": "v1.0", "title": "com.example.dto.Account",
+        "description": "A billing account.", "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id":       { "type": "string", "description": "the account id", "example": "A-1" },
+          "nickname": { "type": "string" }
+        } }
+      """,
+    )
+
+    val result = project.runner("compileJava").build()
+    assertThat(result.task(":compileJava")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+
+    val java = project.generatedJava("com/example/dto/Account.java").readText()
+    assertThat(java).contains("import io.swagger.v3.oas.annotations.media.Schema;")
+    assertThat(java).contains("@Schema(description = \"A billing account.\")")
+    assertThat(java)
+        .contains(
+            "@Schema(description = \"the account id\", example = \"A-1\"," +
+                " requiredMode = Schema.RequiredMode.REQUIRED)"
+        )
+  }
+
+  @Test
   fun `does not add jspecify when the build already declares it`() {
     project.writeStandardBuild(dependencies = "implementation(\"org.jspecify:jspecify:1.0.0\")")
     project.writeSchemas()

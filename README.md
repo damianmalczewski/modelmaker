@@ -59,6 +59,10 @@ Features configurable via `ModelOptions` and `"features"` section in schema file
 - `withers` - adds `withXyz(value)` methods, which are per property, single-field copy methods.
 - `preferPrimitives` - force usage of type primitives (`int`/`double`/`boolean`) instead of their boxed types if
   possible (for example, integer with default value will produce `int`).
+- `openapi` - adds OpenAPI `@Schema` annotations (`io.swagger.v3.oas.annotations.media.Schema`) carrying each schema's
+  `description` / `example` and, for a required property, `requiredMode`. Facets such as `minimum` / `pattern` are left
+  to the `validation` feature, which the OpenAPI tooling already reads. Needs `io.swagger.core.v3:swagger-annotations-jakarta`
+  on the consumer's compile classpath.
 
 Generated classes are annotated with **JSpecify** annotations - `@NullMarked` on a class and `@Nullable` on every
 optional field/parameter.
@@ -122,6 +126,7 @@ modelmaker {
         validation       = false  // jakarta.validation annotations, @Valid cascades
         withers          = false  // withXyz(value) per property
         preferPrimitives = false  // int/double/boolean instead of boxed types
+        openapi          = false  // OpenAPI @Schema (description / example / requiredMode)
     }
 }
 ```
@@ -144,7 +149,7 @@ a JSON object:
 | `type`        | yes      | must be `"object"`                                                                                 |
 | `properties`  | yes      | object of property name -> property schema                                                         |
 | `required`    | no       | array of property names that must always be set                                                    |
-| `description` | no       | copied onto the generated class as its Javadoc                                                     |
+| `description` | no       | emitted as `@Schema(description = ...)` on the generated class when the `openapi` feature is on    |
 | `features`    | no       | per-file override of `modelmaker { features { } }`, see below                                      |
 
 Each entry under `properties` is itself a small schema, either a `"type"` or a `"$ref"`:
@@ -209,8 +214,21 @@ array node and size the `List` itself. Element annotations - and the `@Valid` ca
 render on the **field only** (the getter, constructor and builder keep the plain `List<T>`); with field-access
 validation that is enough, and it avoids Hibernate Validator visiting each element twice.
 
-The `features` section (`jackson`, `validation`, `withers`, `preferPrimitives`) allows overriding the global
-`ModelOptions` on a per-file basis.
+OpenAPI keywords, emitted as `@Schema` arguments when the `openapi` feature is on; ignored otherwise:
+
+| Keyword         | Applies to         | Emitted as                                                            |
+|-----------------|--------------------|----------------------------------------------------------------------|
+| `description`   | type or property   | `@Schema(description = ...)` on the class / field                    |
+| `example`       | property (scalar)  | `@Schema(example = "...")` on the field (rendered as a string)       |
+| `required`      | property           | `@Schema(requiredMode = Schema.RequiredMode.REQUIRED)` on the field  |
+
+A `@Schema` annotation is only emitted for a field that carries a `description` or `example`. Facets such as
+`minimum` / `pattern` are deliberately left off `@Schema` - the `validation` feature emits them as
+`jakarta.validation` annotations, which OpenAPI generators (springdoc, swagger-core) already read. For Avro input the
+record / field `"doc"` is used as the `description`.
+
+The `features` section (`jackson`, `validation`, `withers`, `preferPrimitives`, `openapi`) allows overriding the
+global `ModelOptions` on a per-file basis.
 
 <details>
 <summary><b>Example (expand)...</b></summary>
@@ -360,6 +378,7 @@ Standalone Gradle builds under `examples/`, each applying the plugin from `maven
 | `example-jackson2`   | `jackson` feature with Jackson 2 (`com.fasterxml.jackson`).              |
 | `example-jackson3`   | `jackson` feature with Jackson 3 (`tools.jackson`) plus Kotlin `mutate`. |
 | `example-validation` | `validation` feature and `jakarta.validation` constraints.               |
+| `example-openapi`    | `jackson` + `validation` + `openapi` on one type; OpenAPI `@Schema`.     |
 | `example-withers`    | `withers` feature - per-property copy methods.                           |
 | `example-mutator`    | Kotlin `mutate { }` extensions.                                          |
 | `example-avro`       | `.avsc` schema input.                                                    |

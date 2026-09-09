@@ -78,6 +78,47 @@ class PropertyTest {
   }
 
   @Test
+  void sixArgConstructorLeavesOpenApiMetadataUnset() {
+    Property prop =
+        new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null);
+
+    assertThat(prop.getDescription()).isNull();
+    assertThat(prop.getExample()).isNull();
+  }
+
+  @Test
+  void carriesDescriptionAndExample() {
+    Property prop =
+        new Property(
+            "id",
+            PropType.ScalarType.STRING,
+            true,
+            Constraints.none(),
+            "id",
+            null,
+            "the identifier",
+            "P123");
+
+    assertThat(prop.getDescription()).isEqualTo("the identifier");
+    assertThat(prop.getExample()).isEqualTo("P123");
+  }
+
+  @Test
+  void notEqualWhenDescriptionOrExampleDiffers() {
+    Property base =
+        new Property(
+            "id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null, "a", "x");
+
+    assertThat(base)
+        .isNotEqualTo(
+            new Property(
+                "id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null, "b", "x"))
+        .isNotEqualTo(
+            new Property(
+                "id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null, "a", "y"));
+  }
+
+  @Test
   void toStringReportsEveryField() {
     assertThat(full().toString())
         .isEqualTo(
@@ -89,6 +130,8 @@ class PropertyTest {
                 + Constraints.builder().pattern("^X").build()
                 + ", jsonName=id_json"
                 + ", defaultValue=Str[value=x]"
+                + ", description=null"
+                + ", example=null"
                 + "]");
   }
 

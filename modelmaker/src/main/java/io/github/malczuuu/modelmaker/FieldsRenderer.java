@@ -46,6 +46,13 @@ final class FieldsRenderer extends AbstractSnippetRenderer {
     Set<String> imports = new TreeSet<>();
     StringBuilder code = new StringBuilder();
     for (Property p : properties) {
+      if (options.isOpenapi()) {
+        AnnotationSpec schema = OpenApiUtils.schemaAnnotationOf(p);
+        if (schema != null) {
+          imports.add(schema.getImportName());
+          code.append(indent).append(OpenApiUtils.render(schema)).append('\n');
+        }
+      }
       if (options.isValidation()) {
         for (String a : constraintAnnotations(p, imports)) {
           code.append(indent).append(a).append('\n');

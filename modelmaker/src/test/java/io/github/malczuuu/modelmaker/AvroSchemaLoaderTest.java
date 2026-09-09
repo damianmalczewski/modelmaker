@@ -222,7 +222,7 @@ class AvroSchemaLoaderTest {
             "x.All.avsc",
             "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"All\", \"features\": {"
                 + " \"jackson\": true, \"validation\": false, \"withers\": true,"
-                + " \"preferPrimitives\": false }, \"fields\": [] }");
+                + " \"preferPrimitives\": false, \"openapi\": true }, \"fields\": [] }");
     ModelType m = loader.load(List.of(f)).get(0);
 
     assertThat(m.getFeatureOverrides())
@@ -232,7 +232,34 @@ class AvroSchemaLoaderTest {
                 .validation(false)
                 .withers(true)
                 .preferPrimitives(false)
+                .openapi(true)
                 .build());
+  }
+
+  @Test
+  void mapsFieldDocToThePropertyDescription() {
+    Path f =
+        write(
+            "x.Account.avsc",
+            "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Account\", \"fields\": ["
+                + " { \"name\": \"id\", \"type\": \"string\", \"doc\": \"the account id\" },"
+                + " { \"name\": \"plain\", \"type\": \"string\" } ] }");
+    ModelType m = loader.load(List.of(f)).get(0);
+
+    assertThat(
+            m.getProperties().stream()
+                .filter(p -> p.getName().equals("id"))
+                .findFirst()
+                .orElseThrow()
+                .getDescription())
+        .isEqualTo("the account id");
+    assertThat(
+            m.getProperties().stream()
+                .filter(p -> p.getName().equals("plain"))
+                .findFirst()
+                .orElseThrow()
+                .getDescription())
+        .isNull();
   }
 
   @Test

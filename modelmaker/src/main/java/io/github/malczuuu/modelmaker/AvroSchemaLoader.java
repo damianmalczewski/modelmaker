@@ -167,6 +167,7 @@ public final class AvroSchemaLoader implements SchemaLoader {
         .validation(parseFeatureFlag(file, features, "validation"))
         .withers(parseFeatureFlag(file, features, "withers"))
         .preferPrimitives(parseFeatureFlag(file, features, "preferPrimitives"))
+        .openapi(parseFeatureFlag(file, features, "openapi"))
         .build();
   }
 
@@ -226,7 +227,15 @@ public final class AvroSchemaLoader implements SchemaLoader {
     DefaultValue defaultValue =
         required ? null : parseDefault(file, fieldName, get(field, "default"), type);
 
-    return new Property(fieldName, type, required, constraints, fieldName, defaultValue);
+    return new Property(
+        fieldName,
+        type,
+        required,
+        constraints,
+        fieldName,
+        defaultValue,
+        stringOrNull(field, "doc"),
+        null);
   }
 
   /**

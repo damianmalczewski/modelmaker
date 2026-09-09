@@ -449,7 +449,7 @@ class SimpleSchemaLoaderTest {
         schema(
             "x.All",
             "\"features\": { \"jackson\": true, \"validation\": false, \"withers\": true,"
-                + " \"preferPrimitives\": false }, \"properties\": {}");
+                + " \"preferPrimitives\": false, \"openapi\": true }, \"properties\": {}");
     Path jacksonOnly =
         schema("x.JacksonOnly", "\"features\": { \"jackson\": true }, \"properties\": {}");
     Path none = schema("x.None", "\"properties\": {}");
@@ -463,10 +463,35 @@ class SimpleSchemaLoaderTest {
                 .validation(false)
                 .withers(true)
                 .preferPrimitives(false)
+                .openapi(true)
                 .build());
     assertThat(named(types, "JacksonOnly").getFeatureOverrides())
         .isEqualTo(FeatureOverrides.builder().jackson(true).build());
     assertThat(named(types, "None").getFeatureOverrides()).isEqualTo(FeatureOverrides.none());
+  }
+
+  @Test
+  void parsesPerPropertyDescriptionAndExample() {
+    Path f =
+        schema(
+            "x.Account",
+            """
+            "required": ["id"],
+            "properties": {
+              "id":     { "type": "string", "description": "the account id", "example": "A-1" },
+              "count":  { "type": "integer", "example": 7 },
+              "plain":  { "type": "string" }
+            }
+            """);
+
+    ModelType t = named(loader.load(List.of(f)), "Account");
+
+    assertThat(prop(t, "id").getDescription()).isEqualTo("the account id");
+    assertThat(prop(t, "id").getExample()).isEqualTo("A-1");
+    assertThat(prop(t, "count").getExample()).isEqualTo("7");
+    assertThat(prop(t, "count").getDescription()).isNull();
+    assertThat(prop(t, "plain").getDescription()).isNull();
+    assertThat(prop(t, "plain").getExample()).isNull();
   }
 
   @Test

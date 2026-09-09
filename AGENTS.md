@@ -59,7 +59,8 @@ Schema file (s) -> `SchemaLoader` -> `ModelType` tree -> `ModelMaker.emit(type)`
   focused chunk (fields, constructor, getters, builder, withers, `mutate`, …) plus the imports it needs, as a
   `RenderResult`. `JavaModelMaker` / `KotlinExtensionMaker` compose them and assemble the `package` line, import block,
   do-not-edit banner and class body.
-- **Feature flags**: `jackson`, `validation`, `withers`, `preferPrimitives`. Precedence, highest first: per-schema
+- **Feature flags**: `jackson`, `validation`, `withers`, `preferPrimitives`, `openapi` (OpenAPI `@Schema` from
+  per-schema/-property `description` / `example`; `OpenApiUtils` maps them). Precedence, highest first: per-schema
   `"features"` object -> per-task `features { }` (or `kotlin { }`) -> `modelmaker { features { } }` project default.
 
 ### Plugin wiring (`:plugin-gradle`)

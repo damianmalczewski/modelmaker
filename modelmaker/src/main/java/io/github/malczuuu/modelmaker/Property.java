@@ -28,9 +28,11 @@ public final class Property {
   private final Constraints constraints;
   private final String jsonName;
   private final @Nullable DefaultValue defaultValue;
+  private final @Nullable String description;
+  private final @Nullable String example;
 
   /**
-   * Creates a new {@link Property}.
+   * Creates a new {@link Property} with no OpenAPI documentation metadata.
    *
    * @param name camelCase identifier used for the generated field / getter / parameter.
    * @param type resolved property type.
@@ -47,12 +49,41 @@ public final class Property {
       Constraints constraints,
       String jsonName,
       @Nullable DefaultValue defaultValue) {
+    this(name, type, required, constraints, jsonName, defaultValue, null, null);
+  }
+
+  /**
+   * Creates a new {@link Property}.
+   *
+   * @param name camelCase identifier used for the generated field / getter / parameter.
+   * @param type resolved property type.
+   * @param required whether the JSON key is listed in the type's {@code required} array.
+   * @param constraints validation keywords parsed from the property node.
+   * @param jsonName original JSON key, kept for {@code @JsonProperty} and
+   *     {@code @JsonPropertyOrder}.
+   * @param defaultValue {@code default} value, or {@code null}.
+   * @param description schema {@code description}, emitted as {@code @Schema(description = ...)}
+   *     when the {@code openapi} feature is on; {@code null} when unset.
+   * @param example schema {@code example} rendered as a string, emitted as {@code @Schema(example =
+   *     ...)} when the {@code openapi} feature is on; {@code null} when unset.
+   */
+  Property(
+      String name,
+      PropType type,
+      boolean required,
+      Constraints constraints,
+      String jsonName,
+      @Nullable DefaultValue defaultValue,
+      @Nullable String description,
+      @Nullable String example) {
     this.name = name;
     this.type = type;
     this.required = required;
     this.constraints = constraints;
     this.jsonName = jsonName;
     this.defaultValue = defaultValue;
+    this.description = description;
+    this.example = example;
   }
 
   /**
@@ -111,6 +142,26 @@ public final class Property {
   }
 
   /**
+   * Schema {@code description}, emitted as {@code @Schema(description = ...)} when the {@code
+   * openapi} feature is on.
+   *
+   * @return the description, or {@code null} when unset.
+   */
+  public @Nullable String getDescription() {
+    return description;
+  }
+
+  /**
+   * Schema {@code example} rendered as a string, emitted as {@code @Schema(example = ...)} when the
+   * {@code openapi} feature is on.
+   *
+   * @return the example, or {@code null} when unset.
+   */
+  public @Nullable String getExample() {
+    return example;
+  }
+
+  /**
    * Whether the property is always populated - {@link #isRequired()} or has a default.
    *
    * @return {@code true} when always populated.
@@ -132,12 +183,15 @@ public final class Property {
         && Objects.equals(type, other.type)
         && Objects.equals(constraints, other.constraints)
         && Objects.equals(jsonName, other.jsonName)
-        && Objects.equals(defaultValue, other.defaultValue);
+        && Objects.equals(defaultValue, other.defaultValue)
+        && Objects.equals(description, other.description)
+        && Objects.equals(example, other.example);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, type, required, constraints, jsonName, defaultValue);
+    return Objects.hash(
+        name, type, required, constraints, jsonName, defaultValue, description, example);
   }
 
   @Override
@@ -149,6 +203,8 @@ public final class Property {
         + (", constraints=" + constraints)
         + (", jsonName=" + jsonName)
         + (", defaultValue=" + defaultValue)
+        + (", description=" + description)
+        + (", example=" + example)
         + "]";
   }
 }

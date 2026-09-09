@@ -52,6 +52,7 @@ public class ModelMakerPlugin : Plugin<Project> {
       extension.features.validation.convention(false)
       extension.features.withers.convention(false)
       extension.features.preferPrimitives.convention(false)
+      extension.features.openapi.convention(false)
       extension.kotlin.enabled.convention(false)
       extension.src.enabled.convention(true)
 
