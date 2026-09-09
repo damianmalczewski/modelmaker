@@ -8,6 +8,6 @@
     "city": { "type": "string" }
   },
   "features": {
-    "jackson": true
+    "jackson": { "enabled": true }
   }
 }

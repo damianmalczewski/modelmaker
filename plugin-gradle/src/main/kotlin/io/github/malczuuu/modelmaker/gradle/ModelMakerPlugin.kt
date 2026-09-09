@@ -48,11 +48,18 @@ public class ModelMakerPlugin : Plugin<Project> {
     with(project) {
       val extension = extensions.create("modelmaker", ModelMakerExtension::class.java)
 
-      extension.features.jackson.convention(false)
-      extension.features.validation.convention(false)
-      extension.features.withers.convention(false)
-      extension.features.preferPrimitives.convention(false)
-      extension.features.openapi.convention(false)
+      with(extension.features) {
+        listOf(jackson.enabled, validation.enabled, openApi.enabled).forEach {
+          it.convention(false)
+        }
+        listOf(jackson.annotateFields, validation.annotateFields, openApi.annotateFields).forEach {
+          it.convention(false)
+        }
+        listOf(jackson.annotateGetters, validation.annotateGetters, openApi.annotateGetters)
+            .forEach { it.convention(true) }
+        withers.enabled.convention(false)
+        preferPrimitives.enabled.convention(false)
+      }
       extension.kotlin.enabled.convention(false)
       extension.src.enabled.convention(true)
 

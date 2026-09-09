@@ -33,7 +33,7 @@ class ModelTypeTest {
         List.of(
             new ModelType(
                 "Nested", "com.example.dto", null, List.of(), List.of(), FeatureOverrides.none())),
-        FeatureOverrides.builder().jackson(true).build());
+        FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build());
   }
 
   @Test
@@ -50,7 +50,7 @@ class ModelTypeTest {
             "A widget.",
             full().getProperties(),
             full().getNested(),
-            FeatureOverrides.builder().jackson(true).build());
+            FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build());
 
     assertThat(full()).isNotEqualTo(other);
   }
@@ -64,7 +64,7 @@ class ModelTypeTest {
             "A different widget.",
             full().getProperties(),
             full().getNested(),
-            FeatureOverrides.builder().jackson(true).build());
+            FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build());
 
     assertThat(full()).isNotEqualTo(other);
   }
@@ -86,6 +86,8 @@ class ModelTypeTest {
         .contains("name=Widget")
         .contains("packageName=com.example.dto")
         .contains("description=A widget.")
-        .contains("featureOverrides=" + FeatureOverrides.builder().jackson(true).build());
+        .contains(
+            "featureOverrides="
+                + FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build());
   }
 }

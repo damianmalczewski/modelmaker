@@ -12,6 +12,6 @@
     "priority": { "type": "string", "enum": ["LOW", "NORMAL", "HIGH"], "default": "NORMAL" }
   },
   "features": {
-    "jackson": true
+    "jackson": { "enabled": true }
   }
 }

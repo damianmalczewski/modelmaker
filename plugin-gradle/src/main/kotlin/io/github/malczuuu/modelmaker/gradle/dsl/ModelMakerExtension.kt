@@ -33,10 +33,11 @@ import org.gradle.kotlin.dsl.newInstance
  *     enabled = true | false
  *   }
  *   features {
- *     jackson          = true | false
- *     validation       = true | false
- *     withers          = true | false
- *     preferPrimitives = true | false
+ *     jackson    { enabled = true | false; annotateFields = true | false; annotateGetters = true | false }
+ *     validation { enabled = true | false }
+ *     openApi    { enabled = true | false }
+ *     withers    { enabled = true | false }
+ *     preferPrimitives { enabled = true | false }
  *   }
  * }
  * ```
@@ -94,11 +95,11 @@ public abstract class ModelMakerExtension @Inject constructor(objects: ObjectFac
    * ```
    * modelmaker {
    *   features {
-   *     jackson          = true | false
-   *     validation       = true | false
-   *     withers          = true | false
-   *     preferPrimitives = true | false
-   *     openapi          = true | false
+   *     jackson    { enabled = true | false; annotateFields = true | false; annotateGetters = true | false }
+   *     validation { enabled = true | false }
+   *     openApi    { enabled = true | false }
+   *     withers    { enabled = true | false }
+   *     preferPrimitives { enabled = true | false }
    *   }
    * }
    * ```

@@ -21,8 +21,8 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
- * One {@code jakarta.validation} annotation to place on a generated field. {@code args} are
- * pre-rendered {@code {name} = {value}} strings.
+ * One annotation to place on a generated field or getter. {@code args} are pre-rendered {@code
+ * {name} = {value}} strings.
  */
 final class AnnotationSpec {
 
@@ -68,6 +68,17 @@ final class AnnotationSpec {
    */
   List<String> getArgs() {
     return args;
+  }
+
+  /**
+   * The annotation in its {@code @Name} / {@code @Name(args)} source form.
+   *
+   * @return the rendered annotation.
+   */
+  String render() {
+    return args.isEmpty()
+        ? "@" + simpleName
+        : "@" + simpleName + "(" + String.join(", ", args) + ")";
   }
 
   @Override

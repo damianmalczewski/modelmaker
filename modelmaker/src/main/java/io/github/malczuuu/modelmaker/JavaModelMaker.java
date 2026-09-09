@@ -25,7 +25,7 @@ import java.util.TreeSet;
 
 /**
  * Emits an immutable Java POJO (final class, final fields, no setters, all-args constructor) for a
- * {@link ModelType}. The constructor is private, unless {@link ModelOptions#isJackson()} is on, in
+ * {@link ModelType}. The constructor is private, unless {@link ModelOptions#getJackson()} is on, in
  * which case it is package-private and carries {@code @JsonCreator}/{@code @JsonProperty} so
  * Jackson deserializes through it directly. Instances are also built through the nested {@code
  * Builder}. Inline objects become {@code static final} nested classes.
@@ -77,7 +77,7 @@ public final class JavaModelMaker implements ModelMaker {
     imports.add("org.jspecify.annotations.NullMarked");
     imports.add("org.jspecify.annotations.Nullable");
     imports.add("java.util.Objects");
-    if (options.isJackson()) {
+    if (options.getJackson().isEnabled()) {
       imports.add("com.fasterxml.jackson.annotation.JsonIgnoreProperties");
       imports.add("com.fasterxml.jackson.annotation.JsonCreator");
       if (anyProperty(type)) {
@@ -104,20 +104,20 @@ public final class JavaModelMaker implements ModelMaker {
     if (topLevel) {
       b.append(indent).append("@NullMarked\n");
     }
-    if (options.isOpenapi()) {
+    if (options.getOpenApi().isEnabled()) {
       AnnotationSpec schema = OpenApiUtils.schemaAnnotationForType(type);
       if (schema != null) {
         imports.add(schema.getImportName());
-        b.append(indent).append(OpenApiUtils.render(schema)).append('\n');
+        b.append(indent).append(schema.render()).append('\n');
       }
     }
-    if (options.isJackson()) {
+    if (options.getJackson().isEnabled()) {
       b.append(indent).append("@JsonIgnoreProperties(ignoreUnknown = true)\n");
     }
 
     List<Property> props = type.getProperties();
 
-    if (options.isJackson() && !props.isEmpty()) {
+    if (options.getJackson().isEnabled() && !props.isEmpty()) {
       imports.add("com.fasterxml.jackson.annotation.JsonPropertyOrder");
       b.append(indent)
           .append("@JsonPropertyOrder({")

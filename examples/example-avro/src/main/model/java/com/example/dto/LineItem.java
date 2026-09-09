@@ -19,14 +19,10 @@ import org.jspecify.annotations.Nullable;
 @JsonPropertyOrder({"sku", "quantity", "unit"})
 public final class LineItem {
 
-  @NotNull(message = "must not be null")
   private final String sku;
 
-  @NotNull(message = "must not be null")
   private final Long quantity;
 
-  @NotNull(message = "must not be null")
-  @Pattern(regexp = "^(\\QEACH\\E|\\QCASE\\E|\\QPALLET\\E)$", message = "must be one of EACH, CASE, PALLET")
   private final String unit;
 
   @JsonCreator
@@ -40,16 +36,20 @@ public final class LineItem {
   }
 
   @JsonProperty("sku")
+  @NotNull(message = "must not be null")
   public String getSku() {
     return sku;
   }
 
   @JsonProperty("quantity")
+  @NotNull(message = "must not be null")
   public Long getQuantity() {
     return quantity;
   }
 
   @JsonProperty("unit")
+  @NotNull(message = "must not be null")
+  @Pattern(regexp = "^(\\QEACH\\E|\\QCASE\\E|\\QPALLET\\E)$", message = "must be one of EACH, CASE, PALLET")
   public String getUnit() {
     return unit;
   }

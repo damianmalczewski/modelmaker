@@ -8,6 +8,6 @@
     "y": { "type": "integer" }
   },
   "features": {
-    "preferPrimitives": true
+    "preferPrimitives": { "enabled": true }
   }
 }

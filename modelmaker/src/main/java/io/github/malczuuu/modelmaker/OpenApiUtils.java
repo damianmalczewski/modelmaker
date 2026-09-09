@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
  * Maps schema documentation metadata to the OpenAPI {@code
  * io.swagger.v3.oas.annotations.media.Schema} annotation. Only carries what {@code
  * jakarta.validation} cannot express - {@code description}, {@code example} and, for a required
- * property, {@code requiredMode} - so a model with both the {@code validation} and {@code openapi}
+ * property, {@code requiredMode} - so a model with both the {@code validation} and {@code openApi}
  * features on does not repeat every facet.
  */
 final class OpenApiUtils {
@@ -76,17 +76,5 @@ final class OpenApiUtils {
         "Schema",
         SCHEMA_IMPORT,
         List.of("description = \"" + ConstraintUtils.escapeConstraintLiteral(description) + "\""));
-  }
-
-  /**
-   * Renders an {@link AnnotationSpec} to its {@code @Name(args)} source form.
-   *
-   * @param spec the annotation to render.
-   * @return the rendered annotation.
-   */
-  static String render(AnnotationSpec spec) {
-    return spec.getArgs().isEmpty()
-        ? "@" + spec.getSimpleName()
-        : "@" + spec.getSimpleName() + "(" + String.join(", ", spec.getArgs()) + ")";
   }
 }

@@ -20,10 +20,8 @@ import org.jspecify.annotations.Nullable;
 @JsonPropertyOrder({"id", "payload", "signature"})
 public final class Blob {
 
-  @NotNull(message = "must not be null")
   private final String id;
 
-  @NotNull(message = "must not be null")
   private final byte[] payload;
 
   private final @Nullable byte[] signature;
@@ -39,11 +37,13 @@ public final class Blob {
   }
 
   @JsonProperty("id")
+  @NotNull(message = "must not be null")
   public String getId() {
     return id;
   }
 
   @JsonProperty("payload")
+  @NotNull(message = "must not be null")
   public byte[] getPayload() {
     return payload.clone();
   }

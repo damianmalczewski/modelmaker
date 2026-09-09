@@ -25,6 +25,28 @@ class FieldsRendererTest {
 
   private static final ModelOptions OPTIONS = ModelOptions.builder().build();
 
+  private static ModelOptions validationOnFields() {
+    return ModelOptions.builder()
+        .validation(
+            ValidationConfig.builder()
+                .enabled(true)
+                .annotateFields(true)
+                .annotateGetters(false)
+                .build())
+        .build();
+  }
+
+  private static ModelOptions openApiOnFields() {
+    return ModelOptions.builder()
+        .openApi(
+            OpenApiConfig.builder()
+                .enabled(true)
+                .annotateFields(true)
+                .annotateGetters(false)
+                .build())
+        .build();
+  }
+
   private static ModelType type(String name, Property... properties) {
     return new ModelType(
         name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
@@ -86,7 +108,7 @@ class FieldsRendererTest {
                 Constraints.builder().pattern("^X\\d+$").build(),
                 "id",
                 null));
-    ModelOptions validation = ModelOptions.builder().validation(true).build();
+    ModelOptions validation = validationOnFields();
 
     RenderResult result = new FieldsRenderer().init("", type, validation).render();
 
@@ -97,7 +119,7 @@ class FieldsRendererTest {
   }
 
   @Test
-  void openapiOnPrependsSchemaAnnotationWithDescriptionAndExample() {
+  void openApiOnPrependsSchemaAnnotationWithDescriptionAndExample() {
     ModelType type =
         type(
             "Person",
@@ -110,9 +132,9 @@ class FieldsRendererTest {
                 null,
                 "the identifier",
                 "P123"));
-    ModelOptions openapi = ModelOptions.builder().openapi(true).build();
+    ModelOptions openApi = openApiOnFields();
 
-    RenderResult result = new FieldsRenderer().init("", type, openapi).render();
+    RenderResult result = new FieldsRenderer().init("", type, openApi).render();
 
     assertThat(result.getCode())
         .contains(
@@ -123,21 +145,21 @@ class FieldsRendererTest {
   }
 
   @Test
-  void openapiOnEmitsNoSchemaAnnotationWithoutDescriptionOrExample() {
+  void openApiOnEmitsNoSchemaAnnotationWithoutDescriptionOrExample() {
     ModelType type =
         type(
             "Person",
             new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null));
-    ModelOptions openapi = ModelOptions.builder().openapi(true).build();
+    ModelOptions openApi = openApiOnFields();
 
-    RenderResult result = new FieldsRenderer().init("", type, openapi).render();
+    RenderResult result = new FieldsRenderer().init("", type, openApi).render();
 
     assertThat(result.getCode()).doesNotContain("@Schema");
     assertThat(result.getImports()).doesNotContain("io.swagger.v3.oas.annotations.media.Schema");
   }
 
   @Test
-  void openapiOffEmitsNoSchemaAnnotations() {
+  void openApiOffEmitsNoSchemaAnnotations() {
     ModelType type =
         type(
             "Person",
@@ -189,7 +211,7 @@ class FieldsRendererTest {
                     .build(),
                 "tags",
                 null));
-    ModelOptions validation = ModelOptions.builder().validation(true).build();
+    ModelOptions validation = validationOnFields();
 
     RenderResult result = new FieldsRenderer().init("", type, validation).render();
 
@@ -213,7 +235,7 @@ class FieldsRendererTest {
                 Constraints.none(),
                 "addresses",
                 null));
-    ModelOptions validation = ModelOptions.builder().validation(true).build();
+    ModelOptions validation = validationOnFields();
 
     RenderResult result = new FieldsRenderer().init("", type, validation).render();
 

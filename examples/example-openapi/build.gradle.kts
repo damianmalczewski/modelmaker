@@ -19,9 +19,9 @@ tasks.named<JavaCompile>("compileJava") {
 
 modelmaker {
     features {
-        jackson = true
-        validation = true
-        openapi = true
+        jackson { enabled = true }
+        validation { enabled = true }
+        openApi { enabled = true }
     }
     src {
         enabled = true

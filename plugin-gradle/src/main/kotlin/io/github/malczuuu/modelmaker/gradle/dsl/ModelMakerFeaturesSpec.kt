@@ -16,31 +16,89 @@
 
 package io.github.malczuuu.modelmaker.gradle.dsl
 
-import org.gradle.api.provider.Property
+import org.gradle.api.Action
+import org.gradle.api.tasks.Nested
 
 /**
- * The generation features, configured via `modelmaker { features { } }`. Every flag defaults to
- * `false` and can be overridden per schema through a top-level `"features"` object in the schema
- * file.
+ * The generation features, configured via `modelmaker { features { } }`. Each feature has its own
+ * spec type so it can grow independent options later.
  *
- * @property jackson emit Jackson annotations on the models.
- * @property validation emit `jakarta.validation` annotations on the models.
- * @property withers emit a `withXyz(value)` single-field copy method per property.
- * @property preferPrimitives always-set scalar fields (`integer`, `number`, `boolean`) use the
- *   primitive type (`int`, `double`, `boolean`) instead of the boxed default.
- * @property openapi emit OpenAPI (`io.swagger.v3.oas.annotations.media.Schema`) annotations on the
- *   models, carrying each schema's `description` / `example` and, for a required property,
- *   `requiredMode`.
+ * ```
+ * features {
+ *     jackson    { enabled = true; annotateFields = false; annotateGetters = true }
+ *     validation { enabled = true }
+ *     openApi    { enabled = true }
+ *     withers    { enabled = false }
+ *     preferPrimitives { enabled = false }
+ * }
+ * ```
+ *
+ * `jackson` / `validation` / `openApi` carry on/off plus field / getter placement; `withers` /
+ * `preferPrimitives` are plain on/off. Every flag defaults to `false` except each annotation
+ * feature's `annotateGetters` (defaults to `true`), and every flag can be overridden per schema
+ * through a top-level `"features"` object in the schema file.
+ *
+ * @property jackson Jackson annotations (`@JsonCreator`, `@JsonProperty`, ...).
+ * @property validation `jakarta.validation` constraint annotations and `@Valid` cascades.
+ * @property openApi OpenAPI `@Schema` annotations (`io.swagger.v3.oas.annotations.media.Schema`).
+ * @property withers a `withXyz(value)` single-field copy method per property.
+ * @property preferPrimitives always-set scalar fields use the primitive type (`int`, `double`,
+ *   `boolean`) instead of the boxed default.
  */
 public abstract class ModelMakerFeaturesSpec {
 
-  public abstract val jackson: Property<Boolean>
+  @get:Nested public abstract val jackson: ModelMakerJacksonSpec
 
-  public abstract val validation: Property<Boolean>
+  @get:Nested public abstract val validation: ModelMakerValidationSpec
 
-  public abstract val withers: Property<Boolean>
+  @get:Nested public abstract val openApi: ModelMakerOpenApiSpec
 
-  public abstract val preferPrimitives: Property<Boolean>
+  @get:Nested public abstract val withers: ModelMakerWithersSpec
 
-  public abstract val openapi: Property<Boolean>
+  @get:Nested public abstract val preferPrimitives: ModelMakerPreferPrimitivesSpec
+
+  /**
+   * Configures the Jackson annotations.
+   *
+   * @param configuration action applied to [jackson]
+   */
+  public fun jackson(configuration: Action<in ModelMakerJacksonSpec>) {
+    configuration.execute(jackson)
+  }
+
+  /**
+   * Configures the `jakarta.validation` annotations.
+   *
+   * @param configuration action applied to [validation]
+   */
+  public fun validation(configuration: Action<in ModelMakerValidationSpec>) {
+    configuration.execute(validation)
+  }
+
+  /**
+   * Configures the OpenAPI `@Schema` annotations.
+   *
+   * @param configuration action applied to [openApi]
+   */
+  public fun openApi(configuration: Action<in ModelMakerOpenApiSpec>) {
+    configuration.execute(openApi)
+  }
+
+  /**
+   * Configures the `withXyz(value)` copy methods.
+   *
+   * @param configuration action applied to [withers]
+   */
+  public fun withers(configuration: Action<in ModelMakerWithersSpec>) {
+    configuration.execute(withers)
+  }
+
+  /**
+   * Configures the primitive-vs-boxed scalar preference.
+   *
+   * @param configuration action applied to [preferPrimitives]
+   */
+  public fun preferPrimitives(configuration: Action<in ModelMakerPreferPrimitivesSpec>) {
+    configuration.execute(preferPrimitives)
+  }
 }

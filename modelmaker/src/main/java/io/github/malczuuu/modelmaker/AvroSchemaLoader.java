@@ -158,28 +158,11 @@ public final class AvroSchemaLoader implements SchemaLoader {
    */
   private static FeatureOverrides parseFeatureOverrides(Path file, JsonObject root) {
     JsonElement featuresNode = get(root, "features");
-    if (featuresNode == null || !featuresNode.isJsonObject()) {
-      return FeatureOverrides.none();
+    if (featuresNode != null && !featuresNode.isJsonObject()) {
+      throw fail(file, "\"features\" must be an object");
     }
-    JsonObject features = featuresNode.getAsJsonObject();
-    return FeatureOverrides.builder()
-        .jackson(parseFeatureFlag(file, features, "jackson"))
-        .validation(parseFeatureFlag(file, features, "validation"))
-        .withers(parseFeatureFlag(file, features, "withers"))
-        .preferPrimitives(parseFeatureFlag(file, features, "preferPrimitives"))
-        .openapi(parseFeatureFlag(file, features, "openapi"))
-        .build();
-  }
-
-  private static @Nullable Boolean parseFeatureFlag(Path file, JsonObject features, String field) {
-    JsonElement fieldNode = get(features, field);
-    if (fieldNode == null) {
-      return null;
-    }
-    if (!isBoolean(fieldNode)) {
-      throw fail(file, "\"features." + field + "\" must be a boolean");
-    }
-    return fieldNode.getAsBoolean();
+    JsonObject features = featuresNode != null ? featuresNode.getAsJsonObject() : null;
+    return new FeatureOverridesParser(message -> fail(file, message)).parse(features);
   }
 
   private static Property parseField(

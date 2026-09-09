@@ -257,12 +257,12 @@ class JavaModelMakerTest {
             FeatureOverrides.none());
 
     String out = new JavaModelMaker(opts().build()).emit(type);
-    assertThat(out).contains("@Valid\n  private final Address home;");
-    assertThat(out).contains("private final @Nullable List<@Valid Address> extras;");
-    assertThat(out).doesNotContain("@Valid\n  @Size");
+    // default placement is getters: the field stays plain, the getter carries @Valid
+    assertThat(out).contains("private final Address home;");
+    assertThat(out).contains("@Valid\n  public Address getHome() {");
+    assertThat(out).contains("private final @Nullable List<Address> extras;");
+    assertThat(out).contains("public @Nullable List<@Valid Address> getExtras() {");
     assertThat(out).contains("import jakarta.validation.Valid;");
-    // the @Valid cascade is on the field only - the getter returns a plain List
-    assertThat(out).doesNotContain("List<@Valid Address> getExtras");
 
     String plain = new JavaModelMaker(opts().validation(false).build()).emit(type);
     assertThat(plain).doesNotContain("@Valid");
@@ -271,7 +271,7 @@ class JavaModelMakerTest {
   }
 
   @Test
-  void javaPutsElementConstraintsOnTheListFieldOnly() {
+  void javaPutsElementConstraintsOnTheListGetterByDefault() {
     ModelType type =
         new ModelType(
             "CreateDeviceRequest",
@@ -295,11 +295,11 @@ class JavaModelMakerTest {
 
     assertThat(out)
         .contains(
-            "private final @Nullable List<@Size(min = 1, max = 255, message = \"size must be"
-                + " between 1 and 255\") String> tags;");
+            "public @Nullable List<@Size(min = 1, max = 255, message = \"size must be"
+                + " between 1 and 255\") String> getTags() {");
     assertThat(out).contains("import jakarta.validation.constraints.Size;");
-    // getter, constructor param and builder keep the plain List<String>
-    assertThat(out).contains("public @Nullable List<String> getTags() {");
+    // field, constructor param and builder keep the plain List<String>
+    assertThat(out).contains("private final @Nullable List<String> tags;");
     assertThat(out).containsOnlyOnce("List<@Size");
   }
 
@@ -372,9 +372,9 @@ class JavaModelMakerTest {
           FeatureOverrides.none());
 
   @Test
-  void openapiEmitsSchemaOnTheClassAndOnDocumentedFieldsOnly() {
+  void openApiEmitsSchemaOnTheClassAndOnDocumentedFieldsOnly() {
     String out =
-        new JavaModelMaker(opts().jackson(false).validation(false).openapi(true).build())
+        new JavaModelMaker(opts().jackson(false).validation(false).openApi(true).build())
             .emit(documented);
 
     assertThat(out).contains("import io.swagger.v3.oas.annotations.media.Schema;");
@@ -388,9 +388,9 @@ class JavaModelMakerTest {
   }
 
   @Test
-  void openapiOffEmitsNoSchemaAnnotations() {
+  void openApiOffEmitsNoSchemaAnnotations() {
     String out =
-        new JavaModelMaker(opts().jackson(false).validation(false).openapi(false).build())
+        new JavaModelMaker(opts().jackson(false).validation(false).openApi(false).build())
             .emit(documented);
 
     assertThat(out).doesNotContain("@Schema");
@@ -398,17 +398,19 @@ class JavaModelMakerTest {
   }
 
   @Test
-  void aSchemasOpenapiOverrideWinsOverTheProjectDefaultInBothDirections() {
-    JavaModelMaker offByDefault = new JavaModelMaker(opts().openapi(false).build());
-    JavaModelMaker onByDefault = new JavaModelMaker(opts().openapi(true).build());
+  void aSchemasOpenApiOverrideWinsOverTheProjectDefaultInBothDirections() {
+    JavaModelMaker offByDefault = new JavaModelMaker(opts().openApi(false).build());
+    JavaModelMaker onByDefault = new JavaModelMaker(opts().openApi(true).build());
 
     assertThat(
             offByDefault.emit(
-                documented.withFeatureOverrides(FeatureOverrides.builder().openapi(true).build())))
+                documented.withFeatureOverrides(
+                    FeatureOverrides.builder().openApi(OpenApiOverride.enabled(true)).build())))
         .contains("@Schema(description = \"A billing account.\")");
     assertThat(
             onByDefault.emit(
-                documented.withFeatureOverrides(FeatureOverrides.builder().openapi(false).build())))
+                documented.withFeatureOverrides(
+                    FeatureOverrides.builder().openApi(OpenApiOverride.enabled(false)).build())))
         .doesNotContain("@Schema");
   }
 
@@ -437,12 +439,14 @@ class JavaModelMakerTest {
 
     String forcedOff =
         onByDefault.emit(
-            person.withFeatureOverrides(FeatureOverrides.builder().jackson(false).build()));
+            person.withFeatureOverrides(
+                FeatureOverrides.builder().jackson(JacksonOverride.enabled(false)).build()));
     assertThat(forcedOff).doesNotContain("@JsonCreator");
 
     String forcedOn =
         offByDefault.emit(
-            person.withFeatureOverrides(FeatureOverrides.builder().jackson(true).build()));
+            person.withFeatureOverrides(
+                FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build()));
     assertThat(forcedOn).contains("@JsonCreator");
   }
 
@@ -453,12 +457,14 @@ class JavaModelMakerTest {
 
     String forcedOff =
         onByDefault.emit(
-            person.withFeatureOverrides(FeatureOverrides.builder().validation(false).build()));
+            person.withFeatureOverrides(
+                FeatureOverrides.builder().validation(ValidationOverride.enabled(false)).build()));
     assertThat(forcedOff).doesNotContain("@NotNull");
 
     String forcedOn =
         offByDefault.emit(
-            person.withFeatureOverrides(FeatureOverrides.builder().validation(true).build()));
+            person.withFeatureOverrides(
+                FeatureOverrides.builder().validation(ValidationOverride.enabled(true)).build()));
     assertThat(forcedOn).contains("@NotNull");
   }
 
@@ -505,7 +511,9 @@ class JavaModelMakerTest {
     JavaModelMaker emitter = new JavaModelMaker(opts().jackson(false).build());
 
     String overridden =
-        emitter.emit(person.withFeatureOverrides(FeatureOverrides.builder().jackson(true).build()));
+        emitter.emit(
+            person.withFeatureOverrides(
+                FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build()));
     assertThat(overridden).contains("@JsonCreator");
 
     String next = emitter.emit(address);
@@ -534,7 +542,7 @@ class JavaModelMakerTest {
     assertThat(java).contains("private final String userId;");
     assertThat(java).contains("public String getUserId() {");
     assertThat(java).contains("@JsonPropertyOrder({\"user_id\"})");
-    assertThat(java).contains("@JsonProperty(\"user_id\")\n  public String getUserId() {");
+    assertThat(java).contains("@JsonProperty(\"user_id\")");
     assertThat(java).contains("@JsonProperty(\"user_id\") String userId) {");
     assertThat(java).doesNotContain("@JsonProperty(\"user_id\")\n    public Builder");
   }

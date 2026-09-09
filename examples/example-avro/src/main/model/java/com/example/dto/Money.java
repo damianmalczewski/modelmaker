@@ -18,16 +18,12 @@ import org.jspecify.annotations.Nullable;
 @JsonPropertyOrder({"currency", "amount", "scale", "taxable"})
 public final class Money {
 
-  @NotNull(message = "must not be null")
   private final String currency;
 
-  @NotNull(message = "must not be null")
   private final Double amount;
 
-  @NotNull(message = "must not be null")
   private final Integer scale;
 
-  @NotNull(message = "must not be null")
   private final Boolean taxable;
 
   @JsonCreator
@@ -43,21 +39,25 @@ public final class Money {
   }
 
   @JsonProperty("currency")
+  @NotNull(message = "must not be null")
   public String getCurrency() {
     return currency;
   }
 
   @JsonProperty("amount")
+  @NotNull(message = "must not be null")
   public Double getAmount() {
     return amount;
   }
 
   @JsonProperty("scale")
+  @NotNull(message = "must not be null")
   public Integer getScale() {
     return scale;
   }
 
   @JsonProperty("taxable")
+  @NotNull(message = "must not be null")
   public Boolean getTaxable() {
     return taxable;
   }

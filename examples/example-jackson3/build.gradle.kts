@@ -38,8 +38,8 @@ tasks.named<KotlinCompile>("compileKotlin") {
 modelmaker {
     features {
         // Each file has an override for it.
-        jackson = false
-        validation = false
+        jackson { enabled = false }
+        validation { enabled = false }
     }
     kotlin {
         enabled = true

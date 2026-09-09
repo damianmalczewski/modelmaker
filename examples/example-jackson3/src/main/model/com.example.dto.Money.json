@@ -11,6 +11,6 @@
     "taxable": { "type": "boolean" }
   },
   "features": {
-    "jackson": true
+    "jackson": { "enabled": true }
   }
 }

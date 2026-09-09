@@ -24,7 +24,7 @@ import java.util.TreeSet;
 /**
  * Renders the all-args constructor for one model type (no-arg when it has no properties).
  * Package-private with {@code @JsonCreator}/{@code @JsonProperty} when {@link
- * ModelOptions#isJackson()} is on, so Jackson deserializes through it directly instead of through
+ * ModelOptions#getJackson()} is on, so Jackson deserializes through it directly instead of through
  * the {@code Builder}; otherwise private. A defaulted property's parameter falls back to its {@code
  * default} when {@code null}.
  *
@@ -64,10 +64,10 @@ final class ConstructorRenderer extends AbstractSnippetRenderer {
   public RenderResult render() {
     Set<String> imports = new TreeSet<>();
     StringBuilder code = new StringBuilder();
-    String visibility = options.isJackson() ? "" : "private ";
+    String visibility = options.getJackson().isEnabled() ? "" : "private ";
 
     if (properties.isEmpty()) {
-      if (options.isJackson()) {
+      if (options.getJackson().isEnabled()) {
         imports.add(JSON_CREATOR_IMPORT);
         code.append(indent).append("@JsonCreator\n");
       }
@@ -75,7 +75,7 @@ final class ConstructorRenderer extends AbstractSnippetRenderer {
       return new RenderResult(imports, code.toString());
     }
 
-    if (options.isJackson()) {
+    if (options.getJackson().isEnabled()) {
       imports.add(JSON_CREATOR_IMPORT);
       code.append(indent).append("@JsonCreator\n");
     }
@@ -83,7 +83,7 @@ final class ConstructorRenderer extends AbstractSnippetRenderer {
     for (int i = 0; i < properties.size(); i++) {
       Property p = properties.get(i);
       code.append(indent).append("    ");
-      if (options.isJackson()) {
+      if (options.getJackson().isEnabled()) {
         imports.add(JSON_PROPERTY_IMPORT);
         code.append("@JsonProperty(\"").append(p.getJsonName()).append("\") ");
       }

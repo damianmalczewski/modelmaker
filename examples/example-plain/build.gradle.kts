@@ -37,8 +37,8 @@ tasks.named<KotlinCompile>("compileKotlin") {
 
 modelmaker {
     features {
-        jackson = false
-        validation = false
+        jackson { enabled = false }
+        validation { enabled = false }
     }
     kotlin {
         enabled = true

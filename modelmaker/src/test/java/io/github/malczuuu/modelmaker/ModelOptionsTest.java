@@ -22,60 +22,96 @@ import org.junit.jupiter.api.Test;
 
 class ModelOptionsTest {
 
-  private static ModelOptions options(
-      boolean preferPrimitives, boolean withers, boolean jackson, boolean validation) {
-    return options(preferPrimitives, withers, jackson, validation, false);
-  }
+  @Test
+  void defaultsHaveEveryFeatureOff() {
+    ModelOptions o = ModelOptions.defaults();
 
-  private static ModelOptions options(
-      boolean preferPrimitives,
-      boolean withers,
-      boolean jackson,
-      boolean validation,
-      boolean openapi) {
-    return ModelOptions.builder()
-        .preferPrimitives(preferPrimitives)
-        .withers(withers)
-        .jackson(jackson)
-        .validation(validation)
-        .openapi(openapi)
-        .build();
+    assertThat(o.getJackson().isEnabled()).isFalse();
+    assertThat(o.getValidation().isEnabled()).isFalse();
+    assertThat(o.getOpenApi().isEnabled()).isFalse();
+    assertThat(o.isWithers()).isFalse();
+    assertThat(o.isPreferPrimitives()).isFalse();
   }
 
   @Test
-  void equalWhenEveryFlagMatches() {
-    assertThat(options(true, false, true, false))
-        .isEqualTo(options(true, false, true, false))
-        .hasSameHashCodeAs(options(true, false, true, false));
+  void booleanShorthandEnablesTheFeatureKeepingGetterPlacement() {
+    ModelOptions o = ModelOptions.builder().validation(true).build();
+
+    assertThat(o.getValidation().isEnabled()).isTrue();
+    assertThat(o.getValidation().emitsOnGetters()).isTrue();
+    assertThat(o.getValidation().emitsOnFields()).isFalse();
   }
 
   @Test
-  void notEqualWhenAnyFlagDiffers() {
-    ModelOptions base = options(true, false, true, false);
+  void anExplicitConfigIsKept() {
+    OpenApiConfig cfg =
+        OpenApiConfig.builder().enabled(true).annotateFields(true).annotateGetters(false).build();
+
+    ModelOptions o = ModelOptions.builder().openApi(cfg).build();
+
+    assertThat(o.getOpenApi()).isEqualTo(cfg);
+    assertThat(o.getOpenApi().emitsOnFields()).isTrue();
+    assertThat(o.getOpenApi().emitsOnGetters()).isFalse();
+  }
+
+  @Test
+  void mutateRoundTrips() {
+    ModelOptions o =
+        ModelOptions.builder()
+            .preferPrimitives(true)
+            .withers(true)
+            .jackson(true)
+            .validation(
+                ValidationConfig.builder()
+                    .enabled(true)
+                    .annotateFields(true)
+                    .annotateGetters(true)
+                    .build())
+            .build();
+
+    assertThat(o.mutate().build()).isEqualTo(o);
+  }
+
+  @Test
+  void equalWhenEveryValueMatches() {
+    assertThat(ModelOptions.builder().jackson(true).build())
+        .isEqualTo(ModelOptions.builder().jackson(true).build())
+        .hasSameHashCodeAs(ModelOptions.builder().jackson(true).build());
+  }
+
+  @Test
+  void notEqualWhenAnyValueDiffers() {
+    ModelOptions base = ModelOptions.builder().jackson(true).build();
 
     assertThat(base)
-        .isNotEqualTo(options(false, false, true, false))
-        .isNotEqualTo(options(true, true, true, false))
-        .isNotEqualTo(options(true, false, false, false))
-        .isNotEqualTo(options(true, false, true, true))
-        .isNotEqualTo(options(true, false, true, false, true));
-  }
-
-  @Test
-  void mutateCarriesOpenapi() {
-    assertThat(options(false, false, false, false, true).mutate().build().isOpenapi()).isTrue();
+        .isNotEqualTo(ModelOptions.builder().jackson(false).build())
+        .isNotEqualTo(ModelOptions.builder().jackson(true).withers(true).build())
+        .isNotEqualTo(
+            ModelOptions.builder()
+                .jackson(
+                    JacksonConfig.builder()
+                        .enabled(true)
+                        .annotateFields(true)
+                        .annotateGetters(true)
+                        .build())
+                .build());
   }
 
   @Test
   void notEqualToNullOrAnotherType() {
-    assertThat(options(true, false, true, false)).isNotEqualTo(null).isNotEqualTo("ModelOptions");
+    assertThat(ModelOptions.defaults()).isNotEqualTo(null).isNotEqualTo("ModelOptions");
   }
 
   @Test
-  void toStringReportsEveryFlag() {
-    assertThat(options(true, false, true, false).toString())
+  void toStringReportsEveryValue() {
+    assertThat(ModelOptions.builder().preferPrimitives(true).jackson(true).build().toString())
         .isEqualTo(
-            "ModelOptions[preferPrimitives=true, withers=false, jackson=true, validation=false,"
-                + " openapi=false]");
+            "ModelOptions[preferPrimitives=true, withers=false, "
+                + "jackson=JacksonConfig[enabled=true, annotateFields=false,"
+                + " annotateGetters=true], "
+                + "validation=ValidationConfig[enabled=false, annotateFields=false,"
+                + " annotateGetters=true], "
+                + "openApi=OpenApiConfig[enabled=false, annotateFields=false,"
+                + " annotateGetters=true]]");
   }
 }

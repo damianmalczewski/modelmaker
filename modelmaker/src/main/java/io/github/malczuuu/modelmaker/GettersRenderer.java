@@ -20,8 +20,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Renders the {@code getXyz()} getters for one model type, one per property, each carrying
- * {@code @JsonProperty} when {@link ModelOptions#isJackson()} is on. A collection-valued getter
+ * Renders the {@code getXyz()} getters for one model type, one per property, each preceded by the
+ * annotations of any feature whose config {@code emitsOnGetters()}. A collection-valued getter
  * returns {@code Collections.unmodifiableList} of the field so a caller cannot mutate the DTO
  * through it.
  *
@@ -31,8 +31,6 @@ import java.util.TreeSet;
 final class GettersRenderer extends AbstractSnippetRenderer {
 
   private static final String NULLABLE_IMPORT = "org.jspecify.annotations.Nullable";
-  private static final String JSON_PROPERTY_IMPORT =
-      "com.fasterxml.jackson.annotation.JsonProperty";
   private static final String COLLECTIONS_IMPORT = "java.util.Collections";
 
   /** Creates a new {@link GettersRenderer}. */
@@ -47,14 +45,17 @@ final class GettersRenderer extends AbstractSnippetRenderer {
   public RenderResult render() {
     Set<String> imports = new TreeSet<>();
     StringBuilder code = new StringBuilder();
+    boolean openApi = options.getOpenApi().emitsOnGetters();
+    boolean jackson = options.getJackson().emitsOnGetters();
+    boolean validation = options.getValidation().emitsOnGetters();
     for (Property p : properties) {
-      if (options.isJackson()) {
-        imports.add(JSON_PROPERTY_IMPORT);
-        code.append(indent).append("@JsonProperty(\"").append(p.getJsonName()).append("\")\n");
+      for (String a :
+          PropertyAnnotations.declarationAnnotations(p, openApi, jackson, validation, imports)) {
+        code.append(indent).append(a).append('\n');
       }
       code.append(indent)
           .append("public ")
-          .append(fieldType(p, imports))
+          .append(returnType(p, validation, imports))
           .append(' ')
           .append(getterName(p))
           .append("() {\n");
@@ -66,13 +67,28 @@ final class GettersRenderer extends AbstractSnippetRenderer {
 
   /**
    * Type of the getter return value: non-null when the value is always set, and a primitive scalar
-   * only when {@link ModelOptions#isPreferPrimitives()} is on.
+   * only when {@link ModelOptions#isPreferPrimitives()} is on. A {@code List} return type carries
+   * its element's {@code jakarta.validation} constraints (and {@code @Valid} for a DTO element) in
+   * the container-element position when {@code validation} annotates getters.
    *
    * @param prop the property to type.
+   * @param validation whether {@code jakarta.validation} emits on getters.
    * @param imports import set to add any needed type to.
    * @return the rendered return type, including a leading {@code @Nullable} when applicable.
    */
-  private String fieldType(Property prop, Set<String> imports) {
+  private String returnType(Property prop, boolean validation, Set<String> imports) {
+    if (prop.getType() instanceof PropType.ArrayType array) {
+      String list =
+          types.listType(
+              array,
+              PropertyAnnotations.elementAnnotations(prop, array, validation, imports),
+              imports);
+      if (prop.nonNull()) {
+        return list;
+      }
+      imports.add(NULLABLE_IMPORT);
+      return "@Nullable " + list;
+    }
     if (prop.nonNull()) {
       return types.nonNull(prop.getType(), imports);
     }

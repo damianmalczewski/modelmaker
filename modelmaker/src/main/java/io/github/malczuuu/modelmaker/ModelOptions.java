@@ -22,7 +22,12 @@ import org.jspecify.annotations.Nullable;
 /**
  * Toggles for what {@link JavaModelMaker} puts on the generated model - the Java-side subset of
  * {@code modelmaker { features { } }}, with any per-schema feature overrides already applied. Built
- * through {@link #builder()}; every flag defaults to {@code false}.
+ * through {@link #builder()}.
+ *
+ * <p>The three annotation-emitting features ({@code jackson}, {@code validation}, {@code openApi})
+ * each carry their own config ({@link JacksonConfig}, {@link ValidationConfig}, {@link
+ * OpenApiConfig}) - on/off plus field / getter placement. {@code withers} and {@code
+ * preferPrimitives} are plain toggles.
  */
 public final class ModelOptions {
 
@@ -30,25 +35,25 @@ public final class ModelOptions {
 
   private final boolean preferPrimitives;
   private final boolean withers;
-  private final boolean jackson;
-  private final boolean validation;
-  private final boolean openapi;
+  private final JacksonConfig jackson;
+  private final ValidationConfig validation;
+  private final OpenApiConfig openApi;
 
   private ModelOptions(
       boolean preferPrimitives,
       boolean withers,
-      boolean jackson,
-      boolean validation,
-      boolean openapi) {
+      JacksonConfig jackson,
+      ValidationConfig validation,
+      OpenApiConfig openApi) {
     this.preferPrimitives = preferPrimitives;
     this.withers = withers;
     this.jackson = jackson;
     this.validation = validation;
-    this.openapi = openapi;
+    this.openApi = openApi;
   }
 
   /**
-   * The default options - every flag {@code false}.
+   * The default options - every feature off, annotations placed on getters when later enabled.
    *
    * @return the shared default instance.
    */
@@ -59,7 +64,7 @@ public final class ModelOptions {
   /**
    * Starts accumulating a new options set.
    *
-   * @return a new {@link Builder}, every flag starting {@code false}.
+   * @return a new {@link Builder}.
    */
   public static Builder builder() {
     return new Builder();
@@ -84,35 +89,35 @@ public final class ModelOptions {
   }
 
   /**
-   * Whether Jackson annotations are emitted.
+   * Jackson annotation configuration - on/off plus field / getter placement.
    *
-   * @return {@code true} when on.
+   * @return the configuration.
    */
-  public boolean isJackson() {
+  public JacksonConfig getJackson() {
     return jackson;
   }
 
   /**
-   * Whether {@code jakarta.validation} annotations are emitted.
+   * {@code jakarta.validation} annotation configuration - on/off plus field / getter placement.
    *
-   * @return {@code true} when on.
+   * @return the configuration.
    */
-  public boolean isValidation() {
+  public ValidationConfig getValidation() {
     return validation;
   }
 
   /**
-   * Whether OpenAPI ({@code io.swagger.v3.oas.annotations}) {@code @Schema} annotations are
-   * emitted.
+   * OpenAPI ({@code io.swagger.v3.oas.annotations}) {@code @Schema} configuration - on/off plus
+   * field / getter placement.
    *
-   * @return {@code true} when on.
+   * @return the configuration.
    */
-  public boolean isOpenapi() {
-    return openapi;
+  public OpenApiConfig getOpenApi() {
+    return openApi;
   }
 
   /**
-   * Starts a new {@link Builder} pre-filled with this instance's flags, for producing a modified
+   * Starts a new {@link Builder} pre-filled with this instance's values, for producing a modified
    * copy.
    *
    * @return the pre-filled builder.
@@ -123,7 +128,7 @@ public final class ModelOptions {
         .withers(withers)
         .jackson(jackson)
         .validation(validation)
-        .openapi(openapi);
+        .openApi(openApi);
   }
 
   @Override
@@ -136,14 +141,14 @@ public final class ModelOptions {
     }
     return preferPrimitives == other.preferPrimitives
         && withers == other.withers
-        && jackson == other.jackson
-        && validation == other.validation
-        && openapi == other.openapi;
+        && jackson.equals(other.jackson)
+        && validation.equals(other.validation)
+        && openApi.equals(other.openApi);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(preferPrimitives, withers, jackson, validation, openapi);
+    return Objects.hash(preferPrimitives, withers, jackson, validation, openApi);
   }
 
   @Override
@@ -153,18 +158,18 @@ public final class ModelOptions {
         + (", withers=" + withers)
         + (", jackson=" + jackson)
         + (", validation=" + validation)
-        + (", openapi=" + openapi)
+        + (", openApi=" + openApi)
         + "]";
   }
 
-  /** Accumulates {@link ModelOptions}; every flag starts {@code false}. */
+  /** Accumulates {@link ModelOptions}. */
   public static final class Builder {
 
     private boolean preferPrimitives = false;
     private boolean withers = false;
-    private boolean jackson = false;
-    private boolean validation = false;
-    private boolean openapi = false;
+    private JacksonConfig jackson = JacksonConfig.defaults();
+    private ValidationConfig validation = ValidationConfig.defaults();
+    private OpenApiConfig openApi = OpenApiConfig.defaults();
 
     private Builder() {}
 
@@ -192,46 +197,78 @@ public final class ModelOptions {
     }
 
     /**
-     * Emit Jackson annotations when {@code true}.
+     * Turns Jackson annotations on or off, keeping the default getter placement.
      *
      * @param value {@code true} to turn it on.
      * @return {@code this}.
      */
     public Builder jackson(boolean value) {
+      this.jackson = JacksonConfig.builder().enabled(value).build();
+      return this;
+    }
+
+    /**
+     * Sets the jackson configuration, e.g. from {@link JacksonConfig#builder()}.
+     *
+     * @param value the configuration.
+     * @return {@code this}.
+     */
+    public Builder jackson(JacksonConfig value) {
       this.jackson = value;
       return this;
     }
 
     /**
-     * Emit {@code jakarta.validation} annotations when {@code true}.
+     * Turns {@code jakarta.validation} annotations on or off, keeping the default getter placement.
      *
      * @param value {@code true} to turn it on.
      * @return {@code this}.
      */
     public Builder validation(boolean value) {
+      this.validation = ValidationConfig.builder().enabled(value).build();
+      return this;
+    }
+
+    /**
+     * Sets the validation configuration, e.g. from {@link ValidationConfig#builder()}.
+     *
+     * @param value the configuration.
+     * @return {@code this}.
+     */
+    public Builder validation(ValidationConfig value) {
       this.validation = value;
       return this;
     }
 
     /**
-     * Emit OpenAPI ({@code io.swagger.v3.oas.annotations}) {@code @Schema} annotations when {@code
-     * true}.
+     * Turns OpenAPI {@code @Schema} annotations on or off, keeping the default getter placement.
      *
      * @param value {@code true} to turn it on.
      * @return {@code this}.
      */
-    public Builder openapi(boolean value) {
-      this.openapi = value;
+    public Builder openApi(boolean value) {
+      this.openApi = OpenApiConfig.builder().enabled(value).build();
       return this;
     }
 
     /**
-     * Builds the options from the accumulated flags.
+     * Sets the openApi configuration, e.g. from {@link OpenApiConfig#builder()}.
+     *
+     * @param value the configuration.
+     * @return {@code this}.
+     */
+    public Builder openApi(OpenApiConfig value) {
+      this.openApi = value;
+      return this;
+    }
+
+    /**
+     * Builds the options from the accumulated values.
      *
      * @return a new {@link ModelOptions}.
      */
     public ModelOptions build() {
-      return new ModelOptions(preferPrimitives, withers, jackson, validation, openapi);
+      return new ModelOptions(preferPrimitives, withers, jackson, validation, openApi);
     }
 
     @Override
@@ -241,7 +278,7 @@ public final class ModelOptions {
           + (", withers=" + withers)
           + (", jackson=" + jackson)
           + (", validation=" + validation)
-          + (", openapi=" + openapi)
+          + (", openApi=" + openApi)
           + "]";
     }
   }

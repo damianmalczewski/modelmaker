@@ -82,6 +82,115 @@ class GettersRendererTest {
   }
 
   @Test
+  void validationOnGettersPrependsConstraintsAndCarriesElementAnnotationsOnTheReturnType() {
+    ModelType type =
+        type(
+            "Person",
+            new Property(
+                "id",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.builder().pattern("^X$").build(),
+                "id",
+                null),
+            new Property(
+                "tags",
+                PropType.ArrayType.of(PropType.ScalarType.STRING),
+                false,
+                Constraints.builder()
+                    .elementConstraints(Constraints.builder().minLength(1).build())
+                    .build(),
+                "tags",
+                null));
+    ModelOptions validation =
+        ModelOptions.builder()
+            .validation(
+                ValidationConfig.builder()
+                    .enabled(true)
+                    .annotateFields(false)
+                    .annotateGetters(true)
+                    .build())
+            .build();
+
+    RenderResult result = new GettersRenderer().init("", type, validation).render();
+
+    assertThat(result.getCode())
+        .contains("@NotNull(message = \"must not be null\")")
+        .contains(
+            "@Pattern(regexp = \"^X$\", message = \"must match \\\"^X$\\\"\")\n"
+                + "public String getId() {")
+        .contains(
+            "public @Nullable List<@Size(min = 1, message = \"size must be at least 1\") String>"
+                + " getTags() {");
+    assertThat(result.getImports()).contains("jakarta.validation.constraints.Size");
+  }
+
+  @Test
+  void openApiOnGettersPrependsSchemaAnnotation() {
+    ModelType type =
+        type(
+            "Person",
+            new Property(
+                "id",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.none(),
+                "id",
+                null,
+                "the id",
+                null));
+    ModelOptions openApi =
+        ModelOptions.builder()
+            .openApi(
+                OpenApiConfig.builder()
+                    .enabled(true)
+                    .annotateFields(false)
+                    .annotateGetters(true)
+                    .build())
+            .build();
+
+    RenderResult result = new GettersRenderer().init("", type, openApi).render();
+
+    assertThat(result.getCode())
+        .contains(
+            "@Schema(description = \"the id\", requiredMode = Schema.RequiredMode.REQUIRED)\n"
+                + "public String getId() {");
+  }
+
+  @Test
+  void annotateGettersOffEmitsNoGetterAnnotations() {
+    ModelType type =
+        type(
+            "Person",
+            new Property(
+                "id",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.builder().pattern("^X$").build(),
+                "id",
+                null));
+    ModelOptions fieldsOnly =
+        ModelOptions.builder()
+            .jackson(
+                JacksonConfig.builder()
+                    .enabled(true)
+                    .annotateFields(false)
+                    .annotateGetters(false)
+                    .build())
+            .validation(
+                ValidationConfig.builder()
+                    .enabled(true)
+                    .annotateFields(false)
+                    .annotateGetters(false)
+                    .build())
+            .build();
+
+    RenderResult result = new GettersRenderer().init("", type, fieldsOnly).render();
+
+    assertThat(result.getCode()).doesNotContain("@JsonProperty").doesNotContain("@Pattern");
+  }
+
+  @Test
   void aRequiredCollectionGetterReturnsAnUnmodifiableListUnconditionally() {
     ModelType type =
         type(

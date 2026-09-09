@@ -22,30 +22,34 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Per-schema overrides of {@code modelmaker { features { } }}, parsed from a schema file's
- * top-level {@code "features"} object. Each flag is {@code null} when the schema does not set it -
- * the project default then applies. Built through {@link #builder()} or {@link #none()}.
+ * top-level {@code "features"} object. The {@code jackson} / {@code validation} / {@code openApi}
+ * overrides are {@link JacksonOverride} / {@link ValidationOverride} / {@link OpenApiOverride}
+ * (each flag {@code null} when unset); {@code withers} / {@code preferPrimitives} are {@code null}
+ * when unset. Built through {@link #builder()} or {@link #none()}.
  */
 public final class FeatureOverrides {
 
-  private static final FeatureOverrides NONE = new FeatureOverrides(null, null, null, null, null);
+  private static final FeatureOverrides NONE =
+      new FeatureOverrides(
+          JacksonOverride.none(), ValidationOverride.none(), OpenApiOverride.none(), null, null);
 
-  private final @Nullable Boolean jackson;
-  private final @Nullable Boolean validation;
+  private final JacksonOverride jackson;
+  private final ValidationOverride validation;
+  private final OpenApiOverride openApi;
   private final @Nullable Boolean withers;
   private final @Nullable Boolean preferPrimitives;
-  private final @Nullable Boolean openapi;
 
   private FeatureOverrides(
-      @Nullable Boolean jackson,
-      @Nullable Boolean validation,
+      JacksonOverride jackson,
+      ValidationOverride validation,
+      OpenApiOverride openApi,
       @Nullable Boolean withers,
-      @Nullable Boolean preferPrimitives,
-      @Nullable Boolean openapi) {
+      @Nullable Boolean preferPrimitives) {
     this.jackson = jackson;
     this.validation = validation;
+    this.openApi = openApi;
     this.withers = withers;
     this.preferPrimitives = preferPrimitives;
-    this.openapi = openapi;
   }
 
   /**
@@ -62,26 +66,35 @@ public final class FeatureOverrides {
    *
    * @return a new {@link Builder}, every flag starting unset.
    */
-  public static Builder builder() {
+  static Builder builder() {
     return new Builder();
   }
 
   /**
    * The {@code features.jackson} override.
    *
-   * @return the override, or empty when unset.
+   * @return the override ({@link JacksonOverride#none()} when unset).
    */
-  public Optional<Boolean> getJackson() {
-    return Optional.ofNullable(jackson);
+  public JacksonOverride getJackson() {
+    return jackson;
   }
 
   /**
    * The {@code features.validation} override.
    *
-   * @return the override, or empty when unset.
+   * @return the override ({@link ValidationOverride#none()} when unset).
    */
-  public Optional<Boolean> getValidation() {
-    return Optional.ofNullable(validation);
+  public ValidationOverride getValidation() {
+    return validation;
+  }
+
+  /**
+   * The {@code features.openApi} override.
+   *
+   * @return the override ({@link OpenApiOverride#none()} when unset).
+   */
+  public OpenApiOverride getOpenApi() {
+    return openApi;
   }
 
   /**
@@ -103,15 +116,6 @@ public final class FeatureOverrides {
   }
 
   /**
-   * The {@code features.openapi} override.
-   *
-   * @return the override, or empty when unset.
-   */
-  public Optional<Boolean> getOpenapi() {
-    return Optional.ofNullable(openapi);
-  }
-
-  /**
    * Applies every set flag over {@code baseOptions}, leaving unset flags at the base value.
    *
    * @param baseOptions the project's default options.
@@ -121,9 +125,9 @@ public final class FeatureOverrides {
     ModelOptions.Builder builder = baseOptions.mutate();
     getPreferPrimitives().ifPresent(builder::preferPrimitives);
     getWithers().ifPresent(builder::withers);
-    getJackson().ifPresent(builder::jackson);
-    getValidation().ifPresent(builder::validation);
-    getOpenapi().ifPresent(builder::openapi);
+    builder.jackson(baseOptions.getJackson().withOverride(jackson));
+    builder.validation(baseOptions.getValidation().withOverride(validation));
+    builder.openApi(baseOptions.getOpenApi().withOverride(openApi));
     return builder.build();
   }
 
@@ -135,16 +139,16 @@ public final class FeatureOverrides {
     if (!(obj instanceof FeatureOverrides other)) {
       return false;
     }
-    return Objects.equals(jackson, other.jackson)
-        && Objects.equals(validation, other.validation)
+    return jackson.equals(other.jackson)
+        && validation.equals(other.validation)
+        && openApi.equals(other.openApi)
         && Objects.equals(withers, other.withers)
-        && Objects.equals(preferPrimitives, other.preferPrimitives)
-        && Objects.equals(openapi, other.openapi);
+        && Objects.equals(preferPrimitives, other.preferPrimitives);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(jackson, validation, withers, preferPrimitives, openapi);
+    return Objects.hash(jackson, validation, openApi, withers, preferPrimitives);
   }
 
   @Override
@@ -152,30 +156,30 @@ public final class FeatureOverrides {
     return "FeatureOverrides["
         + ("jackson=" + jackson)
         + (", validation=" + validation)
+        + (", openApi=" + openApi)
         + (", withers=" + withers)
         + (", preferPrimitives=" + preferPrimitives)
-        + (", openapi=" + openapi)
         + "]";
   }
 
-  /** Accumulates {@link FeatureOverrides}; every flag starts unset ({@code null}). */
+  /** Accumulates {@link FeatureOverrides}; every flag starts unset. */
   public static final class Builder {
 
-    private @Nullable Boolean jackson = null;
-    private @Nullable Boolean validation = null;
+    private JacksonOverride jackson = JacksonOverride.none();
+    private ValidationOverride validation = ValidationOverride.none();
+    private OpenApiOverride openApi = OpenApiOverride.none();
     private @Nullable Boolean withers = null;
     private @Nullable Boolean preferPrimitives = null;
-    private @Nullable Boolean openapi = null;
 
     private Builder() {}
 
     /**
      * Sets the {@code features.jackson} override.
      *
-     * @param value the override, or {@code null} to leave it unset.
+     * @param value the override.
      * @return {@code this}.
      */
-    public Builder jackson(@Nullable Boolean value) {
+    Builder jackson(JacksonOverride value) {
       this.jackson = value;
       return this;
     }
@@ -183,11 +187,22 @@ public final class FeatureOverrides {
     /**
      * Sets the {@code features.validation} override.
      *
-     * @param value the override, or {@code null} to leave it unset.
+     * @param value the override.
      * @return {@code this}.
      */
-    public Builder validation(@Nullable Boolean value) {
+    Builder validation(ValidationOverride value) {
       this.validation = value;
+      return this;
+    }
+
+    /**
+     * Sets the {@code features.openApi} override.
+     *
+     * @param value the override.
+     * @return {@code this}.
+     */
+    Builder openApi(OpenApiOverride value) {
+      this.openApi = value;
       return this;
     }
 
@@ -214,23 +229,12 @@ public final class FeatureOverrides {
     }
 
     /**
-     * Sets the {@code features.openapi} override.
-     *
-     * @param value the override, or {@code null} to leave it unset.
-     * @return {@code this}.
-     */
-    public Builder openapi(@Nullable Boolean value) {
-      this.openapi = value;
-      return this;
-    }
-
-    /**
      * Builds the overrides from the accumulated flags.
      *
      * @return a new {@link FeatureOverrides}.
      */
     public FeatureOverrides build() {
-      return new FeatureOverrides(jackson, validation, withers, preferPrimitives, openapi);
+      return new FeatureOverrides(jackson, validation, openApi, withers, preferPrimitives);
     }
 
     @Override
@@ -238,9 +242,9 @@ public final class FeatureOverrides {
       return "FeatureOverrides.Builder["
           + ("jackson=" + jackson)
           + (", validation=" + validation)
+          + (", openApi=" + openApi)
           + (", withers=" + withers)
           + (", preferPrimitives=" + preferPrimitives)
-          + (", openapi=" + openapi)
           + "]";
     }
   }

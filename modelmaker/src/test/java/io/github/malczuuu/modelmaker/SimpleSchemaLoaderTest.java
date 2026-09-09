@@ -448,10 +448,14 @@ class SimpleSchemaLoaderTest {
     Path all =
         schema(
             "x.All",
-            "\"features\": { \"jackson\": true, \"validation\": false, \"withers\": true,"
-                + " \"preferPrimitives\": false, \"openapi\": true }, \"properties\": {}");
+            "\"features\": { \"jackson\": { \"enabled\": true, \"annotateFields\": true,"
+                + " \"annotateGetters\": false }, \"validation\": { \"enabled\": false },"
+                + " \"withers\": { \"enabled\": true }, \"preferPrimitives\": { \"enabled\": false"
+                + " }, \"openApi\": { \"enabled\": true } }, \"properties\": {}");
     Path jacksonOnly =
-        schema("x.JacksonOnly", "\"features\": { \"jackson\": true }, \"properties\": {}");
+        schema(
+            "x.JacksonOnly",
+            "\"features\": { \"jackson\": { \"enabled\": true } }, \"properties\": {}");
     Path none = schema("x.None", "\"properties\": {}");
 
     List<ModelType> types = loader.load(List.of(all, jacksonOnly, none));
@@ -459,14 +463,14 @@ class SimpleSchemaLoaderTest {
     assertThat(named(types, "All").getFeatureOverrides())
         .isEqualTo(
             FeatureOverrides.builder()
-                .jackson(true)
-                .validation(false)
+                .jackson(JacksonOverride.of(true, true, false))
+                .validation(ValidationOverride.enabled(false))
                 .withers(true)
                 .preferPrimitives(false)
-                .openapi(true)
+                .openApi(OpenApiOverride.enabled(true))
                 .build());
     assertThat(named(types, "JacksonOnly").getFeatureOverrides())
-        .isEqualTo(FeatureOverrides.builder().jackson(true).build());
+        .isEqualTo(FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build());
     assertThat(named(types, "None").getFeatureOverrides()).isEqualTo(FeatureOverrides.none());
   }
 
@@ -495,10 +499,37 @@ class SimpleSchemaLoaderTest {
   }
 
   @Test
-  void rejectsANonBooleanFeaturesOverride() {
-    Path f = schema("x.Bad", "\"features\": { \"jackson\": \"yes\" }, \"properties\": {}");
+  void rejectsANonBooleanFeaturesFlag() {
+    Path f =
+        schema(
+            "x.Bad", "\"features\": { \"jackson\": { \"enabled\": \"yes\" } }, \"properties\": {}");
     assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("\"features.jackson\" must be a boolean");
+        .hasMessageContaining("\"features.jackson.enabled\" must be a boolean");
+  }
+
+  @Test
+  void rejectsABooleanShorthandFeaturesEntry() {
+    Path f = schema("x.Bad", "\"features\": { \"jackson\": true }, \"properties\": {}");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("\"features.jackson\" must be an object");
+  }
+
+  @Test
+  void rejectsAnUnknownFeaturesEntry() {
+    Path f =
+        schema("x.Bad", "\"features\": { \"jacksom\": { \"enabled\": true } }, \"properties\": {}");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("unknown \"features\" entry \"jacksom\"");
+  }
+
+  @Test
+  void rejectsAnUnknownKeyInsideAFeatureEntry() {
+    Path f =
+        schema(
+            "x.Bad",
+            "\"features\": { \"withers\": { \"annotateFields\": true } }, \"properties\": {}");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("unknown \"features.withers\" entry \"annotateFields\"");
   }
 
   @Test

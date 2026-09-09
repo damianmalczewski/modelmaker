@@ -19,7 +19,7 @@ tasks.named<JavaCompile>("compileJava") {
 
 modelmaker {
     features {
-        withers = true
+        withers { enabled = true }
     }
 }
 

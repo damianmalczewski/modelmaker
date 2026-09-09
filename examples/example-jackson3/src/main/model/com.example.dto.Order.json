@@ -9,6 +9,6 @@
     "shippingAddress": { "$ref": "com.example.dto.Address" }
   },
   "features": {
-    "jackson": true
+    "jackson": { "enabled": true }
   }
 }

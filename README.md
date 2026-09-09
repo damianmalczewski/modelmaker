@@ -56,13 +56,19 @@ Features configurable via `ModelOptions` and `"features"` section in schema file
 - `jackson` - adds `@JsonCreator`, `@JsonProperty` and friends for JSON deserialization, also makes the constructor
   `package-private` to allow deserialization.
 - `validation` - adds `jakarta.validation` constraint annotations, according to rules from schema file.
-- `withers` - adds `withXyz(value)` methods, which are per property, single-field copy methods.
-- `preferPrimitives` - force usage of type primitives (`int`/`double`/`boolean`) instead of their boxed types if
-  possible (for example, integer with default value will produce `int`).
-- `openapi` - adds OpenAPI `@Schema` annotations (`io.swagger.v3.oas.annotations.media.Schema`) carrying each schema's
+- `openApi` - adds OpenAPI `@Schema` annotations (`io.swagger.v3.oas.annotations.media.Schema`) carrying each schema's
   `description` / `example` and, for a required property, `requiredMode`. Facets such as `minimum` / `pattern` are left
   to the `validation` feature, which the OpenAPI tooling already reads. Needs `io.swagger.core.v3:swagger-annotations-jakarta`
   on the consumer's compile classpath.
+- `withers` - adds `withXyz(value)` methods, which are per property, single-field copy methods.
+- `preferPrimitives` - force usage of type primitives (`int`/`double`/`boolean`) instead of their boxed types if
+  possible (for example, integer with default value will produce `int`).
+
+`jackson`, `validation` and `openApi` are each a block, not a bare boolean: `{ enabled; annotateFields; annotateGetters }`
+- `enabled` turns the feature on, `annotateFields` / `annotateGetters` choose where its annotations are placed
+(defaults: `enabled = false`, `annotateFields = false`, `annotateGetters = true`, so an enabled feature annotates the
+getters). Setting both `annotateFields` and `annotateGetters` emits on both - for `validation` that means Hibernate
+Validator visits each constraint twice. `withers` and `preferPrimitives` stay plain `{ enabled }` toggles.
 
 Generated classes are annotated with **JSpecify** annotations - `@NullMarked` on a class and `@Nullable` on every
 optional field/parameter.
@@ -122,17 +128,30 @@ modelmaker {
         enabled = false  // default off
     }
     features {
-        jackson          = false  // @JsonCreator / @JsonProperty / ...
-        validation       = false  // jakarta.validation annotations, @Valid cascades
-        withers          = false  // withXyz(value) per property
-        preferPrimitives = false  // int/double/boolean instead of boxed types
-        openapi          = false  // OpenAPI @Schema (description / example / requiredMode)
+        jackson {          // @JsonCreator / @JsonProperty / ...
+            enabled         = false
+            annotateFields  = false
+            annotateGetters = true
+        }
+        validation { enabled = false }  // jakarta.validation annotations, @Valid cascades
+        openApi    { enabled = false }  // OpenAPI @Schema (description / example / requiredMode)
+        withers          { enabled = false }  // withXyz(value) per property
+        preferPrimitives { enabled = false }  // int/double/boolean instead of boxed types
     }
 }
 ```
 
 Any `features` flag can be overridden per schema file via a top-level `"features"` object in that file, taking
-precedence over the project default for that type only.
+precedence over the project default for that type only. Each entry is an object matching the DSL shape - `{ "enabled":
+..., "annotateFields": ..., "annotateGetters": ... }` for `jackson` / `validation` / `openApi`, `{ "enabled": ... }`
+for `withers` / `preferPrimitives`; any key left out keeps the project default:
+
+```json
+"features": {
+  "jackson":    { "enabled": true },
+  "validation": { "enabled": true, "annotateFields": true, "annotateGetters": false }
+}
+```
 
 The plugin adds `org.jspecify:jspecify` on `compileOnly` unless the build already declares it, as generated classes are
 `@NullMarked`.
@@ -149,7 +168,7 @@ a JSON object:
 | `type`        | yes      | must be `"object"`                                                                                 |
 | `properties`  | yes      | object of property name -> property schema                                                         |
 | `required`    | no       | array of property names that must always be set                                                    |
-| `description` | no       | emitted as `@Schema(description = ...)` on the generated class when the `openapi` feature is on    |
+| `description` | no       | emitted as `@Schema(description = ...)` on the generated class when `openApi` is on                |
 | `features`    | no       | per-file override of `modelmaker { features { } }`, see below                                      |
 
 Each entry under `properties` is itself a small schema, either a `"type"` or a `"$ref"`:
@@ -211,23 +230,27 @@ Validation keywords, translated to `jakarta.validation` annotations when the `va
 `maxLength`, `minimum` / `maximum`) also apply when written **inside an array's `"items"`**, and are emitted as
 container-element annotations, e.g. `List<@Size(min = 1, max = 255) String> tags`. `minItems` / `maxItems` stay on the
 array node and size the `List` itself. Element annotations - and the `@Valid` cascade into a `List` of generated types -
-render on the **field only** (the getter, constructor and builder keep the plain `List<T>`); with field-access
-validation that is enough, and it avoids Hibernate Validator visiting each element twice.
+render at the same site as the property's own constraints (the getter by default), on the field / getter type only; the
+constructor and builder keep the plain `List<T>`.
 
-OpenAPI keywords, emitted as `@Schema` arguments when the `openapi` feature is on; ignored otherwise:
+**Placement.** `validation` and `openApi` annotations sit on the getters by default (`annotateGetters = true`), matching
+where `jackson` puts `@JsonProperty`. Set `annotateFields = true` (and, if you want field placement only,
+`annotateGetters = false`) to move or duplicate them onto the `private final` fields.
+
+OpenAPI keywords, emitted as `@Schema` arguments when the `openApi` feature is on; ignored otherwise:
 
 | Keyword         | Applies to         | Emitted as                                                            |
 |-----------------|--------------------|----------------------------------------------------------------------|
-| `description`   | type or property   | `@Schema(description = ...)` on the class / field                    |
-| `example`       | property (scalar)  | `@Schema(example = "...")` on the field (rendered as a string)       |
-| `required`      | property           | `@Schema(requiredMode = Schema.RequiredMode.REQUIRED)` on the field  |
+| `description`   | type or property   | `@Schema(description = ...)` on the class / on the getter or field    |
+| `example`       | property (scalar)  | `@Schema(example = "...")`, rendered as a string                      |
+| `required`      | property           | `@Schema(requiredMode = Schema.RequiredMode.REQUIRED)`                |
 
-A `@Schema` annotation is only emitted for a field that carries a `description` or `example`. Facets such as
-`minimum` / `pattern` are deliberately left off `@Schema` - the `validation` feature emits them as
-`jakarta.validation` annotations, which OpenAPI generators (springdoc, swagger-core) already read. For Avro input the
-record / field `"doc"` is used as the `description`.
+A property's `@Schema` is only emitted when it carries a `description` or `example`. Facets such as `minimum` /
+`pattern` are deliberately left off `@Schema` - the `validation` feature emits them as `jakarta.validation`
+annotations, which OpenAPI generators (springdoc, swagger-core) already read. For Avro input the record / field
+`"doc"` is used as the `description`.
 
-The `features` section (`jackson`, `validation`, `withers`, `preferPrimitives`, `openapi`) allows overriding the
+The `features` section (`jackson`, `validation`, `openApi`, `withers`, `preferPrimitives`) allows overriding the
 global `ModelOptions` on a per-file basis.
 
 <details>
@@ -244,8 +267,8 @@ global `ModelOptions` on a per-file basis.
     "age": { "type": "integer" }
   },
   "features": {
-    "jackson": true,
-    "validation": true
+    "jackson": { "enabled": true },
+    "validation": { "enabled": true }
   }
 }
 ```
@@ -327,8 +350,8 @@ The same example as above can be generated using the following Avro, with `jacks
     { "name": "age", "type": ["null", "int"], "default": null }
   ],
   "features": {
-    "jackson": true,
-    "validation": true
+    "jackson": { "enabled": true },
+    "validation": { "enabled": true }
   }
 }
 ```
@@ -378,7 +401,7 @@ Standalone Gradle builds under `examples/`, each applying the plugin from `maven
 | `example-jackson2`   | `jackson` feature with Jackson 2 (`com.fasterxml.jackson`).              |
 | `example-jackson3`   | `jackson` feature with Jackson 3 (`tools.jackson`) plus Kotlin `mutate`. |
 | `example-validation` | `validation` feature and `jakarta.validation` constraints.               |
-| `example-openapi`    | `jackson` + `validation` + `openapi` on one type; OpenAPI `@Schema`.     |
+| `example-openapi`    | `jackson` + `validation` + `openApi` on one type; OpenAPI `@Schema`.     |
 | `example-withers`    | `withers` feature - per-property copy methods.                           |
 | `example-mutator`    | Kotlin `mutate { }` extensions.                                          |
 | `example-avro`       | `.avsc` schema input.                                                    |

@@ -221,18 +221,20 @@ class AvroSchemaLoaderTest {
         write(
             "x.All.avsc",
             "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"All\", \"features\": {"
-                + " \"jackson\": true, \"validation\": false, \"withers\": true,"
-                + " \"preferPrimitives\": false, \"openapi\": true }, \"fields\": [] }");
+                + " \"jackson\": { \"enabled\": true, \"annotateFields\": true },"
+                + " \"validation\": { \"enabled\": false }, \"withers\": { \"enabled\": true },"
+                + " \"preferPrimitives\": { \"enabled\": false },"
+                + " \"openApi\": { \"enabled\": true } }, \"fields\": [] }");
     ModelType m = loader.load(List.of(f)).get(0);
 
     assertThat(m.getFeatureOverrides())
         .isEqualTo(
             FeatureOverrides.builder()
-                .jackson(true)
-                .validation(false)
+                .jackson(JacksonOverride.of(true, true, null))
+                .validation(ValidationOverride.enabled(false))
                 .withers(true)
                 .preferPrimitives(false)
-                .openapi(true)
+                .openApi(OpenApiOverride.enabled(true))
                 .build());
   }
 
@@ -276,14 +278,15 @@ class AvroSchemaLoaderTest {
         write(
             "x.Order.avsc",
             "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Order\", \"features\": {"
-                + " \"jackson\": true }, \"fields\": [ { \"name\": \"shipTo\", \"type\": {"
+                + " \"jackson\": { \"enabled\": true } }, \"fields\": [ { \"name\": \"shipTo\","
+                + " \"type\": {"
                 + " \"type\": \"record\", \"name\": \"Address\", \"fields\": [ { \"name\":"
                 + " \"city\", \"type\": \"string\" } ] } } ] }");
     List<ModelType> types = loader.load(List.of(f));
     ModelType order = types.get(0);
 
     assertThat(order.getFeatureOverrides())
-        .isEqualTo(FeatureOverrides.builder().jackson(true).build());
+        .isEqualTo(FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build());
     assertThat(order.getNested().get(0).getFeatureOverrides()).isEqualTo(FeatureOverrides.none());
   }
 
@@ -293,9 +296,20 @@ class AvroSchemaLoaderTest {
         write(
             "x.Bad.avsc",
             "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Bad\", \"features\": {"
-                + " \"jackson\": \"yes\" }, \"fields\": [] }");
+                + " \"jackson\": { \"enabled\": \"yes\" } }, \"fields\": [] }");
     assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("\"features.jackson\" must be a boolean");
+        .hasMessageContaining("\"features.jackson.enabled\" must be a boolean");
+  }
+
+  @Test
+  void rejectsABooleanShorthandFeaturesEntry() {
+    Path f =
+        write(
+            "x.Bad.avsc",
+            "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Bad\", \"features\": {"
+                + " \"jackson\": true }, \"fields\": [] }");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("\"features.jackson\" must be an object");
   }
 
   @Test

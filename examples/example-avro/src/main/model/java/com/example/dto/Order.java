@@ -23,24 +23,16 @@ import org.jspecify.annotations.Nullable;
 @JsonPropertyOrder({"id", "status", "shippingAddress", "items", "discountRate", "priority"})
 public final class Order {
 
-  @NotNull(message = "must not be null")
   private final String id;
 
-  @NotNull(message = "must not be null")
-  @Pattern(regexp = "^(\\QNEW\\E|\\QPAID\\E|\\QSHIPPED\\E)$", message = "must be one of NEW, PAID, SHIPPED")
   private final String status;
 
-  @NotNull(message = "must not be null")
-  @Valid
   private final Address shippingAddress;
 
-  @NotNull(message = "must not be null")
-  private final List<@Valid LineItem> items;
+  private final List<LineItem> items;
 
   private final @Nullable Float discountRate;
 
-  @NotNull(message = "must not be null")
-  @Pattern(regexp = "^(\\QLOW\\E|\\QNORMAL\\E|\\QHIGH\\E)$", message = "must be one of LOW, NORMAL, HIGH")
   private final String priority;
 
   @JsonCreator
@@ -60,22 +52,28 @@ public final class Order {
   }
 
   @JsonProperty("id")
+  @NotNull(message = "must not be null")
   public String getId() {
     return id;
   }
 
   @JsonProperty("status")
+  @NotNull(message = "must not be null")
+  @Pattern(regexp = "^(\\QNEW\\E|\\QPAID\\E|\\QSHIPPED\\E)$", message = "must be one of NEW, PAID, SHIPPED")
   public String getStatus() {
     return status;
   }
 
   @JsonProperty("shippingAddress")
+  @NotNull(message = "must not be null")
+  @Valid
   public Address getShippingAddress() {
     return shippingAddress;
   }
 
   @JsonProperty("items")
-  public List<LineItem> getItems() {
+  @NotNull(message = "must not be null")
+  public List<@Valid LineItem> getItems() {
     return Collections.unmodifiableList(items);
   }
 
@@ -85,6 +83,8 @@ public final class Order {
   }
 
   @JsonProperty("priority")
+  @NotNull(message = "must not be null")
+  @Pattern(regexp = "^(\\QLOW\\E|\\QNORMAL\\E|\\QHIGH\\E)$", message = "must be one of LOW, NORMAL, HIGH")
   public String getPriority() {
     return priority;
   }

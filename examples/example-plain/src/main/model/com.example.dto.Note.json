@@ -11,6 +11,6 @@
     "folder": { "$ref": "com.example.dto.Folder" }
   },
   "features": {
-    "preferPrimitives": true
+    "preferPrimitives": { "enabled": true }
   }
 }

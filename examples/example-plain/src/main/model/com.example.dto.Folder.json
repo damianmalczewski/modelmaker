@@ -8,6 +8,6 @@
     "name": { "type": "string" }
   },
   "features": {
-    "withers": true
+    "withers": { "enabled": true }
   }
 }

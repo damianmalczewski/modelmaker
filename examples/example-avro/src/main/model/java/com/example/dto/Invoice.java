@@ -22,15 +22,11 @@ import org.jspecify.annotations.Nullable;
 @JsonPropertyOrder({"id", "billTo", "notes"})
 public final class Invoice {
 
-  @NotNull(message = "must not be null")
   private final String id;
 
-  @NotNull(message = "must not be null")
-  @Valid
   private final Contact billTo;
 
-  @NotNull(message = "must not be null")
-  private final List<@Valid Note> notes;
+  private final List<Note> notes;
 
   @JsonCreator
   Invoice(
@@ -43,17 +39,21 @@ public final class Invoice {
   }
 
   @JsonProperty("id")
+  @NotNull(message = "must not be null")
   public String getId() {
     return id;
   }
 
   @JsonProperty("billTo")
+  @NotNull(message = "must not be null")
+  @Valid
   public Contact getBillTo() {
     return billTo;
   }
 
   @JsonProperty("notes")
-  public List<Note> getNotes() {
+  @NotNull(message = "must not be null")
+  public List<@Valid Note> getNotes() {
     return Collections.unmodifiableList(notes);
   }
 
@@ -144,10 +144,8 @@ public final class Invoice {
   @JsonPropertyOrder({"name", "email"})
   public static final class Contact {
 
-    @NotNull(message = "must not be null")
     private final String name;
 
-    @NotNull(message = "must not be null")
     private final String email;
 
     @JsonCreator
@@ -159,11 +157,13 @@ public final class Invoice {
     }
 
     @JsonProperty("name")
+    @NotNull(message = "must not be null")
     public String getName() {
       return name;
     }
 
     @JsonProperty("email")
+    @NotNull(message = "must not be null")
     public String getEmail() {
       return email;
     }
@@ -252,10 +252,8 @@ public final class Invoice {
   @JsonPropertyOrder({"author", "text"})
   public static final class Note {
 
-    @NotNull(message = "must not be null")
     private final String author;
 
-    @NotNull(message = "must not be null")
     private final String text;
 
     @JsonCreator
@@ -267,11 +265,13 @@ public final class Invoice {
     }
 
     @JsonProperty("author")
+    @NotNull(message = "must not be null")
     public String getAuthor() {
       return author;
     }
 
     @JsonProperty("text")
+    @NotNull(message = "must not be null")
     public String getText() {
       return text;
     }

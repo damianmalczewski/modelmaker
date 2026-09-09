@@ -146,16 +146,11 @@ public final class SimpleSchemaLoader implements SchemaLoader {
       throw fail(file, "top-level \"type\" must be \"object\"");
     }
     JsonElement featuresNode = get(root, "features");
-    JsonObject features =
-        featuresNode != null && featuresNode.isJsonObject() ? featuresNode.getAsJsonObject() : null;
+    if (featuresNode != null && !featuresNode.isJsonObject()) {
+      throw fail(file, "\"features\" must be an object");
+    }
     FeatureOverrides overrides =
-        FeatureOverrides.builder()
-            .jackson(parseFeatureFlag(file, features, "jackson"))
-            .validation(parseFeatureFlag(file, features, "validation"))
-            .withers(parseFeatureFlag(file, features, "withers"))
-            .preferPrimitives(parseFeatureFlag(file, features, "preferPrimitives"))
-            .openapi(parseFeatureFlag(file, features, "openapi"))
-            .build();
+        parseFeatures(file, featuresNode != null ? featuresNode.getAsJsonObject() : null);
 
     return parseObject(
         file,
@@ -165,29 +160,8 @@ public final class SimpleSchemaLoader implements SchemaLoader {
         overrides);
   }
 
-  /**
-   * Reads {@code features.<field>} ({@code true}/{@code false}), a per-schema override of {@code
-   * modelmaker.features} for this file only. {@code null} when the top-level {@code "features"}
-   * object, or this field of it, is absent - the project default then applies.
-   *
-   * @param file the schema file being parsed, for error messages.
-   * @param features the top-level {@code "features"} object, or {@code null} when absent.
-   * @param field the flag name to read.
-   * @return the flag's value, or {@code null} when unset.
-   */
-  private static @Nullable Boolean parseFeatureFlag(
-      Path file, @Nullable JsonObject features, String field) {
-    if (features == null) {
-      return null;
-    }
-    JsonElement fieldNode = get(features, field);
-    if (fieldNode == null) {
-      return null;
-    }
-    if (!isBoolean(fieldNode)) {
-      throw fail(file, "\"features." + field + "\" must be a boolean");
-    }
-    return fieldNode.getAsBoolean();
+  private static FeatureOverrides parseFeatures(Path file, @Nullable JsonObject features) {
+    return new FeatureOverridesParser(message -> fail(file, message)).parse(features);
   }
 
   private static ModelType parseObject(

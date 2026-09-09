@@ -19,14 +19,10 @@ import org.jspecify.annotations.Nullable;
 @JsonPropertyOrder({"street", "city", "kind"})
 public final class Address {
 
-  @NotNull(message = "must not be null")
   private final String street;
 
-  @NotNull(message = "must not be null")
   private final String city;
 
-  @NotNull(message = "must not be null")
-  @Pattern(regexp = "^(\\QRESIDENTIAL\\E|\\QCOMMERCIAL\\E)$", message = "must be one of RESIDENTIAL, COMMERCIAL")
   private final String kind;
 
   @JsonCreator
@@ -40,16 +36,20 @@ public final class Address {
   }
 
   @JsonProperty("street")
+  @NotNull(message = "must not be null")
   public String getStreet() {
     return street;
   }
 
   @JsonProperty("city")
+  @NotNull(message = "must not be null")
   public String getCity() {
     return city;
   }
 
   @JsonProperty("kind")
+  @NotNull(message = "must not be null")
+  @Pattern(regexp = "^(\\QRESIDENTIAL\\E|\\QCOMMERCIAL\\E)$", message = "must be one of RESIDENTIAL, COMMERCIAL")
   public String getKind() {
     return kind;
   }

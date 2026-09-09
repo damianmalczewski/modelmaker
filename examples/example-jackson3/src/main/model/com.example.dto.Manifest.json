@@ -9,6 +9,6 @@
     "items": { "type": "array", "items": { "$ref": "com.example.dto.LineItem" } }
   },
   "features": {
-    "jackson": true
+    "jackson": { "enabled": true }
   }
 }

@@ -25,24 +25,12 @@ import org.jspecify.annotations.Nullable;
 @JsonPropertyOrder({"id", "email", "loyaltyPoints", "shippingAddress"})
 public final class Customer {
 
-  @Schema(description = "Customer identifier, C followed by digits.", example = "C42", requiredMode = Schema.RequiredMode.REQUIRED)
-  @NotNull(message = "must not be null")
-  @Pattern(regexp = "^C\\d+$", message = "must match \"^C\\d+$\"")
   private final String id;
 
-  @Schema(description = "Primary contact email.", example = "ada@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
-  @NotNull(message = "must not be null")
-  @Email(message = "must be a well-formed email address")
   private final String email;
 
-  @Schema(description = "Accrued loyalty points.")
-  @NotNull(message = "must not be null")
-  @Min(value = 0, message = "must be greater than or equal to 0")
-  @Max(value = 100000, message = "must be less than or equal to 100000")
   private final Integer loyaltyPoints;
 
-  @NotNull(message = "must not be null")
-  @Valid
   private final Address shippingAddress;
 
   @JsonCreator
@@ -57,22 +45,34 @@ public final class Customer {
     this.shippingAddress = shippingAddress;
   }
 
+  @Schema(description = "Customer identifier, C followed by digits.", example = "C42", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("id")
+  @NotNull(message = "must not be null")
+  @Pattern(regexp = "^C\\d+$", message = "must match \"^C\\d+$\"")
   public String getId() {
     return id;
   }
 
+  @Schema(description = "Primary contact email.", example = "ada@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("email")
+  @NotNull(message = "must not be null")
+  @Email(message = "must be a well-formed email address")
   public String getEmail() {
     return email;
   }
 
+  @Schema(description = "Accrued loyalty points.")
   @JsonProperty("loyaltyPoints")
+  @NotNull(message = "must not be null")
+  @Min(value = 0, message = "must be greater than or equal to 0")
+  @Max(value = 100000, message = "must be less than or equal to 100000")
   public Integer getLoyaltyPoints() {
     return loyaltyPoints;
   }
 
   @JsonProperty("shippingAddress")
+  @NotNull(message = "must not be null")
+  @Valid
   public Address getShippingAddress() {
     return shippingAddress;
   }

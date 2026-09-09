@@ -8,6 +8,6 @@
     "quantity": { "type": "integer" }
   },
   "features": {
-    "jackson": true
+    "jackson": { "enabled": true }
   }
 }

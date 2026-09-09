@@ -16,9 +16,12 @@
 
 package io.github.malczuuu.modelmaker.gradle.tasks
 
+import io.github.malczuuu.modelmaker.JacksonConfig
 import io.github.malczuuu.modelmaker.JavaModelMaker
 import io.github.malczuuu.modelmaker.ModelOptions
+import io.github.malczuuu.modelmaker.OpenApiConfig
 import io.github.malczuuu.modelmaker.SchemaLoaders
+import io.github.malczuuu.modelmaker.ValidationConfig
 import io.github.malczuuu.modelmaker.gradle.dsl.ModelMakerFeaturesSpec
 import java.io.File
 import javax.inject.Inject
@@ -26,10 +29,9 @@ import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -57,32 +59,12 @@ public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFacto
   /** Where the generated Java DTOs are written; cleared before each run. */
   @get:OutputDirectory public abstract val javaOutputDirectory: DirectoryProperty
 
-  private val featuresSpec: ModelMakerFeaturesSpec = objects.newInstance()
-
   /**
-   * The Java-side feature flags this task emits with, defaulting to the `modelmaker { features { }
-   * }` values (see [inheritFeatures]) unless overridden through [features]. Each is also
-   * overridable per schema via a `"features"` object in the schema file.
+   * The features this task emits with, defaulting to the `modelmaker { features { } }` values (see
+   * [inheritFeatures]) unless overridden through [features]. Each is also overridable per schema
+   * via a `"features"` object in the schema file.
    */
-  @get:Input
-  public val jackson: Provider<Boolean>
-    get() = featuresSpec.jackson
-
-  @get:Input
-  public val validation: Provider<Boolean>
-    get() = featuresSpec.validation
-
-  @get:Input
-  public val withers: Provider<Boolean>
-    get() = featuresSpec.withers
-
-  @get:Input
-  public val preferPrimitives: Provider<Boolean>
-    get() = featuresSpec.preferPrimitives
-
-  @get:Input
-  public val openapi: Provider<Boolean>
-    get() = featuresSpec.openapi
+  @get:Nested public val featuresSpec: ModelMakerFeaturesSpec = objects.newInstance()
 
   /**
    * Configures which features this task emits, overriding the `modelmaker { features { } }`
@@ -90,7 +72,7 @@ public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFacto
    * ```
    * tasks.named<JavaModelGenerate>("generateModelJava") {
    *   features {
-   *     validation = false
+   *     validation { enabled = false }
    *   }
    * }
    * ```
@@ -109,11 +91,23 @@ public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFacto
    * @param features the `modelmaker { features { } }` spec
    */
   internal fun inheritFeatures(features: ModelMakerFeaturesSpec) {
-    featuresSpec.jackson.convention(features.jackson)
-    featuresSpec.validation.convention(features.validation)
-    featuresSpec.withers.convention(features.withers)
-    featuresSpec.preferPrimitives.convention(features.preferPrimitives)
-    featuresSpec.openapi.convention(features.openapi)
+    with(featuresSpec.jackson) {
+      enabled.convention(features.jackson.enabled)
+      annotateFields.convention(features.jackson.annotateFields)
+      annotateGetters.convention(features.jackson.annotateGetters)
+    }
+    with(featuresSpec.validation) {
+      enabled.convention(features.validation.enabled)
+      annotateFields.convention(features.validation.annotateFields)
+      annotateGetters.convention(features.validation.annotateGetters)
+    }
+    with(featuresSpec.openApi) {
+      enabled.convention(features.openApi.enabled)
+      annotateFields.convention(features.openApi.annotateFields)
+      annotateGetters.convention(features.openApi.annotateGetters)
+    }
+    featuresSpec.withers.enabled.convention(features.withers.enabled)
+    featuresSpec.preferPrimitives.enabled.convention(features.preferPrimitives.enabled)
   }
 
   @TaskAction
@@ -137,11 +131,29 @@ public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFacto
     val javaModelMaker =
         JavaModelMaker(
             ModelOptions.builder()
-                .preferPrimitives(preferPrimitives.get())
-                .withers(withers.get())
-                .jackson(jackson.get())
-                .validation(validation.get())
-                .openapi(openapi.get())
+                .preferPrimitives(featuresSpec.preferPrimitives.enabled.get())
+                .withers(featuresSpec.withers.enabled.get())
+                .jackson(
+                    JacksonConfig.builder()
+                        .enabled(featuresSpec.jackson.enabled.get())
+                        .annotateFields(featuresSpec.jackson.annotateFields.get())
+                        .annotateGetters(featuresSpec.jackson.annotateGetters.get())
+                        .build()
+                )
+                .validation(
+                    ValidationConfig.builder()
+                        .enabled(featuresSpec.validation.enabled.get())
+                        .annotateFields(featuresSpec.validation.annotateFields.get())
+                        .annotateGetters(featuresSpec.validation.annotateGetters.get())
+                        .build()
+                )
+                .openApi(
+                    OpenApiConfig.builder()
+                        .enabled(featuresSpec.openApi.enabled.get())
+                        .annotateFields(featuresSpec.openApi.annotateFields.get())
+                        .annotateGetters(featuresSpec.openApi.annotateGetters.get())
+                        .build()
+                )
                 .build()
         )
 

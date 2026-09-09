@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 
 class FeatureOverridesTest {
 
-  /** primitives off, withers on, jackson on, validation off. */
+  /** primitives off, withers on, jackson on, validation off, openApi off. */
   private static ModelOptions base() {
     return ModelOptions.builder()
         .preferPrimitives(false)
@@ -38,27 +38,44 @@ class FeatureOverridesTest {
 
     ModelOptions result = FeatureOverrides.none().applyOn(base);
 
-    assertThat(result.isPreferPrimitives()).isEqualTo(base.isPreferPrimitives());
-    assertThat(result.isWithers()).isEqualTo(base.isWithers());
-    assertThat(result.isJackson()).isEqualTo(base.isJackson());
-    assertThat(result.isValidation()).isEqualTo(base.isValidation());
+    assertThat(result).isEqualTo(base);
   }
 
   @Test
-  void aSetOverrideReplacesOnlyThatFlag() {
-    ModelOptions result = FeatureOverrides.builder().jackson(false).build().applyOn(base());
+  void aSetEnabledOverrideReplacesOnlyThatFeature() {
+    ModelOptions result =
+        FeatureOverrides.builder().jackson(JacksonOverride.enabled(false)).build().applyOn(base());
 
-    assertThat(result.isJackson()).isFalse(); // overridden
-    assertThat(result.isValidation()).isFalse(); // untouched
+    assertThat(result.getJackson().isEnabled()).isFalse(); // overridden
+    assertThat(result.getValidation().isEnabled()).isFalse(); // untouched
     assertThat(result.isWithers()).isTrue(); // untouched
     assertThat(result.isPreferPrimitives()).isFalse(); // untouched
   }
 
   @Test
-  void openapiOverrideIsApplied() {
-    assertThat(FeatureOverrides.builder().openapi(true).build().applyOn(base()).isOpenapi())
+  void aPlacementOverrideLeavesEnabledAtTheBase() {
+    ModelOptions result =
+        FeatureOverrides.builder()
+            .jackson(JacksonOverride.of(null, true, null))
+            .build()
+            .applyOn(base());
+
+    assertThat(result.getJackson().isEnabled()).isTrue(); // base
+    assertThat(result.getJackson().isAnnotateFields()).isTrue(); // overridden
+    assertThat(result.getJackson().isAnnotateGetters()).isTrue(); // base default
+  }
+
+  @Test
+  void openApiOverrideIsApplied() {
+    assertThat(
+            FeatureOverrides.builder()
+                .openApi(OpenApiOverride.enabled(true))
+                .build()
+                .applyOn(base())
+                .getOpenApi()
+                .isEnabled())
         .isTrue();
-    assertThat(FeatureOverrides.none().applyOn(base()).isOpenapi()).isFalse();
+    assertThat(FeatureOverrides.none().applyOn(base()).getOpenApi().isEnabled()).isFalse();
   }
 
   @Test
@@ -75,15 +92,15 @@ class FeatureOverridesTest {
         FeatureOverrides.builder()
             .preferPrimitives(true)
             .withers(false)
-            .jackson(false)
-            .validation(true)
+            .jackson(JacksonOverride.enabled(false))
+            .validation(ValidationOverride.enabled(true))
             .build()
             .applyOn(base());
 
     assertThat(result.isPreferPrimitives()).isTrue();
     assertThat(result.isWithers()).isFalse();
-    assertThat(result.isJackson()).isFalse();
-    assertThat(result.isValidation()).isTrue();
+    assertThat(result.getJackson().isEnabled()).isFalse();
+    assertThat(result.getValidation().isEnabled()).isTrue();
   }
 
   @Test
@@ -93,25 +110,30 @@ class FeatureOverridesTest {
 
     assertThat(result.isWithers()).isFalse(); // override
     assertThat(result.isPreferPrimitives()).isTrue(); // override
-    assertThat(result.isJackson()).isTrue(); // base
-    assertThat(result.isValidation()).isFalse(); // base
+    assertThat(result.getJackson().isEnabled()).isTrue(); // base
+    assertThat(result.getValidation().isEnabled()).isFalse(); // base
   }
 
   @Test
-  void aNullOverrideIsTreatedAsUnset() {
-    ModelOptions result = FeatureOverrides.builder().jackson(null).build().applyOn(base());
+  void aNoneOverrideIsTreatedAsUnset() {
+    ModelOptions result =
+        FeatureOverrides.builder().jackson(JacksonOverride.none()).build().applyOn(base());
 
-    assertThat(result.isJackson()).isEqualTo(base().isJackson());
+    assertThat(result.getJackson()).isEqualTo(base().getJackson());
   }
 
   @Test
   void applyOnDoesNotMutateTheBase() {
     ModelOptions base = base();
 
-    FeatureOverrides.builder().jackson(false).validation(true).build().applyOn(base);
+    FeatureOverrides.builder()
+        .jackson(JacksonOverride.enabled(false))
+        .validation(ValidationOverride.enabled(true))
+        .build()
+        .applyOn(base);
 
-    assertThat(base.isJackson()).isTrue();
-    assertThat(base.isValidation()).isFalse();
+    assertThat(base.getJackson().isEnabled()).isTrue();
+    assertThat(base.getValidation().isEnabled()).isFalse();
   }
 
   @Test
@@ -130,16 +152,16 @@ class FeatureOverridesTest {
 
   @Test
   void equalWhenEveryFlagMatches() {
-    FeatureOverrides a = FeatureOverrides.builder().jackson(true).validation(false).build();
-    FeatureOverrides b = FeatureOverrides.builder().jackson(true).validation(false).build();
+    FeatureOverrides a = FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build();
+    FeatureOverrides b = FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build();
 
     assertThat(a).isEqualTo(b).hasSameHashCodeAs(b);
   }
 
   @Test
   void notEqualWhenAFlagDiffers() {
-    FeatureOverrides a = FeatureOverrides.builder().jackson(true).build();
-    FeatureOverrides b = FeatureOverrides.builder().jackson(false).build();
+    FeatureOverrides a = FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build();
+    FeatureOverrides b = FeatureOverrides.builder().jackson(JacksonOverride.enabled(false)).build();
 
     assertThat(a).isNotEqualTo(b);
   }
@@ -151,9 +173,15 @@ class FeatureOverridesTest {
 
   @Test
   void toStringReportsEveryFlag() {
-    assertThat(FeatureOverrides.builder().jackson(true).build().toString())
+    assertThat(FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build().toString())
         .isEqualTo(
-            "FeatureOverrides[jackson=true, validation=null, withers=null,"
-                + " preferPrimitives=null, openapi=null]");
+            "FeatureOverrides["
+                + "jackson=JacksonOverride[enabled=true, annotateFields=null,"
+                + " annotateGetters=null], "
+                + "validation=ValidationOverride[enabled=null, annotateFields=null,"
+                + " annotateGetters=null], "
+                + "openApi=OpenApiOverride[enabled=null, annotateFields=null,"
+                + " annotateGetters=null], "
+                + "withers=null, preferPrimitives=null]");
   }
 }

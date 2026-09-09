@@ -18,9 +18,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * {@code modelmaker { features { jackson = true; validation = true; openapi = true } }}: the three
- * annotation sets coexist on one generated DTO. Jackson binds it, Hibernate Validator enforces the
- * constraints, and the OpenAPI {@code @Schema} metadata is readable via reflection.
+ * {@code jackson}, {@code validation} and {@code openApi} all on: the three annotation sets coexist
+ * on one generated DTO. Jackson binds it, Hibernate Validator enforces the constraints, and the
+ * OpenAPI {@code @Schema} metadata is readable via reflection (on the getters, the default
+ * placement).
  */
 class CombinedAnnotationsTest {
 
@@ -112,18 +113,23 @@ class CombinedAnnotationsTest {
   }
 
   @Test
-  void aDocumentedRequiredFieldCarriesDescriptionExampleAndRequiredMode() throws Exception {
-    Schema schema = Customer.class.getDeclaredField("id").getAnnotation(Schema.class);
+  void aDocumentedRequiredPropertyCarriesDescriptionExampleAndRequiredMode() throws Exception {
+    // default placement is the getter
+    Schema schema = Customer.class.getDeclaredMethod("getId").getAnnotation(Schema.class);
 
     assertThat(schema).isNotNull();
     assertThat(schema.description()).isEqualTo("Customer identifier, C followed by digits.");
     assertThat(schema.example()).isEqualTo("C42");
     assertThat(schema.requiredMode()).isEqualTo(Schema.RequiredMode.REQUIRED);
+
+    // nothing on the field by default
+    assertThat(Customer.class.getDeclaredField("id").getAnnotation(Schema.class)).isNull();
   }
 
   @Test
-  void aDefaultedOptionalFieldIsNotMarkedRequired() throws Exception {
-    Schema schema = Customer.class.getDeclaredField("loyaltyPoints").getAnnotation(Schema.class);
+  void aDefaultedOptionalPropertyIsNotMarkedRequired() throws Exception {
+    Schema schema =
+        Customer.class.getDeclaredMethod("getLoyaltyPoints").getAnnotation(Schema.class);
 
     assertThat(schema).isNotNull();
     assertThat(schema.description()).isEqualTo("Accrued loyalty points.");

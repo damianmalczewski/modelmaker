@@ -45,7 +45,7 @@ class OpenApiUtilsTest {
     AnnotationSpec spec = OpenApiUtils.schemaAnnotationOf(prop(true, "an id", "P1"));
 
     assertThat(spec).isNotNull();
-    assertThat(OpenApiUtils.render(spec))
+    assertThat(spec.render())
         .isEqualTo(
             "@Schema(description = \"an id\", example = \"P1\","
                 + " requiredMode = Schema.RequiredMode.REQUIRED)");
@@ -57,7 +57,7 @@ class OpenApiUtilsTest {
     AnnotationSpec spec = OpenApiUtils.schemaAnnotationOf(prop(false, "an id", null));
 
     assertThat(spec).isNotNull();
-    assertThat(OpenApiUtils.render(spec)).isEqualTo("@Schema(description = \"an id\")");
+    assertThat(spec.render()).isEqualTo("@Schema(description = \"an id\")");
   }
 
   @Test
@@ -65,8 +65,7 @@ class OpenApiUtilsTest {
     AnnotationSpec spec = OpenApiUtils.schemaAnnotationOf(prop(false, "a \"b\" \\ c", null));
 
     assertThat(spec).isNotNull();
-    assertThat(OpenApiUtils.render(spec))
-        .isEqualTo("@Schema(description = \"a \\\"b\\\" \\\\ c\")");
+    assertThat(spec.render()).isEqualTo("@Schema(description = \"a \\\"b\\\" \\\\ c\")");
   }
 
   @Test
@@ -86,6 +85,6 @@ class OpenApiUtilsTest {
     AnnotationSpec spec = OpenApiUtils.schemaAnnotationForType(type);
 
     assertThat(spec).isNotNull();
-    assertThat(OpenApiUtils.render(spec)).isEqualTo("@Schema(description = \"A thing.\")");
+    assertThat(spec.render()).isEqualTo("@Schema(description = \"A thing.\")");
   }
 }

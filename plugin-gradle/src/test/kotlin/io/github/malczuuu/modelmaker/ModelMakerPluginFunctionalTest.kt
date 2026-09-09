@@ -64,7 +64,7 @@ class ModelMakerPluginFunctionalTest {
   @Test
   fun `jacksonAnnotations opt-in emits jackson annotations and compiles against declared jackson`() {
     project.writeStandardBuild(
-        modelMakerBlock = "modelmaker { features { jackson = true } }",
+        modelMakerBlock = "modelmaker { features { jackson { enabled = true } } }",
         dependencies = "implementation(\"com.fasterxml.jackson.core:jackson-annotations:2.18.2\")",
     )
     project.writeSchemas()
@@ -87,7 +87,7 @@ class ModelMakerPluginFunctionalTest {
         "src/main/model/com.example.dto.Receipt.json",
         $$"""
       { "$modelmaker": "v1.0", "title": "com.example.dto.Receipt", "type": "object",
-        "features": { "jackson": true },
+        "features": { "jackson": { "enabled": true } },
         "required": ["id"], "properties": { "id": { "type": "string" } } }
       """,
     )
@@ -108,7 +108,7 @@ class ModelMakerPluginFunctionalTest {
   @Test
   fun `validationAnnotations opt-in emits jakarta annotations and compiles against declared api`() {
     project.writeStandardBuild(
-        modelMakerBlock = "modelmaker { features { validation = true } }",
+        modelMakerBlock = "modelmaker { features { validation { enabled = true } } }",
         dependencies = "implementation(\"jakarta.validation:jakarta.validation-api:3.1.1\")",
     )
     project.writeSchemas()
@@ -123,9 +123,9 @@ class ModelMakerPluginFunctionalTest {
   }
 
   @Test
-  fun `openapi opt-in emits Schema annotations and compiles against declared swagger annotations`() {
+  fun `openApi opt-in emits Schema annotations and compiles against declared swagger annotations`() {
     project.writeStandardBuild(
-        modelMakerBlock = "modelmaker { features { openapi = true } }",
+        modelMakerBlock = "modelmaker { features { openApi { enabled = true } } }",
         dependencies = "implementation(\"io.swagger.core.v3:swagger-annotations-jakarta:2.2.30\")",
     )
     project.write(
@@ -155,6 +155,28 @@ class ModelMakerPluginFunctionalTest {
   }
 
   @Test
+  fun `validation annotates getters by default and fields when annotateFields is set`() {
+    project.writeStandardBuild(
+        modelMakerBlock =
+            "modelmaker { features { validation { enabled = true; annotateFields = true;" +
+                " annotateGetters = false } } }",
+        dependencies = "implementation(\"jakarta.validation:jakarta.validation-api:3.1.1\")",
+    )
+    project.writeSchemas()
+    project.runner("compileJava").build()
+
+    val java = project.generatedJava("com/example/dto/Customer.java").readText()
+    assertThat(java)
+        .contains(
+            "@Pattern(regexp = \"^C\", message = \"must match \\\"^C\\\"\")\n  private final String id;"
+        )
+    assertThat(java)
+        .doesNotContain(
+            "@Pattern(regexp = \"^C\", message = \"must match \\\"^C\\\"\")\n  public String getId()"
+        )
+  }
+
+  @Test
   fun `does not add jspecify when the build already declares it`() {
     project.writeStandardBuild(dependencies = "implementation(\"org.jspecify:jspecify:1.0.0\")")
     project.writeSchemas()
@@ -168,7 +190,7 @@ class ModelMakerPluginFunctionalTest {
   @Test
   fun `preferPrimitives switches always-set scalars to primitives`() {
     project.writeStandardBuild(
-        modelMakerBlock = "modelmaker { features { preferPrimitives = true } }"
+        modelMakerBlock = "modelmaker { features { preferPrimitives { enabled = true } } }"
     )
     project.writeSchemas()
 
@@ -186,7 +208,7 @@ class ModelMakerPluginFunctionalTest {
     assertThat(project.generatedJava("com/example/dto/Customer.java").readText())
         .doesNotContain("withHome")
 
-    project.appendToBuildScript("modelmaker { features { withers = true } }")
+    project.appendToBuildScript("modelmaker { features { withers { enabled = true } } }")
     project.runner("compileJava").build()
     assertThat(project.generatedJava("com/example/dto/Customer.java").readText())
         .contains("public Customer withHome(Address home) {")
@@ -200,7 +222,7 @@ class ModelMakerPluginFunctionalTest {
         "src/main/model/com.example.dto.Widget.json",
         $$"""
       { "$modelmaker": "v1.0", "title": "com.example.dto.Widget", "type": "object",
-        "features": { "withers": true, "preferPrimitives": true },
+        "features": { "withers": { "enabled": true }, "preferPrimitives": { "enabled": true } },
         "required": ["count"], "properties": { "count": { "type": "integer" } } }
       """,
     )
@@ -406,7 +428,7 @@ class ModelMakerPluginFunctionalTest {
   @Test
   fun `external $ref gets @NotNull but no @Valid cascade under validation`() {
     project.writeStandardBuild(
-        modelMakerBlock = "modelmaker { features { validation = true } }",
+        modelMakerBlock = "modelmaker { features { validation { enabled = true } } }",
         dependencies = "implementation(\"jakarta.validation:jakarta.validation-api:3.1.1\")",
     )
     project.write(
@@ -431,7 +453,7 @@ class ModelMakerPluginFunctionalTest {
   @Test
   fun `$ref to another schema resolves to that type with an @Valid cascade under validation`() {
     project.writeStandardBuild(
-        modelMakerBlock = "modelmaker { features { validation = true } }",
+        modelMakerBlock = "modelmaker { features { validation { enabled = true } } }",
         dependencies = "implementation(\"jakarta.validation:jakarta.validation-api:3.1.1\")",
     )
     project.writeSchemas()

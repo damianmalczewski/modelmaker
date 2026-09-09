@@ -22,14 +22,8 @@ import org.jspecify.annotations.Nullable;
 @JsonPropertyOrder({"city", "postalCode"})
 public final class Address {
 
-  @Schema(description = "City name.", example = "Kraków", requiredMode = Schema.RequiredMode.REQUIRED)
-  @NotNull(message = "must not be null")
-  @Size(min = 1, message = "size must be at least 1")
   private final String city;
 
-  @Schema(description = "Polish postal code, NN-NNN.", example = "30-001", requiredMode = Schema.RequiredMode.REQUIRED)
-  @NotNull(message = "must not be null")
-  @Pattern(regexp = "^\\d{2}-\\d{3}$", message = "must match \"^\\d{2}-\\d{3}$\"")
   private final String postalCode;
 
   @JsonCreator
@@ -40,12 +34,18 @@ public final class Address {
     this.postalCode = postalCode;
   }
 
+  @Schema(description = "City name.", example = "Kraków", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("city")
+  @NotNull(message = "must not be null")
+  @Size(min = 1, message = "size must be at least 1")
   public String getCity() {
     return city;
   }
 
+  @Schema(description = "Polish postal code, NN-NNN.", example = "30-001", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("postalCode")
+  @NotNull(message = "must not be null")
+  @Pattern(regexp = "^\\d{2}-\\d{3}$", message = "must match \"^\\d{2}-\\d{3}$\"")
   public String getPostalCode() {
     return postalCode;
   }

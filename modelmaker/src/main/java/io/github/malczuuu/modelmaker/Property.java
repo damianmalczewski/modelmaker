@@ -63,9 +63,9 @@ public final class Property {
    *     {@code @JsonPropertyOrder}.
    * @param defaultValue {@code default} value, or {@code null}.
    * @param description schema {@code description}, emitted as {@code @Schema(description = ...)}
-   *     when the {@code openapi} feature is on; {@code null} when unset.
+   *     when the {@code openApi} feature is on; {@code null} when unset.
    * @param example schema {@code example} rendered as a string, emitted as {@code @Schema(example =
-   *     ...)} when the {@code openapi} feature is on; {@code null} when unset.
+   *     ...)} when the {@code openApi} feature is on; {@code null} when unset.
    */
   Property(
       String name,
@@ -143,7 +143,7 @@ public final class Property {
 
   /**
    * Schema {@code description}, emitted as {@code @Schema(description = ...)} when the {@code
-   * openapi} feature is on.
+   * openApi} feature is on.
    *
    * @return the description, or {@code null} when unset.
    */
@@ -153,7 +153,7 @@ public final class Property {
 
   /**
    * Schema {@code example} rendered as a string, emitted as {@code @Schema(example = ...)} when the
-   * {@code openapi} feature is on.
+   * {@code openApi} feature is on.
    *
    * @return the example, or {@code null} when unset.
    */
