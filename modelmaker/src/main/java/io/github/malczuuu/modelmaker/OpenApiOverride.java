@@ -23,8 +23,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * Per-schema override of a {@link OpenApiConfig}, parsed from a schema file's top-level {@code
  * "features"} object. Each flag is {@code null} when the schema does not set it - {@link
- * OpenApiConfig#withOverride} then keeps the project default. Created through {@link #none()} /
- * {@link #of} / {@link #enabled(boolean)}.
+ * OpenApiConfig#withOverride} then keeps the project default.
  */
 public final class OpenApiOverride {
 
@@ -34,6 +33,13 @@ public final class OpenApiOverride {
   private final @Nullable Boolean annotateFields;
   private final @Nullable Boolean annotateGetters;
 
+  /**
+   * Creates a new override with the given flags; pass {@code null} for a flag to leave it unset.
+   *
+   * @param enabled the {@code enabled} override, or {@code null}.
+   * @param annotateFields the {@code annotateFields} override, or {@code null}.
+   * @param annotateGetters the {@code annotateGetters} override, or {@code null}.
+   */
   OpenApiOverride(
       @Nullable Boolean enabled,
       @Nullable Boolean annotateFields,
@@ -50,21 +56,6 @@ public final class OpenApiOverride {
    */
   static OpenApiOverride none() {
     return NONE;
-  }
-
-  /**
-   * An override with the given flags; pass {@code null} for a flag to leave it unset.
-   *
-   * @param enabled the {@code enabled} override, or {@code null}.
-   * @param annotateFields the {@code annotateFields} override, or {@code null}.
-   * @param annotateGetters the {@code annotateGetters} override, or {@code null}.
-   * @return the override.
-   */
-  static OpenApiOverride of(
-      @Nullable Boolean enabled,
-      @Nullable Boolean annotateFields,
-      @Nullable Boolean annotateGetters) {
-    return new OpenApiOverride(enabled, annotateFields, annotateGetters);
   }
 
   /**

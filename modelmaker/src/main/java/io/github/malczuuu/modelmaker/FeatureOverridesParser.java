@@ -66,12 +66,12 @@ final class FeatureOverridesParser {
     }
     return FeatureOverrides.builder()
         .jackson(
-            annotationOverride(features, "jackson", JacksonOverride.none(), JacksonOverride::of))
+            annotationOverride(features, "jackson", JacksonOverride.none(), JacksonOverride::new))
         .validation(
             annotationOverride(
-                features, "validation", ValidationOverride.none(), ValidationOverride::of))
+                features, "validation", ValidationOverride.none(), ValidationOverride::new))
         .openApi(
-            annotationOverride(features, "openApi", OpenApiOverride.none(), OpenApiOverride::of))
+            annotationOverride(features, "openApi", OpenApiOverride.none(), OpenApiOverride::new))
         .withers(toggleOverride(features, "withers"))
         .preferPrimitives(toggleOverride(features, "preferPrimitives"))
         .build();

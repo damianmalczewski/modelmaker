@@ -60,7 +60,7 @@ class AnnotationConfigTest {
     JacksonConfig base =
         JacksonConfig.builder().enabled(true).annotateFields(false).annotateGetters(true).build();
 
-    JacksonConfig result = base.withOverride(JacksonOverride.of(null, true, null));
+    JacksonConfig result = base.withOverride(new JacksonOverride(null, true, null));
 
     assertThat(result.isEnabled()).isTrue(); // kept
     assertThat(result.isAnnotateFields()).isTrue(); // overridden

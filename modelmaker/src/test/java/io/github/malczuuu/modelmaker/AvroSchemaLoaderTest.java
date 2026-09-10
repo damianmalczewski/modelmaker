@@ -230,7 +230,7 @@ class AvroSchemaLoaderTest {
     assertThat(m.getFeatureOverrides())
         .isEqualTo(
             FeatureOverrides.builder()
-                .jackson(JacksonOverride.of(true, true, null))
+                .jackson(new JacksonOverride(true, true, null))
                 .validation(ValidationOverride.enabled(false))
                 .withers(true)
                 .preferPrimitives(false)

@@ -56,7 +56,7 @@ class FeatureOverridesTest {
   void aPlacementOverrideLeavesEnabledAtTheBase() {
     ModelOptions result =
         FeatureOverrides.builder()
-            .jackson(JacksonOverride.of(null, true, null))
+            .jackson(new JacksonOverride(null, true, null))
             .build()
             .applyOn(base());
 
