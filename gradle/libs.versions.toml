@@ -8,7 +8,7 @@ errorprone-plugin = "5.1.1"
 nullaway = "0.14.1"
 kotlin = "2.4.10"
 spotless = "8.10.2"
-plugin-publish = "2.1.1"
+plugin-publish = "2.2.0"
 plugin-compatibility = "1.0.0"
 
 [plugins]
