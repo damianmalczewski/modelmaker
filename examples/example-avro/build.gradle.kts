@@ -4,8 +4,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("com.diffplug.spotless") version "8.8.0"
     kotlin("jvm") version "2.4.10"
+    id("com.diffplug.spotless") version "8.8.0"
     id("io.github.malczuuu.modelmaker") version "1.0.0-SNAPSHOT"
 }
 

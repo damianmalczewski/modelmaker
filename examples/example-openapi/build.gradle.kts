@@ -1,8 +1,8 @@
 import com.diffplug.spotless.LineEnding
 
 plugins {
-    id("com.diffplug.spotless") version "8.8.0"
     java
+    id("com.diffplug.spotless") version "8.8.0"
     id("io.github.malczuuu.modelmaker") version "1.0.0-SNAPSHOT"
 }
 
@@ -22,9 +22,6 @@ modelmaker {
         jackson { enabled = true }
         validation { enabled = true }
         openApi { enabled = true }
-    }
-    src {
-        enabled = true
     }
 }
 

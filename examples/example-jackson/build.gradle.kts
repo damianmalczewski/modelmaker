@@ -37,6 +37,7 @@ tasks.named<KotlinCompile>("compileKotlin") {
 
 modelmaker {
     features {
+        // Each file has an override for it.
         jackson { enabled = false }
         validation { enabled = false }
     }
@@ -46,6 +47,10 @@ modelmaker {
 }
 
 dependencies {
+    implementation(platform("tools.jackson:jackson-bom:3.2.2"))
+    implementation("tools.jackson.core:jackson-databind")
+    implementation("tools.jackson.module:jackson-module-kotlin")
+
     testImplementation(platform("org.junit:junit-bom:6.1.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(platform("org.assertj:assertj-bom:3.27.7"))

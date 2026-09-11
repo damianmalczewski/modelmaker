@@ -12,21 +12,17 @@ plugins {
     alias(libs.plugins.plugin.compatibility)
 }
 
-java {
-    toolchain.languageVersion = JavaLanguageVersion.of(25)
-}
-
 kotlin {
     compilerOptions {
         explicitApi()
-
-        javaParameters = true
+        moduleName = project.name
         apiVersion = KotlinVersion.KOTLIN_2_2
         languageVersion = KotlinVersion.KOTLIN_2_2
     }
 }
 tasks.named<KotlinCompile>("compileKotlin") {
     compilerOptions {
+        javaParameters = true
         jvmTarget = JvmTarget.JVM_17
     }
 }

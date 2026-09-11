@@ -5,6 +5,11 @@ plugins {
     id("java")
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
 tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-parameters")
     options.encoding = "UTF-8"

@@ -5,10 +5,7 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 cd example-avro/ ; ./gradlew "$@" ; cd ../
-cd example-jackson2/ ; ./gradlew "$@" ; cd ../
-cd example-jackson3/ ; ./gradlew "$@" ; cd ../
+cd example-jackson/ ; ./gradlew "$@" ; cd ../
 cd example-mutator/ ; ./gradlew "$@" ; cd ../
 cd example-openapi/ ; ./gradlew "$@" ; cd ../
-cd example-plain/ ; ./gradlew "$@" ; cd ../
 cd example-validation/ ; ./gradlew "$@" ; cd ../
-cd example-withers/ ; ./gradlew "$@" ; cd ../

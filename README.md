@@ -9,7 +9,6 @@ layout and wires code generation into the `main` source set.
 
 ## Table of Contents
 
-- [Modules](#modules)
 - [Quick Start](#quick-start)
 - [Generated Java Classes](#generated-java-classes)
 - [Generated Kotlin Code](#generated-kotlin-code)
@@ -23,13 +22,6 @@ layout and wires code generation into the `main` source set.
 - [Examples](#examples)
 - [Building](#building)
 - [License](#license)
-
-## Modules
-
-| Module          | Artifact                                         | Description                                                                       |
-|-----------------|--------------------------------------------------|-----------------------------------------------------------------------------------|
-| `modelmaker`    | `io.github.malczuuu:modelmaker`                  | Core generator library: schema loaders, `JavaModelMaker`, `KotlinExtensionMaker`. |
-| `plugin-gradle` | Gradle plugin ID `io.github.malczuuu.modelmaker` | Applies ModelMaker conventions and wires generation into the build.               |
 
 ## Quick Start
 
@@ -215,16 +207,16 @@ Rejected at load time (not left to fail `javac`):
 Validation keywords, translated to `jakarta.validation` annotations when the `validation` feature is on (see
 [Generated Java Classes](#generated-java-classes)); ignored otherwise:
 
-| Keyword                                              | Applies to | Annotation                                                                                           |
-|------------------------------------------------------|------------|------------------------------------------------------------------------------------------------------|
-| `pattern`                                            | `string`   | `@Pattern`                                                                                           |
-| `enum`                                               | `string`   | `@Pattern` alternation over the listed values, see [Generated Java Classes](#generated-java-classes) |
-| `format: "email"`                                    | `string`   | `@Email`                                                                                             |
-| `format: "decimal"/"date"/"time"/"date-time"/"uuid"` | `string`   | `@Pattern` for the matching shape                                                                    |
-| `minLength` / `maxLength`                            | `string`   | `@Size`                                                                                              |
-| `minimum` / `maximum`                                | `integer`  | `@Min` / `@Max`                                                                                      |
-| `minimum` / `maximum`                                | `number`   | `@DecimalMin` / `@DecimalMax`                                                                        |
-| `minItems` / `maxItems`                              | `array`    | `@Size` on the `List`                                                                                |
+| Keyword                   | Applies to | Annotation                                                                                           |
+|---------------------------|------------|------------------------------------------------------------------------------------------------------|
+| `pattern`                 | `string`   | `@Pattern`                                                                                           |
+| `enum`                    | `string`   | `@Pattern` alternation over the listed values, see [Generated Java Classes](#generated-java-classes) |
+| `format: "email"`         | `string`   | `@Email`                                                                                             |
+| `format` (other)          | `string`   | `@Pattern` for the matching shape - `decimal`, `date`, `time`, `date-time`, `uuid`                   |
+| `minLength` / `maxLength` | `string`   | `@Size`                                                                                              |
+| `minimum` / `maximum`     | `integer`  | `@Min` / `@Max`                                                                                      |
+| `minimum` / `maximum`     | `number`   | `@DecimalMin` / `@DecimalMax`                                                                        |
+| `minItems` / `maxItems`   | `array`    | `@Size` on the `List`                                                                                |
 
 **List elements.** The `string` / `integer` / `number` keywords above (`pattern`, `enum`, `format`, `minLength` /
 `maxLength`, `minimum` / `maximum`) also apply when written **inside an array's `"items"`**, and are emitted as
@@ -239,11 +231,11 @@ where `jackson` puts `@JsonProperty`. Set `annotateFields = true` (and, if you w
 
 OpenAPI keywords, emitted as `@Schema` arguments when the `openApi` feature is on; ignored otherwise:
 
-| Keyword         | Applies to         | Emitted as                                                            |
-|-----------------|--------------------|----------------------------------------------------------------------|
-| `description`   | type or property   | `@Schema(description = ...)` on the class / on the getter or field    |
-| `example`       | property (scalar)  | `@Schema(example = "...")`, rendered as a string                      |
-| `required`      | property           | `@Schema(requiredMode = Schema.RequiredMode.REQUIRED)`                |
+| Keyword       | Applies to        | Emitted as                                                         |
+|---------------|-------------------|--------------------------------------------------------------------|
+| `description` | type or property  | `@Schema(description = ...)` on the class / on the getter or field |
+| `example`     | property (scalar) | `@Schema(example = "...")`, rendered as a string                   |
+| `required`    | property          | `@Schema(requiredMode = Schema.RequiredMode.REQUIRED)`             |
 
 A property's `@Schema` is only emitted when it carries a `description` or `example`. Facets such as `minimum` /
 `pattern` are deliberately left off `@Schema` - the `validation` feature emits them as `jakarta.validation`
@@ -281,7 +273,6 @@ Renders to the following `Person.java` file.
 @JsonPropertyOrder({"id", "age"})
 public final class Person {
 
-  @NotNull(message = "must not be null")
   private final String id;
 
   private final @Nullable Integer age;
@@ -295,6 +286,7 @@ public final class Person {
   }
 
   @JsonProperty("id")
+  @NotNull(message = "must not be null")
   public String getId() {
     return id;
   }
@@ -395,16 +387,13 @@ SchemaLoaders.createDelegatingSchemaLoader().load(schemas).forEach(
 Standalone Gradle builds under `examples/`, each applying the plugin from `mavenLocal()`. Run all of them with
 `examples/buildAll <tasks>` (e.g. `examples/buildAll build`) after `./gradlew publishToMavenLocal`.
 
-| Example              | Shows                                                                    |
-|----------------------|--------------------------------------------------------------------------|
-| `example-plain`      | Minimal setup; generation into `build/` (`src.enabled = false`).         |
-| `example-jackson2`   | `jackson` feature with Jackson 2 (`com.fasterxml.jackson`).              |
-| `example-jackson3`   | `jackson` feature with Jackson 3 (`tools.jackson`) plus Kotlin `mutate`. |
-| `example-validation` | `validation` feature and `jakarta.validation` constraints.               |
-| `example-openapi`    | `jackson` + `validation` + `openApi` on one type; OpenAPI `@Schema`.     |
-| `example-withers`    | `withers` feature - per-property copy methods.                           |
-| `example-mutator`    | Kotlin `mutate { }` extensions.                                          |
-| `example-avro`       | `.avsc` schema input.                                                    |
+| Example              | Shows                                                                |
+|----------------------|----------------------------------------------------------------------|
+| `example-jackson`    | `jackson` feature (`tools.jackson`, Jackson 3) plus Kotlin `mutate`. |
+| `example-validation` | `validation` feature and `jakarta.validation` constraints.           |
+| `example-openapi`    | `jackson` + `validation` + `openApi` on one type; OpenAPI `@Schema`. |
+| `example-mutator`    | Kotlin `mutate { }` extensions.                                      |
+| `example-avro`       | `.avsc` schema input.                                                |
 
 ## Building
 
