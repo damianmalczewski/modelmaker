@@ -1,30 +1,17 @@
 import org.gradle.plugin.compatibility.compatibility
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `kotlin-dsl`
-    id("internal.java-common-convention")
-    id("internal.jacoco-convention")
-    id("internal.publishing-convention")
     alias(libs.plugins.plugin.publish)
     alias(libs.plugins.plugin.compatibility)
+
+    id("internal.build-convention")
 }
 
-kotlin {
-    compilerOptions {
-        explicitApi()
-        moduleName = project.name
-        apiVersion = KotlinVersion.KOTLIN_2_2
-        languageVersion = KotlinVersion.KOTLIN_2_2
-    }
-}
-tasks.named<KotlinCompile>("compileKotlin") {
-    compilerOptions {
-        javaParameters = true
-        jvmTarget = JvmTarget.JVM_17
-    }
+internalBuild {
+    displayName = "ModelMaker Gradle Plugin"
+    description = "Gradle plugin of the ModelMaker project, generating Java model classes from schema files."
+    kover = false
 }
 
 dependencies {
@@ -51,7 +38,8 @@ gradlePlugin {
             id = "io.github.malczuuu.modelmaker"
             implementationClass = "io.github.malczuuu.modelmaker.gradle.ModelMakerPlugin"
             displayName = "ModelMaker Gradle Plugin"
-            description = "Generates immutable Java model classes from schema files."
+            description =
+                "Wires generation of Java model classes with various annotation support from schema files into compilation process."
             tags =
                 listOf(
                     "code-generation",
@@ -71,11 +59,6 @@ gradlePlugin {
             }
         }
     }
-}
-
-internalPublishing {
-    displayName = "ModelMaker Gradle Plugin"
-    description = "Generates immutable Java model classes from schema files."
 }
 
 tasks.withType<Jar>().configureEach {

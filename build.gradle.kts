@@ -2,6 +2,11 @@ import com.diffplug.spotless.LineEnding
 
 plugins {
     alias(libs.plugins.spotless)
+    alias(libs.plugins.kover)
+}
+
+dependencies {
+    kover(project(":modelmaker"))
 }
 
 spotless {
@@ -69,6 +74,10 @@ spotless {
         endWithNewline()
         lineEndings = LineEnding.UNIX
     }
+}
+
+tasks.named("check") {
+    finalizedBy(tasks.named("koverHtmlReport"), tasks.named("koverXmlReport"))
 }
 
 defaultTasks("spotlessApply", "build", "publishToMavenLocal")

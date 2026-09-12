@@ -66,6 +66,14 @@ jobs:
             -Dorg.gradle.workers.max=1
         run: ./gradlew build
 
+      - name: Upload Kover report to Codecov
+        if: matrix.java == 25
+        uses: codecov/codecov-action@v7
+        with:
+          files: ./build/reports/kover/report.xml
+          disable_search: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
   automerge:
     name: Dependabot PR Auto-Merge
     if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'

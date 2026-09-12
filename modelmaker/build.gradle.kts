@@ -1,14 +1,14 @@
 plugins {
     `java-library`
-    id("internal.errorprone-convention")
-    id("internal.jacoco-convention")
-    id("internal.java-common-convention")
-    id("internal.publishing-convention")
+    alias(libs.plugins.kotlin.jvm)
+
+    id("internal.build-convention")
 }
 
-java {
-    withSourcesJar()
-    withJavadocJar()
+internalBuild {
+    displayName = "ModelMaker Core"
+    description = "Shared core of the ModelMaker project, generating Java model classes from schema files."
+    kover = true
 }
 
 dependencies {
@@ -21,7 +21,6 @@ dependencies {
 
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.assertj.core)
-    testImplementation(libs.gson)
 
     testRuntimeOnly(libs.junit.platform.launcher)
 
@@ -35,10 +34,4 @@ publishing {
             from(components["java"])
         }
     }
-}
-
-internalPublishing {
-    displayName = "ModelMaker Core"
-    description =
-        "Shared core of the ModelMaker build-tool plugins. Generates immutable Java model classes from schema files."
 }

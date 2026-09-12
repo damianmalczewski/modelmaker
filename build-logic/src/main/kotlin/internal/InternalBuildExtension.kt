@@ -21,15 +21,18 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 
 /**
- * Artifact-level publishing metadata, configured lazily from build scripts.
+ * Per-project build metadata, configured lazily from build scripts.
  *
  * @constructor Injected by Gradle via [ObjectFactory].
  */
-abstract class InternalPublishingExtension @Inject constructor(objects: ObjectFactory) {
+abstract class InternalBuildExtension @Inject constructor(objects: ObjectFactory) {
 
   /** Human-readable display name of the artifact, used in the generated POM. */
   val displayName: Property<String> = objects.property(String::class.java)
 
   /** Description of the artifact, used in the generated POM. */
   val description: Property<String> = objects.property(String::class.java)
+
+  /** Whether to apply Kover coverage instrumentation to this project. Defaults to `false`. */
+  val kover: Property<Boolean> = objects.property(Boolean::class.java)
 }
