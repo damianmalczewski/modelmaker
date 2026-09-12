@@ -551,7 +551,7 @@ class SimpleSchemaLoaderTest {
     assertThat(named(types, "All").getFeatureOverrides())
         .isEqualTo(
             FeatureOverrides.builder()
-                .jackson(new JacksonOverride(true, true, false))
+                .jackson(new JacksonOverride(true, true, false, null))
                 .validation(ValidationOverride.enabled(false))
                 .withers(true)
                 .preferPrimitives(false)

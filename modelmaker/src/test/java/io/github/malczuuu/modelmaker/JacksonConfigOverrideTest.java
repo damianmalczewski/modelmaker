@@ -45,8 +45,8 @@ class JacksonOverrideTest {
   @Test
   void equalityAndToString() {
     assertThat(JacksonOverride.enabled(true))
-        .isEqualTo(new JacksonOverride(true, null, null))
-        .hasSameHashCodeAs(new JacksonOverride(true, null, null))
+        .isEqualTo(new JacksonOverride(true, null, null, null))
+        .hasSameHashCodeAs(new JacksonOverride(true, null, null, null))
         .isNotEqualTo(JacksonOverride.none())
         .isNotEqualTo(null);
 

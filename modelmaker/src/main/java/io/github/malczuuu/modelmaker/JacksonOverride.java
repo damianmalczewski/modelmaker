@@ -35,20 +35,6 @@ public final class JacksonOverride {
   private final @Nullable Boolean includeNonNull;
 
   /**
-   * Creates a new override with the given flags; pass {@code null} for a flag to leave it unset.
-   *
-   * @param enabled the {@code enabled} override, or {@code null}.
-   * @param annotateFields the {@code annotateFields} override, or {@code null}.
-   * @param annotateGetters the {@code annotateGetters} override, or {@code null}.
-   */
-  JacksonOverride(
-      @Nullable Boolean enabled,
-      @Nullable Boolean annotateFields,
-      @Nullable Boolean annotateGetters) {
-    this(enabled, annotateFields, annotateGetters, null);
-  }
-
-  /**
    * Creates a new override.
    *
    * @param enabled the {@code enabled} flag, or {@code null} to keep the project default.
