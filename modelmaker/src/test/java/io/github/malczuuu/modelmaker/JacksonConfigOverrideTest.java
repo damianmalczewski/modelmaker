@@ -51,6 +51,7 @@ class JacksonOverrideTest {
         .isNotEqualTo(null);
 
     assertThat(JacksonOverride.none().toString())
-        .isEqualTo("JacksonOverride[enabled=null, annotateFields=null, annotateGetters=null]");
+        .isEqualTo(
+            "JacksonOverride[enabled=null, annotateFields=null, annotateGetters=null, includeNonNull=null]");
   }
 }

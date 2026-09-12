@@ -296,6 +296,47 @@ class ModelMakerPluginFunctionalTest {
   }
 
   @Test
+  fun `jackson includeNonNull opt-in emits JsonInclude and compiles`() {
+    project.writeStandardBuild(
+        modelMakerBlock =
+            """
+        modelmaker {
+            features { jackson { enabled = true; includeNonNull = true } }
+        }
+        """,
+        dependencies =
+            """
+        implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
+        """,
+    )
+    project.writeSchemas()
+
+    val result = project.runner("build").build()
+
+    assertThat(result.task(":build")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+    assertThat(project.generatedJava("com/example/dto/Customer.java").readText())
+        .contains("import com.fasterxml.jackson.annotation.JsonInclude;")
+        .contains("@JsonInclude(JsonInclude.Include.NON_NULL)")
+  }
+
+  @Test
+  fun `jackson includeNonNull is off by default`() {
+    project.writeStandardBuild(
+        modelMakerBlock = "modelmaker { features { jackson { enabled = true } } }",
+        dependencies =
+            """
+        implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
+        """,
+    )
+    project.writeSchemas()
+
+    project.runner("build").build()
+
+    assertThat(project.generatedJava("com/example/dto/Customer.java").readText())
+        .doesNotContain("@JsonInclude")
+  }
+
+  @Test
   fun `a sensitive property is masked in toString`() {
     project.writeStandardBuild()
     project.write(

@@ -36,7 +36,7 @@ import org.gradle.kotlin.dsl.newInstance
  *     enabled = true | false
  *   }
  *   features {
- *     jackson    { enabled = true | false; annotateFields = true | false; annotateGetters = true | false }
+ *     jackson    { enabled = ...; annotateFields = ...; annotateGetters = ...; includeNonNull = ... }
  *     validation { enabled = true | false }
  *     openApi    { enabled = true | false }
  *     withers    { enabled = true | false }
@@ -117,7 +117,7 @@ public abstract class ModelMakerExtension @Inject constructor(objects: ObjectFac
    * ```
    * modelmaker {
    *   features {
-   *     jackson    { enabled = true | false; annotateFields = true | false; annotateGetters = true | false }
+   *     jackson    { enabled = ...; annotateFields = ...; annotateGetters = ...; includeNonNull = ... }
    *     validation { enabled = true | false }
    *     openApi    { enabled = true | false }
    *     withers    { enabled = true | false }

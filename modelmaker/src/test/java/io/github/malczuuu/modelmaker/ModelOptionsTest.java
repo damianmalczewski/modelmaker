@@ -108,7 +108,7 @@ class ModelOptionsTest {
         .isEqualTo(
             "ModelOptions[preferPrimitives=true, withers=false, "
                 + "jackson=JacksonConfig[enabled=true, annotateFields=false,"
-                + " annotateGetters=true], "
+                + " annotateGetters=true, includeNonNull=false], "
                 + "validation=ValidationConfig[enabled=false, annotateFields=false,"
                 + " annotateGetters=true], "
                 + "openApi=OpenApiConfig[enabled=false, annotateFields=false,"

@@ -99,6 +99,10 @@ public final class JavaModelMaker implements ModelMaker {
     if (options.getJackson().isEnabled()) {
       b.append(indent).append("@JsonIgnoreProperties(ignoreUnknown = true)\n");
     }
+    if (options.getJackson().emitsIncludeNonNull()) {
+      imports.add("com.fasterxml.jackson.annotation.JsonInclude");
+      b.append(indent).append("@JsonInclude(JsonInclude.Include.NON_NULL)\n");
+    }
 
     List<Property> props = type.getProperties();
 

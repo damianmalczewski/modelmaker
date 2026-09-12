@@ -24,9 +24,10 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Parses the top-level {@code "features"} object shared by both schema formats. Each entry is
- * itself an object: {@code jackson} / {@code validation} / {@code openApi} take {@code { enabled,
- * annotateFields, annotateGetters }}; {@code withers} / {@code preferPrimitives} take {@code {
- * enabled }}. An unset key falls through to the project default.
+ * itself an object: {@code jackson} takes {@code { enabled, annotateFields, annotateGetters,
+ * includeNonNull }}, {@code validation} / {@code openApi} the same minus {@code includeNonNull};
+ * {@code withers} / {@code preferPrimitives} take {@code { enabled }}. An unset key falls through
+ * to the project default.
  */
 final class FeatureOverridesParser {
 
@@ -34,6 +35,8 @@ final class FeatureOverridesParser {
   private static final Set<String> TOGGLE_FEATURES = Set.of("withers", "preferPrimitives");
   private static final Set<String> ANNOTATION_KEYS =
       Set.of("enabled", "annotateFields", "annotateGetters");
+  private static final Set<String> JACKSON_KEYS =
+      Set.of("enabled", "annotateFields", "annotateGetters", "includeNonNull");
   private static final Set<String> TOGGLE_KEYS = Set.of("enabled");
 
   private final Function<String, RuntimeException> fail;
@@ -65,8 +68,7 @@ final class FeatureOverridesParser {
       }
     }
     return FeatureOverrides.builder()
-        .jackson(
-            annotationOverride(features, "jackson", JacksonOverride.none(), JacksonOverride::new))
+        .jackson(jacksonOverride(features))
         .validation(
             annotationOverride(
                 features, "validation", ValidationOverride.none(), ValidationOverride::new))
@@ -84,6 +86,19 @@ final class FeatureOverridesParser {
         @Nullable Boolean enabled,
         @Nullable Boolean annotateFields,
         @Nullable Boolean annotateGetters);
+  }
+
+  /** {@code jackson} carries one key more than the other annotation features. */
+  private JacksonOverride jacksonOverride(JsonObject features) {
+    if (member(features, "jackson") == null) {
+      return JacksonOverride.none();
+    }
+    JsonObject obj = featureObject(features, "jackson", JACKSON_KEYS);
+    return new JacksonOverride(
+        boolFlag(obj, "jackson", "enabled"),
+        boolFlag(obj, "jackson", "annotateFields"),
+        boolFlag(obj, "jackson", "annotateGetters"),
+        boolFlag(obj, "jackson", "includeNonNull"));
   }
 
   private <T> T annotationOverride(

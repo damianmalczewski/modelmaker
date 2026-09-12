@@ -26,16 +26,19 @@ import org.jspecify.annotations.Nullable;
  */
 public final class JacksonConfig {
 
-  private static final JacksonConfig DEFAULT_VALUE = new JacksonConfig(false, false, true);
+  private static final JacksonConfig DEFAULT_VALUE = new JacksonConfig(false, false, true, false);
 
   private final boolean enabled;
   private final boolean annotateFields;
   private final boolean annotateGetters;
+  private final boolean includeNonNull;
 
-  private JacksonConfig(boolean enabled, boolean annotateFields, boolean annotateGetters) {
+  private JacksonConfig(
+      boolean enabled, boolean annotateFields, boolean annotateGetters, boolean includeNonNull) {
     this.enabled = enabled;
     this.annotateFields = annotateFields;
     this.annotateGetters = annotateGetters;
+    this.includeNonNull = includeNonNull;
   }
 
   /**
@@ -85,6 +88,26 @@ public final class JacksonConfig {
   }
 
   /**
+   * Whether {@code @JsonInclude(JsonInclude.Include.NON_NULL)} is put on the generated class, so a
+   * property left unset is omitted from the serialized JSON instead of written as {@code null}.
+   *
+   * @return {@code true} when on.
+   */
+  public boolean isIncludeNonNull() {
+    return includeNonNull;
+  }
+
+  /**
+   * Whether the generated class carries {@code @JsonInclude} - the {@code includeNonNull} option,
+   * but only while the feature itself is enabled.
+   *
+   * @return {@code true} when the annotation is emitted.
+   */
+  public boolean emitsIncludeNonNull() {
+    return enabled && includeNonNull;
+  }
+
+  /**
    * Whether the feature emits annotations on the fields - on and placed there.
    *
    * @return {@code true} when field annotations should be emitted.
@@ -113,7 +136,8 @@ public final class JacksonConfig {
     return new JacksonConfig(
         override.getEnabled().orElse(enabled),
         override.getAnnotateFields().orElse(annotateFields),
-        override.getAnnotateGetters().orElse(annotateGetters));
+        override.getAnnotateGetters().orElse(annotateGetters),
+        override.getIncludeNonNull().orElse(includeNonNull));
   }
 
   @Override
@@ -126,12 +150,13 @@ public final class JacksonConfig {
     }
     return enabled == other.enabled
         && annotateFields == other.annotateFields
-        && annotateGetters == other.annotateGetters;
+        && annotateGetters == other.annotateGetters
+        && includeNonNull == other.includeNonNull;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(enabled, annotateFields, annotateGetters);
+    return Objects.hash(enabled, annotateFields, annotateGetters, includeNonNull);
   }
 
   @Override
@@ -140,6 +165,7 @@ public final class JacksonConfig {
         + ("enabled=" + enabled)
         + (", annotateFields=" + annotateFields)
         + (", annotateGetters=" + annotateGetters)
+        + (", includeNonNull=" + includeNonNull)
         + "]";
   }
 
@@ -149,6 +175,7 @@ public final class JacksonConfig {
     private boolean enabled = false;
     private boolean annotateFields = false;
     private boolean annotateGetters = true;
+    private boolean includeNonNull = false;
 
     private Builder() {}
 
@@ -186,12 +213,24 @@ public final class JacksonConfig {
     }
 
     /**
+     * Emit {@code @JsonInclude(JsonInclude.Include.NON_NULL)} on the generated class when {@code
+     * true}.
+     *
+     * @param value {@code true} to turn it on.
+     * @return {@code this}.
+     */
+    public Builder includeNonNull(boolean value) {
+      this.includeNonNull = value;
+      return this;
+    }
+
+    /**
      * Builds the configuration from the accumulated flags.
      *
      * @return a new {@link JacksonConfig}.
      */
     public JacksonConfig build() {
-      return new JacksonConfig(enabled, annotateFields, annotateGetters);
+      return new JacksonConfig(enabled, annotateFields, annotateGetters, includeNonNull);
     }
   }
 }

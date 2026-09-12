@@ -111,6 +111,7 @@ public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFacto
       enabled.convention(features.jackson.enabled)
       annotateFields.convention(features.jackson.annotateFields)
       annotateGetters.convention(features.jackson.annotateGetters)
+      includeNonNull.convention(features.jackson.includeNonNull)
     }
     with(featuresSpec.validation) {
       enabled.convention(features.validation.enabled)
@@ -152,6 +153,7 @@ public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFacto
                         .enabled(featuresSpec.jackson.enabled.get())
                         .annotateFields(featuresSpec.jackson.annotateFields.get())
                         .annotateGetters(featuresSpec.jackson.annotateGetters.get())
+                        .includeNonNull(featuresSpec.jackson.includeNonNull.get())
                         .build()
                 )
                 .validation(

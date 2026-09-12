@@ -218,6 +218,54 @@ class JavaModelMakerTest {
   }
 
   @Test
+  void javaEmitsJsonIncludeOnlyWhenIncludeNonNullIsOn() {
+    String withoutIt = new JavaModelMaker(opts().build()).emit(person);
+
+    assertThat(withoutIt).doesNotContain("@JsonInclude");
+
+    String withIt =
+        new JavaModelMaker(
+                opts()
+                    .jackson(JacksonConfig.builder().enabled(true).includeNonNull(true).build())
+                    .build())
+            .emit(person);
+
+    assertThat(withIt)
+        .contains("import com.fasterxml.jackson.annotation.JsonInclude;")
+        .contains(
+            "@JsonIgnoreProperties(ignoreUnknown = true)\n"
+                + "@JsonInclude(JsonInclude.Include.NON_NULL)");
+  }
+
+  @Test
+  void javaEmitsJsonIncludeOnNestedTypesToo() {
+    String out =
+        new JavaModelMaker(
+                opts()
+                    .jackson(JacksonConfig.builder().enabled(true).includeNonNull(true).build())
+                    .build())
+            .emit(withNested);
+
+    assertThat(out)
+        .contains(
+            "@JsonInclude(JsonInclude.Include.NON_NULL)\n"
+                + "  @JsonPropertyOrder({\"sku\"})\n"
+                + "  public static final class Line {");
+  }
+
+  @Test
+  void javaSkipsJsonIncludeWhenJacksonItselfIsOff() {
+    String out =
+        new JavaModelMaker(
+                opts()
+                    .jackson(JacksonConfig.builder().enabled(false).includeNonNull(true).build())
+                    .build())
+            .emit(person);
+
+    assertThat(out).doesNotContain("@JsonInclude");
+  }
+
+  @Test
   void javaEmitsWithXyzCopyMethods() {
     String out = new JavaModelMaker(opts().build()).emit(person);
     assertThat(out).contains("public Person withId(String id) {");

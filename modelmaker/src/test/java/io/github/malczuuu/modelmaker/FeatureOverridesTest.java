@@ -177,7 +177,7 @@ class FeatureOverridesTest {
         .isEqualTo(
             "FeatureOverrides["
                 + "jackson=JacksonOverride[enabled=true, annotateFields=null,"
-                + " annotateGetters=null], "
+                + " annotateGetters=null, includeNonNull=null], "
                 + "validation=ValidationOverride[enabled=null, annotateFields=null,"
                 + " annotateGetters=null], "
                 + "openApi=OpenApiOverride[enabled=null, annotateFields=null,"

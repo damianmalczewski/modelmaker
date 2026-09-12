@@ -27,11 +27,12 @@ import org.jspecify.annotations.Nullable;
  */
 public final class JacksonOverride {
 
-  private static final JacksonOverride NONE = new JacksonOverride(null, null, null);
+  private static final JacksonOverride NONE = new JacksonOverride(null, null, null, null);
 
   private final @Nullable Boolean enabled;
   private final @Nullable Boolean annotateFields;
   private final @Nullable Boolean annotateGetters;
+  private final @Nullable Boolean includeNonNull;
 
   /**
    * Creates a new override with the given flags; pass {@code null} for a flag to leave it unset.
@@ -44,9 +45,26 @@ public final class JacksonOverride {
       @Nullable Boolean enabled,
       @Nullable Boolean annotateFields,
       @Nullable Boolean annotateGetters) {
+    this(enabled, annotateFields, annotateGetters, null);
+  }
+
+  /**
+   * Creates a new override.
+   *
+   * @param enabled the {@code enabled} flag, or {@code null} to keep the project default.
+   * @param annotateFields the {@code annotateFields} flag, or {@code null}.
+   * @param annotateGetters the {@code annotateGetters} flag, or {@code null}.
+   * @param includeNonNull the {@code includeNonNull} flag, or {@code null}.
+   */
+  JacksonOverride(
+      @Nullable Boolean enabled,
+      @Nullable Boolean annotateFields,
+      @Nullable Boolean annotateGetters,
+      @Nullable Boolean includeNonNull) {
     this.enabled = enabled;
     this.annotateFields = annotateFields;
     this.annotateGetters = annotateGetters;
+    this.includeNonNull = includeNonNull;
   }
 
   /**
@@ -65,7 +83,7 @@ public final class JacksonOverride {
    * @return the override.
    */
   static JacksonOverride enabled(boolean value) {
-    return new JacksonOverride(value, null, null);
+    return new JacksonOverride(value, null, null, null);
   }
 
   /**
@@ -96,6 +114,15 @@ public final class JacksonOverride {
   }
 
   /**
+   * The {@code includeNonNull} flag, when the schema set it.
+   *
+   * @return the flag, or empty to keep the project default.
+   */
+  public Optional<Boolean> getIncludeNonNull() {
+    return Optional.ofNullable(includeNonNull);
+  }
+
+  /**
    * Whether this override sets nothing at all.
    *
    * @return {@code true} when every flag is unset.
@@ -114,12 +141,13 @@ public final class JacksonOverride {
     }
     return Objects.equals(enabled, other.enabled)
         && Objects.equals(annotateFields, other.annotateFields)
-        && Objects.equals(annotateGetters, other.annotateGetters);
+        && Objects.equals(annotateGetters, other.annotateGetters)
+        && Objects.equals(includeNonNull, other.includeNonNull);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(enabled, annotateFields, annotateGetters);
+    return Objects.hash(enabled, annotateFields, annotateGetters, includeNonNull);
   }
 
   @Override
@@ -128,6 +156,7 @@ public final class JacksonOverride {
         + ("enabled=" + enabled)
         + (", annotateFields=" + annotateFields)
         + (", annotateGetters=" + annotateGetters)
+        + (", includeNonNull=" + includeNonNull)
         + "]";
   }
 }

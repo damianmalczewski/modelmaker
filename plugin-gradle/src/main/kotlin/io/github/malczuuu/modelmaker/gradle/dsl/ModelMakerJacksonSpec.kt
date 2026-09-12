@@ -27,15 +27,20 @@ import org.gradle.api.tasks.Input
  *     enabled         = true | false
  *     annotateFields  = true | false
  *     annotateGetters = true | false
+ *     includeNonNull  = true | false
  * }
  * ```
  *
- * Defaults: `enabled = false`, `annotateFields = false`, `annotateGetters = true`. With both
- * `annotateFields` and `annotateGetters` on, the annotations are emitted on both.
+ * Defaults: `enabled = false`, `annotateFields = false`, `annotateGetters = true`, `includeNonNull
+ * = false`. With both `annotateFields` and `annotateGetters` on, the annotations are emitted on
+ * both.
  *
  * @property enabled whether the feature emits any annotations.
  * @property annotateFields place the annotations on the generated fields.
  * @property annotateGetters place the annotations on the generated getters.
+ * @property includeNonNull emit `@JsonInclude(JsonInclude.Include.NON_NULL)` on the generated
+ *   class, so a property left unset is omitted from the serialized JSON instead of written as
+ *   `null`.
  */
 public abstract class ModelMakerJacksonSpec {
 
@@ -44,4 +49,6 @@ public abstract class ModelMakerJacksonSpec {
   @get:Input public abstract val annotateFields: Property<Boolean>
 
   @get:Input public abstract val annotateGetters: Property<Boolean>
+
+  @get:Input public abstract val includeNonNull: Property<Boolean>
 }

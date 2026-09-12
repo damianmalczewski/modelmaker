@@ -98,7 +98,8 @@ class AnnotationConfigTest {
         .isNotEqualTo("JacksonConfig");
 
     assertThat(JacksonConfig.defaults().toString())
-        .isEqualTo("JacksonConfig[enabled=false, annotateFields=false, annotateGetters=true]");
+        .isEqualTo(
+            "JacksonConfig[enabled=false, annotateFields=false, annotateGetters=true, includeNonNull=false]");
     assertThat(OpenApiConfig.defaults().toString())
         .isEqualTo("OpenApiConfig[enabled=false, annotateFields=false, annotateGetters=true]");
   }

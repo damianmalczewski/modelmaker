@@ -563,6 +563,40 @@ class SimpleSchemaLoaderTest {
   }
 
   @Test
+  void parsesThePerSchemaIncludeNonNullOverride() {
+    Path f =
+        schema(
+            "x.Account",
+            "\"features\": { \"jackson\": { \"enabled\": true, \"includeNonNull\": true } },"
+                + " \"properties\": {}");
+
+    List<ModelType> types = loader.load(List.of(f));
+
+    assertThat(types.get(0).getFeatureOverrides().getJackson().getIncludeNonNull())
+        .contains(Boolean.TRUE);
+    assertThat(
+            types
+                .get(0)
+                .getFeatureOverrides()
+                .applyOn(ModelOptions.defaults())
+                .getJackson()
+                .emitsIncludeNonNull())
+        .isTrue();
+  }
+
+  @Test
+  void rejectsAnUnknownJacksonFeatureKey() {
+    Path f =
+        schema(
+            "x.Account",
+            "\"features\": { \"jackson\": { \"includeNulls\": true } }, \"properties\": {}");
+
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .isInstanceOf(SchemaException.class)
+        .hasMessageContaining("unknown \"features.jackson\" entry \"includeNulls\"");
+  }
+
+  @Test
   void parsesPerPropertyDescriptionAndExample() {
     Path f =
         schema(

@@ -57,6 +57,7 @@ public class ModelMakerPlugin : Plugin<Project> {
         }
         listOf(jackson.annotateGetters, validation.annotateGetters, openApi.annotateGetters)
             .forEach { it.convention(true) }
+        jackson.includeNonNull.convention(false)
         withers.enabled.convention(false)
         preferPrimitives.enabled.convention(false)
       }
