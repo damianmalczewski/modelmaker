@@ -296,6 +296,31 @@ class ModelMakerPluginFunctionalTest {
   }
 
   @Test
+  fun `a sensitive property is masked in toString`() {
+    project.writeStandardBuild()
+    project.write(
+        "src/main/model/com.example.dto.Account.json",
+        $$"""
+      { "$modelmaker": "v1.0", "title": "com.example.dto.Account", "type": "object",
+        "required": ["id", "password"],
+        "properties": {
+          "id":       { "type": "string" },
+          "password": { "type": "string", "sensitive": true }
+        } }
+      """,
+    )
+
+    project.runner("build").build()
+
+    val generated = project.generatedJava("com/example/dto/Account.java").readText()
+    assertThat(generated).contains("\", password=***\"")
+    assertThat(generated).doesNotContain("\", password=\" + password")
+    // Only toString is affected.
+    assertThat(generated).contains("public String getPassword() {")
+    assertThat(generated).contains("Objects.equals(password, other.password)")
+  }
+
+  @Test
   fun `reads schemas from a configured directory and writes next to them`() {
     project.writeStandardBuild(
         modelMakerBlock =

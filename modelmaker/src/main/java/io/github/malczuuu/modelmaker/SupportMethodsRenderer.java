@@ -155,7 +155,8 @@ final class SupportMethodsRenderer implements SnippetRenderer {
 
   /**
    * The {@code toString()} term for one property: a {@code byte[]} field is rendered as its base64
-   * string (the same form it serializes as), null-guarded; any other field goes in by name.
+   * string (the same form it serializes as), null-guarded; any other field goes in by name. A
+   * masked property never reaches this method.
    *
    * @param prop the property to render.
    * @return the rendered term.

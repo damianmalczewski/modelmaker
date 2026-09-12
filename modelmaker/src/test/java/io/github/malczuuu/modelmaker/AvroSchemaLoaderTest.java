@@ -19,6 +19,7 @@ package io.github.malczuuu.modelmaker;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -651,5 +652,21 @@ class AvroSchemaLoaderTest {
   @Test
   void loadRejectsANullFileList() {
     assertThatNullPointerException().isThrownBy(() -> loader.load(null));
+  }
+
+  @Test
+  void parsesTheSensitiveFieldAttribute() {
+    Path f =
+        write(
+            "x.Token.avsc",
+            "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Token\", \"fields\": ["
+                + " { \"name\": \"secret\", \"type\": \"string\", \"sensitive\": true },"
+                + " { \"name\": \"name\", \"type\": \"string\" } ] }");
+
+    List<ModelType> types = loader.load(List.of(f));
+
+    assertThat(types.get(0).getProperties())
+        .extracting(Property::getName, Property::isSensitive)
+        .containsExactly(tuple("secret", true), tuple("name", false));
   }
 }

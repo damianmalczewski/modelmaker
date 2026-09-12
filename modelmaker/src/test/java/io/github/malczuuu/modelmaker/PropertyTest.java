@@ -132,6 +132,7 @@ class PropertyTest {
                 + ", defaultValue=Str[value=x]"
                 + ", description=null"
                 + ", example=null"
+                + ", sensitive=false"
                 + "]");
   }
 
@@ -196,5 +197,25 @@ class PropertyTest {
         new Property("id", PropType.ScalarType.STRING, false, Constraints.none(), "id", null);
 
     assertThat(prop.nonNull()).isFalse();
+  }
+
+  @Test
+  void isNotSensitiveUnlessTheSchemaSaysSo() {
+    assertThat(full().isSensitive()).isFalse();
+
+    Property sensitive =
+        new Property(
+            "id",
+            PropType.ScalarType.STRING,
+            true,
+            Constraints.none(),
+            "id",
+            null,
+            null,
+            null,
+            true);
+
+    assertThat(sensitive.isSensitive()).isTrue();
+    assertThat(sensitive).isNotEqualTo(full());
   }
 }

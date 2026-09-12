@@ -232,7 +232,8 @@ public final class AvroSchemaLoader implements SchemaLoader {
         fieldName,
         defaultValue,
         stringOrNull(field, "doc"),
-        null);
+        null,
+        booleanOrFalse(field, "sensitive"));
   }
 
   /**
@@ -403,6 +404,19 @@ public final class AvroSchemaLoader implements SchemaLoader {
 
   private static boolean isString(JsonElement node) {
     return node.isJsonPrimitive() && node.getAsJsonPrimitive().isString();
+  }
+
+  /**
+   * Reads a boolean field attribute, treating anything but {@code true} - including an absent or
+   * non-boolean node - as {@code false}.
+   *
+   * @param node the field node.
+   * @param key the attribute to read.
+   * @return the attribute's value, or {@code false}.
+   */
+  private static boolean booleanOrFalse(JsonObject node, String key) {
+    JsonElement value = get(node, key);
+    return value != null && isBoolean(value) && value.getAsBoolean();
   }
 
   private static boolean isBoolean(JsonElement node) {

@@ -229,7 +229,8 @@ public final class SimpleSchemaLoader implements SchemaLoader {
               jsonKey,
               defaultValue,
               stringOrNull(propNode, "description"),
-              exampleStringOrNull(propNode)));
+              exampleStringOrNull(propNode),
+              booleanOrFalse(propNode, "sensitive")));
     }
     return new ModelType(
         name,
@@ -572,6 +573,19 @@ public final class SimpleSchemaLoader implements SchemaLoader {
 
   private static boolean isString(JsonElement node) {
     return node.isJsonPrimitive() && node.getAsJsonPrimitive().isString();
+  }
+
+  /**
+   * Reads a boolean keyword, treating anything but {@code true} - including an absent or
+   * non-boolean node - as {@code false}.
+   *
+   * @param node the property node.
+   * @param key the keyword to read.
+   * @return the keyword's value, or {@code false}.
+   */
+  private static boolean booleanOrFalse(JsonObject node, String key) {
+    JsonElement value = get(node, key);
+    return value != null && isBoolean(value) && value.getAsBoolean();
   }
 
   private static boolean isBoolean(@Nullable JsonElement node) {

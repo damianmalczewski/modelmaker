@@ -158,6 +158,12 @@ final class BuilderRenderer extends AbstractSnippetRenderer {
       }
       Property property = properties.get(i);
       String name = property.getName();
+      // A masked property is a constant, so it folds into the label's own literal.
+      String label = i == 0 ? "\"" + name + "=" : "\", " + name + "=";
+      if (property.isSensitive()) {
+        parts.append(label).append(Constants.REDACTED).append('"');
+        continue;
+      }
       // The builder field is always a @Nullable byte[], so the base64 term is null-guarded.
       String value =
           property.getType() == PropType.ScalarType.BYTES
@@ -167,10 +173,7 @@ final class BuilderRenderer extends AbstractSnippetRenderer {
                   + name
                   + ") : \"null\")"
               : name;
-      parts
-          .append(i == 0 ? "\"" + name + "=\"" : "\", " + name + "=\"")
-          .append(" + ")
-          .append(value);
+      parts.append(label).append('"').append(" + ").append(value);
     }
     String label = builtType + ".Builder";
     String body =

@@ -31,6 +31,11 @@ final class Constants {
   static final String GENERATOR_NAME = "io.github.malczuuu.modelmaker";
 
   /**
+   * What a {@code "sensitive"} property's value is replaced with in a generated {@code toString()}.
+   */
+  static final String REDACTED = "***";
+
+  /**
    * Line comment stamped after the imports of every generated file, in both Java and Kotlin (both
    * use {@code //}). Not Javadoc - it is not attached to any declaration, just a do-not-edit
    * banner.

@@ -19,6 +19,7 @@ package io.github.malczuuu.modelmaker;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -321,6 +322,33 @@ class SimpleSchemaLoaderTest {
         .hasMessageContaining("2 schema errors:")
         .hasMessageContaining("$ref \"x.Missing\"")
         .hasMessageContaining("$ref \"x.AlsoMissing\"");
+  }
+
+  @Test
+  void parsesTheSensitiveKeyword() {
+    Path f =
+        schema(
+            "x.Token",
+            "\"required\": [\"secret\"], \"properties\": { \"secret\": { \"type\": \"string\","
+                + " \"sensitive\": true }, \"name\": { \"type\": \"string\" } }");
+
+    List<ModelType> types = loader.load(List.of(f));
+
+    assertThat(types.get(0).getProperties())
+        .extracting(Property::getName, Property::isSensitive)
+        .containsExactly(tuple("secret", true), tuple("name", false));
+  }
+
+  @Test
+  void treatsANonBooleanSensitiveKeywordAsUnset() {
+    Path f =
+        schema(
+            "x.Token",
+            "\"properties\": { \"secret\": { \"type\": \"string\", \"sensitive\": \"yes\" } }");
+
+    List<ModelType> types = loader.load(List.of(f));
+
+    assertThat(types.get(0).getProperties().get(0).isSensitive()).isFalse();
   }
 
   @Test

@@ -174,4 +174,28 @@ class BuilderRendererTest {
             "return new Blob(\n        Objects.requireNonNull(payload, \"payload is required\"));");
     assertThat(result.getImports()).contains("java.util.Base64");
   }
+
+  @Test
+  void masksASensitivePropertyInTheBuilderToString() {
+    ModelType widget =
+        type(
+            "Widget",
+            new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+            new Property(
+                "token",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.none(),
+                "token",
+                null,
+                null,
+                null,
+                true));
+
+    RenderResult result = new BuilderRenderer().init("", widget, OPTIONS).render();
+
+    assertThat(result.getCode()).contains("\", token=***\"").doesNotContain("\", token=\" + token");
+    // The value itself still goes through the builder untouched.
+    assertThat(result.getCode()).contains("public Builder token(@Nullable String token) {");
+  }
 }

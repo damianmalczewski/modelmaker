@@ -30,6 +30,7 @@ public final class Property {
   private final @Nullable DefaultValue defaultValue;
   private final @Nullable String description;
   private final @Nullable String example;
+  private final boolean sensitive;
 
   /**
    * Creates a new {@link Property} with no OpenAPI documentation metadata.
@@ -49,7 +50,7 @@ public final class Property {
       Constraints constraints,
       String jsonName,
       @Nullable DefaultValue defaultValue) {
-    this(name, type, required, constraints, jsonName, defaultValue, null, null);
+    this(name, type, required, constraints, jsonName, defaultValue, null, null, false);
   }
 
   /**
@@ -76,6 +77,35 @@ public final class Property {
       @Nullable DefaultValue defaultValue,
       @Nullable String description,
       @Nullable String example) {
+    this(name, type, required, constraints, jsonName, defaultValue, description, example, false);
+  }
+
+  /**
+   * Creates a new {@link Property}.
+   *
+   * @param name camelCase identifier used for the generated field / getter / parameter.
+   * @param type resolved property type.
+   * @param required whether the JSON key is listed in the type's {@code required} array.
+   * @param constraints validation keywords parsed from the property node.
+   * @param jsonName original JSON key, kept for {@code @JsonProperty} and
+   *     {@code @JsonPropertyOrder}.
+   * @param defaultValue {@code default} value, or {@code null}.
+   * @param description schema {@code description}, emitted as {@code @Schema(description = ...)}
+   *     when the {@code openApi} feature is on; {@code null} when unset.
+   * @param example schema {@code example} rendered as a string, emitted as {@code @Schema(example =
+   *     ...)} when the {@code openApi} feature is on; {@code null} when unset.
+   * @param sensitive whether the value is masked in {@code toString()}.
+   */
+  Property(
+      String name,
+      PropType type,
+      boolean required,
+      Constraints constraints,
+      String jsonName,
+      @Nullable DefaultValue defaultValue,
+      @Nullable String description,
+      @Nullable String example,
+      boolean sensitive) {
     this.name = name;
     this.type = type;
     this.required = required;
@@ -84,6 +114,7 @@ public final class Property {
     this.defaultValue = defaultValue;
     this.description = description;
     this.example = example;
+    this.sensitive = sensitive;
   }
 
   /**
@@ -162,6 +193,17 @@ public final class Property {
   }
 
   /**
+   * Whether the value is masked in the generated {@code toString()}, from the schema's {@code
+   * "sensitive"} keyword. Masking covers the DTO's and the builder's {@code toString()} only -
+   * getters, {@code equals} and {@code hashCode} see the real value.
+   *
+   * @return {@code true} when the value is masked.
+   */
+  public boolean isSensitive() {
+    return sensitive;
+  }
+
+  /**
    * Whether the property is always populated - {@link #isRequired()} or has a default.
    *
    * @return {@code true} when always populated.
@@ -185,13 +227,14 @@ public final class Property {
         && Objects.equals(jsonName, other.jsonName)
         && Objects.equals(defaultValue, other.defaultValue)
         && Objects.equals(description, other.description)
-        && Objects.equals(example, other.example);
+        && Objects.equals(example, other.example)
+        && sensitive == other.sensitive;
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(
-        name, type, required, constraints, jsonName, defaultValue, description, example);
+        name, type, required, constraints, jsonName, defaultValue, description, example, sensitive);
   }
 
   @Override
@@ -205,6 +248,7 @@ public final class Property {
         + (", defaultValue=" + defaultValue)
         + (", description=" + description)
         + (", example=" + example)
+        + (", sensitive=" + sensitive)
         + "]";
   }
 }

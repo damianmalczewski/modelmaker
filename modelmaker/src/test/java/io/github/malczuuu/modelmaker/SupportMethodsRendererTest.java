@@ -38,6 +38,32 @@ class SupportMethodsRendererTest {
               "note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
 
   @Test
+  void masksASensitivePropertyInToStringOnly() {
+    ModelType widget =
+        type(
+            "Widget",
+            new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+            new Property(
+                "token",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.none(),
+                "token",
+                null,
+                null,
+                null,
+                true));
+
+    RenderResult result = new SupportMethodsRenderer().init("", widget, OPTIONS).render();
+
+    assertThat(result.getCode()).contains("\", token=***\"").doesNotContain("\", token=\" + token");
+    // equals / hashCode keep comparing the real value.
+    assertThat(result.getCode())
+        .contains("Objects.equals(token, other.token)")
+        .contains("Objects.hash(id, token)");
+  }
+
+  @Test
   void rendersEqualsHashCodeAndToString() {
     RenderResult result = new SupportMethodsRenderer().init("", WIDGET, OPTIONS).render();
 

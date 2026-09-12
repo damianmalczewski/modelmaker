@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Add Kotlin `mutate { }` extensions.
 - Add the `jackson`, `validation` and `openApi` features.
 - Add the `withers` and `preferPrimitives` features.
+- Add the `"sensitive"` property keyword.
 - Add per-schema feature overrides.
 - Add `modelmaker { schemas { } }` and `modelmaker { src { } }` configuration.
 - Add `io.github.malczuuu:modelmaker`, the build-tool-agnostic core, for use without Gradle.
