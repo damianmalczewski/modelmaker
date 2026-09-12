@@ -16,6 +16,7 @@
 
 package io.github.malczuuu.modelmaker;
 
+import static io.github.malczuuu.modelmaker.PropertyFactory.property;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -55,9 +56,8 @@ class FieldsRendererTest {
   private static final ModelType WIDGET =
       type(
           "Widget",
-          new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
-          new Property(
-              "note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
+          property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+          property("note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
 
   @Test
   void rendersOnePrivateFinalFieldPerProperty() {
@@ -81,7 +81,7 @@ class FieldsRendererTest {
     ModelType type =
         type(
             "Bag",
-            new Property(
+            property(
                 "tags",
                 PropType.ArrayType.of(PropType.ScalarType.STRING),
                 false,
@@ -101,7 +101,7 @@ class FieldsRendererTest {
     ModelType type =
         type(
             "Person",
-            new Property(
+            property(
                 "id",
                 PropType.ScalarType.STRING,
                 true,
@@ -123,7 +123,7 @@ class FieldsRendererTest {
     ModelType type =
         type(
             "Person",
-            new Property(
+            property(
                 "id",
                 PropType.ScalarType.STRING,
                 true,
@@ -149,7 +149,7 @@ class FieldsRendererTest {
     ModelType type =
         type(
             "Person",
-            new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null));
+            property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null));
     ModelOptions openApi = openApiOnFields();
 
     RenderResult result = new FieldsRenderer().init("", type, openApi).render();
@@ -163,7 +163,7 @@ class FieldsRendererTest {
     ModelType type =
         type(
             "Person",
-            new Property(
+            property(
                 "id",
                 PropType.ScalarType.STRING,
                 true,
@@ -183,7 +183,7 @@ class FieldsRendererTest {
     ModelType type =
         type(
             "Person",
-            new Property(
+            property(
                 "id",
                 PropType.ScalarType.STRING,
                 true,
@@ -201,7 +201,7 @@ class FieldsRendererTest {
     ModelType type =
         type(
             "Bag",
-            new Property(
+            property(
                 "tags",
                 PropType.ArrayType.of(PropType.ScalarType.STRING),
                 false,
@@ -228,7 +228,7 @@ class FieldsRendererTest {
     ModelType type =
         type(
             "Bag",
-            new Property(
+            property(
                 "addresses",
                 PropType.ArrayType.of(PropType.RefType.of("Address")),
                 true,
@@ -248,7 +248,7 @@ class FieldsRendererTest {
     ModelType type =
         type(
             "Bag",
-            new Property(
+            property(
                 "tags",
                 PropType.ArrayType.of(PropType.ScalarType.STRING),
                 false,
@@ -277,9 +277,9 @@ class FieldsRendererTest {
     ModelType blob =
         type(
             "Blob",
-            new Property(
+            property(
                 "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
-            new Property(
+            property(
                 "signature",
                 PropType.ScalarType.BYTES,
                 false,

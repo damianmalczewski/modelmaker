@@ -16,6 +16,7 @@
 
 package io.github.malczuuu.modelmaker;
 
+import static io.github.malczuuu.modelmaker.PropertyFactory.property;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -32,9 +33,9 @@ class BuilderMutatorRendererTest {
 
   private static final ModelType WIDGET =
       type(
-          new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
-          new Property("note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null),
-          new Property(
+          property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+          property("note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null),
+          property(
               "tags",
               PropType.ArrayType.of(PropType.ScalarType.STRING),
               false,

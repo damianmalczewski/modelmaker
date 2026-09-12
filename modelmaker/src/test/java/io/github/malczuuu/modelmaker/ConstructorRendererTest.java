@@ -16,6 +16,7 @@
 
 package io.github.malczuuu.modelmaker;
 
+import static io.github.malczuuu.modelmaker.PropertyFactory.property;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -34,9 +35,8 @@ class ConstructorRendererTest {
   private static final ModelType WIDGET =
       type(
           "Widget",
-          new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
-          new Property(
-              "note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
+          property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+          property("note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
 
   @Test
   void rendersAPrivateAllArgsConstructor() {
@@ -94,7 +94,7 @@ class ConstructorRendererTest {
     ModelType withDefault =
         type(
             "Config",
-            new Property(
+            property(
                 "retries",
                 PropType.ScalarType.INTEGER,
                 false,
@@ -112,7 +112,7 @@ class ConstructorRendererTest {
     ModelType withDefault =
         type(
             "Config",
-            new Property(
+            property(
                 "roles",
                 PropType.ArrayType.of(PropType.ScalarType.STRING),
                 false,
@@ -140,9 +140,9 @@ class ConstructorRendererTest {
     ModelType blob =
         type(
             "Blob",
-            new Property(
+            property(
                 "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
-            new Property(
+            property(
                 "signature",
                 PropType.ScalarType.BYTES,
                 false,

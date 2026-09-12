@@ -16,6 +16,7 @@
 
 package io.github.malczuuu.modelmaker;
 
+import static io.github.malczuuu.modelmaker.PropertyFactory.property;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
@@ -42,8 +43,7 @@ class JavaModelMakerTest {
             "com.example.dto",
             null,
             List.of(
-                new Property(
-                    "id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null)),
+                property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null)),
             List.of(),
             FeatureOverrides.builder().jackson(JacksonOverride.enabled(false)).build());
 
@@ -98,8 +98,7 @@ class JavaModelMakerTest {
           "com.example.dto",
           "An address.",
           List.of(
-              new Property(
-                  "city", PropType.ScalarType.STRING, true, Constraints.none(), "city", null)),
+              property("city", PropType.ScalarType.STRING, true, Constraints.none(), "city", null)),
           List.of(),
           FeatureOverrides.none());
 
@@ -109,23 +108,23 @@ class JavaModelMakerTest {
           "com.example.dto",
           null,
           List.of(
-              new Property(
+              property(
                   "id",
                   PropType.ScalarType.STRING,
                   true,
                   Constraints.builder().pattern("^X\\d+$").build(),
                   "id",
                   null),
-              new Property(
+              property(
                   "age",
                   PropType.ScalarType.INTEGER,
                   false,
                   Constraints.builder().minimum(0L).maximum(120L).build(),
                   "age",
                   null),
-              new Property(
+              property(
                   "home", PropType.RefType.of("Address"), true, Constraints.none(), "home", null),
-              new Property(
+              property(
                   "tags",
                   PropType.ArrayType.of(PropType.ScalarType.STRING),
                   false,
@@ -141,9 +140,9 @@ class JavaModelMakerTest {
           "com.example.dto",
           null,
           List.of(
-              new Property(
+              property(
                   "ref", PropType.RefType.of("Address"), true, Constraints.none(), "ref", null),
-              new Property(
+              property(
                   "line", PropType.RefType.of("Line"), true, Constraints.none(), "line", null)),
           List.of(
               new ModelType(
@@ -151,7 +150,7 @@ class JavaModelMakerTest {
                   "",
                   "An inline nested object.",
                   List.of(
-                      new Property(
+                      property(
                           "sku",
                           PropType.ScalarType.STRING,
                           true,
@@ -168,8 +167,8 @@ class JavaModelMakerTest {
           "x",
           null,
           List.of(
-              new Property("on", PropType.ScalarType.BOOLEAN, true, Constraints.none(), "on", null),
-              new Property(
+              property("on", PropType.ScalarType.BOOLEAN, true, Constraints.none(), "on", null),
+              property(
                   "count", PropType.ScalarType.INTEGER, true, Constraints.none(), "count", null)),
           List.of(),
           FeatureOverrides.none());
@@ -302,14 +301,14 @@ class JavaModelMakerTest {
             "com.example.dto",
             null,
             List.of(
-                new Property(
+                property(
                     "since",
                     PropType.ExternalType.of("java.time.Instant"),
                     true,
                     Constraints.none(),
                     "since",
                     null),
-                new Property(
+                property(
                     "ids",
                     PropType.ArrayType.of(PropType.ExternalType.of("java.util.UUID")),
                     false,
@@ -336,9 +335,9 @@ class JavaModelMakerTest {
             "com.example.dto",
             null,
             List.of(
-                new Property(
+                property(
                     "home", PropType.RefType.of("Address"), true, Constraints.none(), "home", null),
-                new Property(
+                property(
                     "extras",
                     PropType.ArrayType.of(PropType.RefType.of("Address")),
                     false,
@@ -370,7 +369,7 @@ class JavaModelMakerTest {
             "com.example.rest",
             null,
             List.of(
-                new Property(
+                property(
                     "tags",
                     PropType.ArrayType.of(PropType.ScalarType.STRING),
                     false,
@@ -403,14 +402,14 @@ class JavaModelMakerTest {
             "com.example.dto",
             null,
             List.of(
-                new Property(
+                property(
                     "tags",
                     PropType.ArrayType.of(PropType.ScalarType.STRING),
                     true,
                     Constraints.none(),
                     "tags",
                     null),
-                new Property(
+                property(
                     "notes",
                     PropType.ArrayType.of(PropType.ScalarType.STRING),
                     false,
@@ -442,7 +441,7 @@ class JavaModelMakerTest {
           "com.example.dto",
           "A billing account.",
           List.of(
-              new Property(
+              property(
                   "id",
                   PropType.ScalarType.STRING,
                   true,
@@ -451,7 +450,7 @@ class JavaModelMakerTest {
                   null,
                   "the account identifier",
                   "A-42"),
-              new Property(
+              property(
                   "nickname",
                   PropType.ScalarType.STRING,
                   false,
@@ -620,7 +619,7 @@ class JavaModelMakerTest {
             "com.example.dto",
             null,
             List.of(
-                new Property(
+                property(
                     "userId",
                     PropType.ScalarType.STRING,
                     true,
@@ -723,7 +722,7 @@ class JavaModelMakerTest {
             "com.example.dto",
             null,
             List.of(
-                new Property(
+                property(
                     "currency",
                     PropType.ScalarType.STRING,
                     false,
@@ -747,21 +746,21 @@ class JavaModelMakerTest {
             "com.example.dto",
             null,
             List.of(
-                new Property(
+                property(
                     "active",
                     PropType.ScalarType.BOOLEAN,
                     false,
                     Constraints.none(),
                     "active",
                     DefaultValue.Bool.of(true)),
-                new Property(
+                property(
                     "currency",
                     PropType.ScalarType.STRING,
                     false,
                     Constraints.none(),
                     "currency",
                     DefaultValue.Str.of("USD")),
-                new Property(
+                property(
                     "roles",
                     PropType.ArrayType.of(PropType.ScalarType.STRING),
                     false,
@@ -798,14 +797,14 @@ class JavaModelMakerTest {
             "x",
             null,
             List.of(
-                new Property(
+                property(
                     "big",
                     PropType.ScalarType.LONG,
                     true,
                     Constraints.none(),
                     "big",
                     DefaultValue.Num.of("42")),
-                new Property(
+                property(
                     "small",
                     PropType.ScalarType.FLOAT,
                     true,
@@ -834,7 +833,7 @@ class JavaModelMakerTest {
             "x",
             null,
             List.of(
-                new Property(
+                property(
                     "status",
                     PropType.ScalarType.STRING,
                     true,
@@ -866,14 +865,14 @@ class JavaModelMakerTest {
             "x",
             null,
             List.of(
-                new Property(
+                property(
                     "payload",
                     PropType.ScalarType.BYTES,
                     true,
                     Constraints.none(),
                     "payload",
                     null),
-                new Property(
+                property(
                     "signature",
                     PropType.ScalarType.BYTES,
                     false,
@@ -925,7 +924,7 @@ class JavaModelMakerTest {
             "x",
             null,
             List.of(
-                new Property(
+                property(
                     "payload",
                     PropType.ScalarType.BYTES,
                     true,

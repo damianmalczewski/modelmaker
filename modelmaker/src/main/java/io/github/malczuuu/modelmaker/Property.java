@@ -33,54 +33,6 @@ public final class Property {
   private final boolean sensitive;
 
   /**
-   * Creates a new {@link Property} with no OpenAPI documentation metadata.
-   *
-   * @param name camelCase identifier used for the generated field / getter / parameter.
-   * @param type resolved property type.
-   * @param required whether the JSON key is listed in the type's {@code required} array.
-   * @param constraints validation keywords parsed from the property node.
-   * @param jsonName original JSON key, kept for {@code @JsonProperty} and
-   *     {@code @JsonPropertyOrder}.
-   * @param defaultValue {@code default} value, or {@code null}.
-   */
-  Property(
-      String name,
-      PropType type,
-      boolean required,
-      Constraints constraints,
-      String jsonName,
-      @Nullable DefaultValue defaultValue) {
-    this(name, type, required, constraints, jsonName, defaultValue, null, null, false);
-  }
-
-  /**
-   * Creates a new {@link Property}.
-   *
-   * @param name camelCase identifier used for the generated field / getter / parameter.
-   * @param type resolved property type.
-   * @param required whether the JSON key is listed in the type's {@code required} array.
-   * @param constraints validation keywords parsed from the property node.
-   * @param jsonName original JSON key, kept for {@code @JsonProperty} and
-   *     {@code @JsonPropertyOrder}.
-   * @param defaultValue {@code default} value, or {@code null}.
-   * @param description schema {@code description}, emitted as {@code @Schema(description = ...)}
-   *     when the {@code openApi} feature is on; {@code null} when unset.
-   * @param example schema {@code example} rendered as a string, emitted as {@code @Schema(example =
-   *     ...)} when the {@code openApi} feature is on; {@code null} when unset.
-   */
-  Property(
-      String name,
-      PropType type,
-      boolean required,
-      Constraints constraints,
-      String jsonName,
-      @Nullable DefaultValue defaultValue,
-      @Nullable String description,
-      @Nullable String example) {
-    this(name, type, required, constraints, jsonName, defaultValue, description, example, false);
-  }
-
-  /**
    * Creates a new {@link Property}.
    *
    * @param name camelCase identifier used for the generated field / getter / parameter.

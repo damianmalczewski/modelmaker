@@ -16,6 +16,8 @@
 
 package io.github.malczuuu.modelmaker;
 
+import static io.github.malczuuu.modelmaker.PropertyFactory.property;
+import static io.github.malczuuu.modelmaker.PropertyFactory.sensitiveProperty;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
@@ -23,7 +25,7 @@ import org.junit.jupiter.api.Test;
 class PropertyTest {
 
   private static Property full() {
-    return new Property(
+    return property(
         "id",
         PropType.ScalarType.STRING,
         true,
@@ -40,7 +42,7 @@ class PropertyTest {
   @Test
   void notEqualWhenNameDiffers() {
     Property other =
-        new Property(
+        property(
             "other",
             PropType.ScalarType.STRING,
             true,
@@ -53,15 +55,15 @@ class PropertyTest {
 
   @Test
   void notEqualWhenRequiredDiffers() {
-    assertThat(new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null))
+    assertThat(property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null))
         .isNotEqualTo(
-            new Property("id", PropType.ScalarType.STRING, false, Constraints.none(), "id", null));
+            property("id", PropType.ScalarType.STRING, false, Constraints.none(), "id", null));
   }
 
   @Test
   void notEqualWhenDefaultValueDiffers() {
     Property other =
-        new Property(
+        property(
             "id",
             PropType.ScalarType.STRING,
             true,
@@ -80,7 +82,7 @@ class PropertyTest {
   @Test
   void sixArgConstructorLeavesOpenApiMetadataUnset() {
     Property prop =
-        new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null);
+        property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null);
 
     assertThat(prop.getDescription()).isNull();
     assertThat(prop.getExample()).isNull();
@@ -89,7 +91,7 @@ class PropertyTest {
   @Test
   void carriesDescriptionAndExample() {
     Property prop =
-        new Property(
+        property(
             "id",
             PropType.ScalarType.STRING,
             true,
@@ -106,15 +108,14 @@ class PropertyTest {
   @Test
   void notEqualWhenDescriptionOrExampleDiffers() {
     Property base =
-        new Property(
-            "id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null, "a", "x");
+        property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null, "a", "x");
 
     assertThat(base)
         .isNotEqualTo(
-            new Property(
+            property(
                 "id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null, "b", "x"))
         .isNotEqualTo(
-            new Property(
+            property(
                 "id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null, "a", "y"));
   }
 
@@ -139,7 +140,7 @@ class PropertyTest {
   @Test
   void jsonNameDefaultsToNameWhenOmitted() {
     Property prop =
-        new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null);
+        property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null);
 
     assertThat(prop.getJsonName()).isEqualTo("id");
     assertThat(prop.getDefaultValue()).isNull();
@@ -148,7 +149,7 @@ class PropertyTest {
   @Test
   void defaultValueDefaultsToNullWhenOmittedButJsonNameGiven() {
     Property prop =
-        new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id_json", null);
+        property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id_json", null);
 
     assertThat(prop.getJsonName()).isEqualTo("id_json");
     assertThat(prop.getDefaultValue()).isNull();
@@ -157,7 +158,7 @@ class PropertyTest {
   @Test
   void jsonNameDefaultsToNameWhenOnlyDefaultValueGiven() {
     Property prop =
-        new Property(
+        property(
             "id",
             PropType.ScalarType.STRING,
             false,
@@ -172,7 +173,7 @@ class PropertyTest {
   @Test
   void nonNullWhenRequired() {
     Property prop =
-        new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null);
+        property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null);
 
     assertThat(prop.nonNull()).isTrue();
   }
@@ -180,7 +181,7 @@ class PropertyTest {
   @Test
   void nonNullWhenOptionalWithADefault() {
     Property prop =
-        new Property(
+        property(
             "id",
             PropType.ScalarType.STRING,
             false,
@@ -194,7 +195,7 @@ class PropertyTest {
   @Test
   void notNonNullWhenOptionalWithNoDefault() {
     Property prop =
-        new Property("id", PropType.ScalarType.STRING, false, Constraints.none(), "id", null);
+        property("id", PropType.ScalarType.STRING, false, Constraints.none(), "id", null);
 
     assertThat(prop.nonNull()).isFalse();
   }
@@ -204,16 +205,7 @@ class PropertyTest {
     assertThat(full().isSensitive()).isFalse();
 
     Property sensitive =
-        new Property(
-            "id",
-            PropType.ScalarType.STRING,
-            true,
-            Constraints.none(),
-            "id",
-            null,
-            null,
-            null,
-            true);
+        sensitiveProperty("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null);
 
     assertThat(sensitive.isSensitive()).isTrue();
     assertThat(sensitive).isNotEqualTo(full());

@@ -16,6 +16,7 @@
 
 package io.github.malczuuu.modelmaker;
 
+import static io.github.malczuuu.modelmaker.PropertyFactory.property;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -28,8 +29,7 @@ class ModelTypeTest {
         "Widget",
         "com.example.dto",
         "A widget.",
-        List.of(
-            new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null)),
+        List.of(property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null)),
         List.of(
             new ModelType(
                 "Nested", "com.example.dto", null, List.of(), List.of(), FeatureOverrides.none())),

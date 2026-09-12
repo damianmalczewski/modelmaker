@@ -16,6 +16,7 @@
 
 package io.github.malczuuu.modelmaker;
 
+import static io.github.malczuuu.modelmaker.PropertyFactory.property;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -24,7 +25,7 @@ import org.junit.jupiter.api.Test;
 class OpenApiUtilsTest {
 
   private static Property prop(boolean required, String description, String example) {
-    return new Property(
+    return property(
         "id",
         PropType.ScalarType.STRING,
         required,

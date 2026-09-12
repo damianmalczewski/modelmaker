@@ -16,6 +16,7 @@
 
 package io.github.malczuuu.modelmaker;
 
+import static io.github.malczuuu.modelmaker.PropertyFactory.property;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
@@ -30,9 +31,9 @@ class KotlinExtensionMakerTest {
           "com.example.dto",
           null,
           List.of(
-              new Property(
+              property(
                   "ref", PropType.RefType.of("Address"), true, Constraints.none(), "ref", null),
-              new Property(
+              property(
                   "line", PropType.RefType.of("Line"), true, Constraints.none(), "line", null)),
           List.of(
               new ModelType(
@@ -40,7 +41,7 @@ class KotlinExtensionMakerTest {
                   "",
                   "An inline nested object.",
                   List.of(
-                      new Property(
+                      property(
                           "sku",
                           PropType.ScalarType.STRING,
                           true,

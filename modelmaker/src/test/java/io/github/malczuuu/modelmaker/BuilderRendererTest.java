@@ -16,6 +16,8 @@
 
 package io.github.malczuuu.modelmaker;
 
+import static io.github.malczuuu.modelmaker.PropertyFactory.property;
+import static io.github.malczuuu.modelmaker.PropertyFactory.sensitiveProperty;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -33,9 +35,8 @@ class BuilderRendererTest {
   private static final ModelType WIDGET =
       type(
           "Widget",
-          new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
-          new Property(
-              "note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
+          property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+          property("note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
 
   @Test
   void rendersTheBuilderClass() {
@@ -95,8 +96,7 @@ class BuilderRendererTest {
     ModelType optionalOnly =
         type(
             "Widget",
-            new Property(
-                "note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
+            property("note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
     assertThat(new BuilderRenderer().init("", optionalOnly, OPTIONS).render().getImports())
         .doesNotContain("java.util.Objects");
   }
@@ -116,14 +116,14 @@ class BuilderRendererTest {
     ModelType type =
         type(
             "Bag",
-            new Property(
+            property(
                 "tags",
                 PropType.ArrayType.of(PropType.ScalarType.STRING),
                 false,
                 Constraints.none(),
                 "tags",
                 null),
-            new Property(
+            property(
                 "ids",
                 PropType.ArrayType.of(PropType.ScalarType.STRING),
                 true,
@@ -157,7 +157,7 @@ class BuilderRendererTest {
     ModelType blob =
         type(
             "Blob",
-            new Property(
+            property(
                 "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null));
 
     RenderResult result = new BuilderRenderer().init("", blob, OPTIONS).render();
@@ -180,17 +180,9 @@ class BuilderRendererTest {
     ModelType widget =
         type(
             "Widget",
-            new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
-            new Property(
-                "token",
-                PropType.ScalarType.STRING,
-                true,
-                Constraints.none(),
-                "token",
-                null,
-                null,
-                null,
-                true));
+            property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+            sensitiveProperty(
+                "token", PropType.ScalarType.STRING, true, Constraints.none(), "token", null));
 
     RenderResult result = new BuilderRenderer().init("", widget, OPTIONS).render();
 

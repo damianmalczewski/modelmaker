@@ -16,6 +16,7 @@
 
 package io.github.malczuuu.modelmaker;
 
+import static io.github.malczuuu.modelmaker.PropertyFactory.property;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -36,7 +37,7 @@ class ConstraintUtilsTest {
   @Test
   void everyConstraintCarriesAHardcodedEnglishMessageValidDoesNot() {
     Property prop =
-        new Property(
+        property(
             "x",
             PropType.RefType.of("Address"),
             true,

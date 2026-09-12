@@ -16,6 +16,8 @@
 
 package io.github.malczuuu.modelmaker;
 
+import static io.github.malczuuu.modelmaker.PropertyFactory.property;
+import static io.github.malczuuu.modelmaker.PropertyFactory.sensitiveProperty;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -33,26 +35,17 @@ class SupportMethodsRendererTest {
   private static final ModelType WIDGET =
       type(
           "Widget",
-          new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
-          new Property(
-              "note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
+          property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+          property("note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
 
   @Test
   void masksASensitivePropertyInToStringOnly() {
     ModelType widget =
         type(
             "Widget",
-            new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
-            new Property(
-                "token",
-                PropType.ScalarType.STRING,
-                true,
-                Constraints.none(),
-                "token",
-                null,
-                null,
-                null,
-                true));
+            property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+            sensitiveProperty(
+                "token", PropType.ScalarType.STRING, true, Constraints.none(), "token", null));
 
     RenderResult result = new SupportMethodsRenderer().init("", widget, OPTIONS).render();
 
@@ -119,12 +112,10 @@ class SupportMethodsRendererTest {
     ModelType type =
         type(
             "Widget",
-            new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
-            new Property(
-                "count", PropType.ScalarType.INTEGER, true, Constraints.none(), "count", null),
-            new Property(
-                "ratio", PropType.ScalarType.NUMBER, true, Constraints.none(), "ratio", null),
-            new Property("on", PropType.ScalarType.BOOLEAN, true, Constraints.none(), "on", null));
+            property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+            property("count", PropType.ScalarType.INTEGER, true, Constraints.none(), "count", null),
+            property("ratio", PropType.ScalarType.NUMBER, true, Constraints.none(), "ratio", null),
+            property("on", PropType.ScalarType.BOOLEAN, true, Constraints.none(), "on", null));
 
     RenderResult result = new SupportMethodsRenderer().init("", type, preferPrimitives).render();
 
@@ -144,7 +135,7 @@ class SupportMethodsRendererTest {
     ModelType type =
         type(
             "Widget",
-            new Property(
+            property(
                 "count", PropType.ScalarType.INTEGER, false, Constraints.none(), "count", null));
 
     RenderResult result = new SupportMethodsRenderer().init("", type, preferPrimitives).render();
@@ -164,10 +155,10 @@ class SupportMethodsRendererTest {
     ModelType blob =
         type(
             "Blob",
-            new Property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
-            new Property(
+            property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
+            property(
                 "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
-            new Property("sig", PropType.ScalarType.BYTES, false, Constraints.none(), "sig", null));
+            property("sig", PropType.ScalarType.BYTES, false, Constraints.none(), "sig", null));
 
     RenderResult result = new SupportMethodsRenderer().init("", blob, OPTIONS).render();
 
