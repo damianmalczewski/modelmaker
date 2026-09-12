@@ -53,7 +53,6 @@ package com.example.dto;
 
 // imports ...
 
-@Generated("io.github.malczuuu.modelmaker")
 @NullMarked
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({"id", "age"})
