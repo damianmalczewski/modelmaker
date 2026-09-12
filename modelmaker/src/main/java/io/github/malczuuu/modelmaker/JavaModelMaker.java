@@ -29,22 +29,11 @@ import java.util.TreeSet;
  * which case it is package-private and carries {@code @JsonCreator}/{@code @JsonProperty} so
  * Jackson deserializes through it directly. Instances are also built through the nested {@code
  * Builder}. Inline objects become {@code static final} nested classes.
- *
- * <p><b>Not thread-safe.</b> Each {@link #emit} call mutates a shared field with that call's
- * effective options; do not call {@link #emit} concurrently, or re-entrantly, on the same instance.
- * Use a separate instance per thread, or synchronize external calls.
  */
 public final class JavaModelMaker implements ModelMaker {
 
   private final ModelOptions baseOptions;
   private final String generatedAnnotation;
-
-  /**
-   * The effective options for the {@link #emit} call in progress: the base options with the
-   * schema's feature overrides applied. Reassigned fresh at the top of every {@link #emit} call -
-   * see the class-level thread-safety note.
-   */
-  private ModelOptions options;
 
   /**
    * Creates a new {@link JavaModelMaker}.
@@ -54,7 +43,6 @@ public final class JavaModelMaker implements ModelMaker {
    */
   public JavaModelMaker(ModelOptions baseOptions) {
     this.baseOptions = Objects.requireNonNull(baseOptions, "baseOptions must not be null");
-    this.options = this.baseOptions;
     this.generatedAnnotation = "@Generated(\"" + Constants.GENERATOR_NAME + "\")";
   }
 
@@ -70,7 +58,7 @@ public final class JavaModelMaker implements ModelMaker {
   public String emit(ModelType type) {
     Objects.requireNonNull(type, "type must not be null");
 
-    options = type.getFeatureOverrides().applyOn(baseOptions);
+    ModelOptions options = type.getFeatureOverrides().applyOn(baseOptions);
 
     Set<String> imports = new TreeSet<>();
     imports.add("javax.annotation.processing.Generated");
@@ -85,7 +73,7 @@ public final class JavaModelMaker implements ModelMaker {
       }
     }
 
-    String body = renderClass(type, imports, "", true);
+    String body = renderClass(type, options, imports, "", true);
 
     StringBuilder out = new StringBuilder();
     out.append("package ").append(type.getPackageName()).append(";\n\n");
@@ -98,7 +86,8 @@ public final class JavaModelMaker implements ModelMaker {
     return out.toString();
   }
 
-  private String renderClass(ModelType type, Set<String> imports, String indent, boolean topLevel) {
+  private String renderClass(
+      ModelType type, ModelOptions options, Set<String> imports, String indent, boolean topLevel) {
     StringBuilder b = new StringBuilder();
     b.append(indent).append(generatedAnnotation).append('\n');
     if (topLevel) {
@@ -168,7 +157,7 @@ public final class JavaModelMaker implements ModelMaker {
     b.append('\n').append(builder.getCode());
 
     for (ModelType nested : type.getNested()) {
-      b.append('\n').append(renderClass(nested, imports, innerIndent, false));
+      b.append('\n').append(renderClass(nested, options, imports, innerIndent, false));
     }
 
     RenderResult mutator = new BuilderMutatorRenderer().init(innerIndent, type, options).render();

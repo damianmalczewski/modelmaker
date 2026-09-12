@@ -19,7 +19,12 @@ package io.github.malczuuu.modelmaker;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.junit.jupiter.api.Test;
 
 class JavaModelMakerTest {
@@ -27,6 +32,53 @@ class JavaModelMakerTest {
   /** Baseline options: withers, Jackson and validation on, primitives off - tweak per test. */
   private static ModelOptions.Builder opts() {
     return ModelOptions.builder().withers(true).jackson(true).validation(true);
+  }
+
+  @Test
+  void emitIsIndependentPerCallEvenWhenSchemasDisagreeOnFeatures() {
+    ModelType withoutJackson =
+        new ModelType(
+            "Plain",
+            "com.example.dto",
+            null,
+            List.of(
+                new Property(
+                    "id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null)),
+            List.of(),
+            FeatureOverrides.builder().jackson(JacksonOverride.enabled(false)).build());
+
+    JavaModelMaker maker = new JavaModelMaker(opts().build());
+
+    String before = maker.emit(address);
+    String plain = maker.emit(withoutJackson);
+    String after = maker.emit(address);
+
+    assertThat(plain).doesNotContain("@JsonCreator");
+    assertThat(after).isEqualTo(before).contains("@JsonCreator");
+  }
+
+  @Test
+  void emitIsSafeToCallConcurrentlyOnOneInstance() throws Exception {
+    JavaModelMaker maker = new JavaModelMaker(opts().build());
+    List<ModelType> types = List.of(address, person, withNested);
+    List<String> expected = types.stream().map(maker::emit).toList();
+
+    int rounds = 50;
+    ExecutorService executor = Executors.newFixedThreadPool(types.size());
+    try {
+      List<Callable<Boolean>> calls = new ArrayList<>();
+      for (int round = 0; round < rounds; round++) {
+        for (int i = 0; i < types.size(); i++) {
+          int index = i;
+          calls.add(() -> maker.emit(types.get(index)).equals(expected.get(index)));
+        }
+      }
+      for (Future<Boolean> result : executor.invokeAll(calls)) {
+        assertThat(result.get()).isTrue();
+      }
+    } finally {
+      executor.shutdownNow();
+    }
   }
 
   @Test
