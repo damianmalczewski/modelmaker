@@ -47,25 +47,27 @@ tasks.named<JavaCompile>("compileJava").configure {
     options.release = javaTargetVersion
 }
 
-extensions.configure<KotlinJvmProjectExtension> {
-    compilerOptions {
-        jvmToolchain {
-            languageVersion = JavaLanguageVersion.of(javaToolchainVersion)
+pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+    extensions.configure<KotlinJvmProjectExtension> {
+        compilerOptions {
+            jvmToolchain {
+                languageVersion = JavaLanguageVersion.of(javaToolchainVersion)
+            }
+            explicitApi()
+            moduleName = project.name
+            apiVersion = KotlinVersion.KOTLIN_2_2
+            languageVersion = KotlinVersion.KOTLIN_2_2
         }
-        explicitApi()
-        moduleName = project.name
-        apiVersion = KotlinVersion.KOTLIN_2_2
-        languageVersion = KotlinVersion.KOTLIN_2_2
     }
-}
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions {
-        javaParameters = true
+    tasks.withType<KotlinCompile>().configureEach {
+        compilerOptions {
+            javaParameters = true
+        }
     }
-}
-tasks.named<KotlinCompile>("compileKotlin").configure {
-    compilerOptions {
-        jvmTarget = JvmTarget.fromTarget(javaTargetVersion.toString())
+    tasks.named<KotlinCompile>("compileKotlin").configure {
+        compilerOptions {
+            jvmTarget = JvmTarget.fromTarget(javaTargetVersion.toString())
+        }
     }
 }
 tasks.withType<Test>().configureEach {

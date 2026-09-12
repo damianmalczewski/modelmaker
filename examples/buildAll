@@ -9,3 +9,5 @@ cd example-jackson/ ; ./gradlew "$@" ; cd ../
 cd example-mutator/ ; ./gradlew "$@" ; cd ../
 cd example-openapi/ ; ./gradlew "$@" ; cd ../
 cd example-validation/ ; ./gradlew "$@" ; cd ../
+
+cd example-maven/ ; ./mvnw package ; cd ../

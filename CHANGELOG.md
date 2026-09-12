@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Add the `"sensitive"` property keyword.
 - Add per-schema feature overrides.
 - Add `modelmaker { schemas { } }` and `modelmaker { src { } }` configuration.
+- Add the `io.github.malczuuu:modelmaker-maven-plugin` Maven plugin, with a `generate-java` goal bound to
+  `generate-sources`.
 - Add `io.github.malczuuu:modelmaker`, the build-tool-agnostic core, for use without Gradle.
 - Add `SchemaException`, reporting every schema problem of a run at once.
 

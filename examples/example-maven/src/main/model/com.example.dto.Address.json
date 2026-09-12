@@ -1,0 +1,21 @@
+{
+  "$modelmaker": "v1.0",
+  "title": "com.example.dto.Address",
+  "description": "A postal address.",
+  "type": "object",
+  "required": ["city", "postalCode"],
+  "properties": {
+    "city": {
+      "type": "string",
+      "minLength": 1,
+      "description": "City name.",
+      "example": "Kraków"
+    },
+    "postalCode": {
+      "type": "string",
+      "pattern": "^\\d{2}-\\d{3}$",
+      "description": "Polish postal code, NN-NNN.",
+      "example": "30-001"
+    }
+  }
+}
