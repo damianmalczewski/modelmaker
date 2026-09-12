@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Add per-schema feature overrides.
 - Add `modelmaker { src { } }` configuration.
 - Add `io.github.malczuuu:modelmaker`, the build-tool-agnostic core, for use without Gradle.
+- Add `SchemaException`.
 
 [keepachangelog]: https://keepachangelog.com/en/1.1.0/
 

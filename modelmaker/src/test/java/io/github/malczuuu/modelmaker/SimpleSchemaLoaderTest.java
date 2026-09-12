@@ -276,6 +276,15 @@ class SimpleSchemaLoaderTest {
   }
 
   @Test
+  void rejectsAnUnresolvableRef() {
+    Path f = schema("x.B", "\"properties\": { \"a\": { \"$ref\": \"x.Missing\" } }");
+
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .isInstanceOf(SchemaException.class)
+        .hasMessageContaining("$ref \"x.Missing\" does not match any schema title or nested type");
+  }
+
+  @Test
   void rejectsADefaultOfTheWrongType() {
     Path f =
         schema("x.D", "\"properties\": { \"n\": { \"type\": \"integer\", \"default\": \"x\" } }");
@@ -382,7 +391,10 @@ class SimpleSchemaLoaderTest {
   @Test
   void rejectsInvalidJson() {
     Path f = write("x.Bad.json", "{ not json");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("not valid JSON");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .isInstanceOf(SchemaException.class)
+        .hasMessageContaining("not valid JSON")
+        .satisfies(e -> assertThat(((SchemaException) e).getFile()).isEqualTo("x.Bad.json"));
   }
 
   @Test

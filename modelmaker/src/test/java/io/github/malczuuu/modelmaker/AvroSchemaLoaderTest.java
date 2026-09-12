@@ -425,7 +425,9 @@ class AvroSchemaLoaderTest {
   @Test
   void rejectsInvalidJson() {
     Path f = write("x.Bad.avsc", "{ not json");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("not valid JSON");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .isInstanceOf(SchemaException.class)
+        .hasMessageContaining("not valid JSON");
   }
 
   @Test

@@ -79,6 +79,7 @@ class DelegatingSchemaLoaderTest {
   void rejectsAnUnsupportedFileExtension() {
     Path f = write("x.Bad.yaml", "irrelevant");
     assertThatThrownBy(() -> loader.load(List.of(f)))
+        .isInstanceOf(SchemaException.class)
         .hasMessageContaining("unsupported file extension \"yaml\"");
   }
 
@@ -158,6 +159,7 @@ class DelegatingSchemaLoaderTest {
                 + " { \"name\": \"id\", \"type\": \"string\" } ] }");
 
     assertThatThrownBy(() -> loader.load(List.of(good1, bad, good2)))
+        .isInstanceOf(SchemaException.class)
         .hasMessageContaining("unsupported file extension \"yaml\"");
 
     // retrying without the bad file still works, proving the rejected call left no shared state

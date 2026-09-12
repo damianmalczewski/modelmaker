@@ -57,7 +57,7 @@ final class SchemaReferences {
     for (Property prop : type.getProperties()) {
       String ref = refName(prop.getType());
       if (ref != null && !known.contains(ref)) {
-        throw new IllegalArgumentException(
+        throw new SchemaException(
             type.getName()
                 + "."
                 + prop.getName()

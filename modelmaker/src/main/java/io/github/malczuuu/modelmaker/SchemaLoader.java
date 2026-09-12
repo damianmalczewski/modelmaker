@@ -38,6 +38,7 @@ public sealed interface SchemaLoader
    * @param files schema files to parse; processing order is by file name, independent of the list
    *     order.
    * @return one {@link ModelType} per file.
+   * @throws SchemaException when a schema cannot be loaded.
    */
   List<ModelType> load(List<Path> files);
 }

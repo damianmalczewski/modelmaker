@@ -108,8 +108,10 @@ public final class SchemaLoaders {
           return i;
         }
       }
-      throw new IllegalArgumentException(
-          file.getFileName() + ": unsupported file extension \"" + extension + "\"");
+      throw new SchemaException(
+          file.getFileName().toString(),
+          file.getFileName() + ": unsupported file extension \"" + extension + "\"",
+          null);
     }
   }
 

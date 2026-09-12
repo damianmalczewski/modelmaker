@@ -93,8 +93,8 @@ public final class AvroSchemaLoader implements SchemaLoader {
     try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
       parsed = JsonParser.parseReader(reader);
     } catch (Exception e) {
-      throw new IllegalStateException(
-          fileName(file) + ": not valid JSON (" + e.getMessage() + ")", e);
+      throw new SchemaException(
+          fileName(file), fileName(file) + ": not valid JSON (" + e.getMessage() + ")", e);
     }
     if (!parsed.isJsonObject()) {
       throw fail(file, "root must be a JSON object");
@@ -379,8 +379,8 @@ public final class AvroSchemaLoader implements SchemaLoader {
     return value;
   }
 
-  private static IllegalStateException fail(Path file, String message) {
-    return new IllegalStateException(fileName(file) + ": " + message);
+  private static SchemaException fail(Path file, String message) {
+    return new SchemaException(fileName(file), fileName(file) + ": " + message, null);
   }
 
   private static String fileName(Path file) {
