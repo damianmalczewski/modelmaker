@@ -177,10 +177,13 @@ final class SupportMethodsRenderer implements SnippetRenderer {
       }
       Property p = properties.get(i);
       String n = p.getName();
-      parts
-          .append(i == 0 ? "\"" + n + "=\"" : "\", " + n + "=\"")
-          .append(" + ")
-          .append(toStringTerm(p));
+      // A masked property is a constant, so it folds into the label's own literal.
+      String label = i == 0 ? "\"" + n + "=" : "\", " + n + "=";
+      if (p.isSensitive()) {
+        parts.append(label).append(Constants.REDACTED).append('"');
+      } else {
+        parts.append(label).append('"').append(" + ").append(toStringTerm(p));
+      }
     }
     String body =
         properties.isEmpty()

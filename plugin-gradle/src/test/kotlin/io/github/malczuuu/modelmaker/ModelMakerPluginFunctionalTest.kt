@@ -296,6 +296,52 @@ class ModelMakerPluginFunctionalTest {
   }
 
   @Test
+  fun `builds without a schema directory at all`() {
+    project.writeStandardBuild()
+
+    val result = project.runner("build").build()
+
+    assertThat(result.task(":generateModelJava")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+    assertThat(result.task(":build")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+    assertThat(File(project.dir, "src/main/model/java")).doesNotExist()
+  }
+
+  @Test
+  fun `generateModelJava writing into src is up-to-date on the second run`() {
+    project.writeStandardBuild()
+    project.writeSchemas()
+
+    assertThat(project.runner("generateModelJava").build().task(":generateModelJava")?.outcome)
+        .isEqualTo(TaskOutcome.SUCCESS)
+
+    // The generated sources live under the schema directory, so they must not count as this task's
+    // own input - otherwise the first run would dirty itself and execute again.
+    assertThat(project.runner("generateModelJava").build().task(":generateModelJava")?.outcome)
+        .isEqualTo(TaskOutcome.UP_TO_DATE)
+  }
+
+  @Test
+  fun `generateModelJava writing into src restores from the build cache`() {
+    project.writeStandardBuild()
+    project.writeSchemas()
+
+    project.runner("generateModelJava", "--build-cache").build()
+    assertThat(project.generatedJava("com/example/dto/Customer.java")).exists()
+
+    File(project.dir, "src/main/model/java").deleteRecursively()
+
+    assertThat(
+            project
+                .runner("generateModelJava", "--build-cache")
+                .build()
+                .task(":generateModelJava")
+                ?.outcome
+        )
+        .isEqualTo(TaskOutcome.FROM_CACHE)
+    assertThat(project.generatedJava("com/example/dto/Customer.java")).exists()
+  }
+
+  @Test
   fun `generateModelKotlin generates nothing without kotlin extensions opt-in, then runs once enabled`() {
     project.writeStandardBuild(
         languagePlugin = "id(\"org.jetbrains.kotlin.jvm\") version \"2.4.0\""

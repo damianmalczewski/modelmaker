@@ -24,12 +24,15 @@ import javax.inject.Inject
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileTree
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -47,8 +50,8 @@ import org.gradle.kotlin.dsl.newInstance
  * files rather than leaving them stale.
  *
  * Not incremental: [kotlinOutputDirectory] is wiped on every run, rebuilt only when generating.
- * Cacheable, with [sourceDirectory] tracked relative, so a cache hit restores the whole output
- * without re-emitting.
+ * Cacheable, with [schemaFiles] tracked relative, so a cache hit restores the whole output without
+ * re-emitting.
  *
  * @param objects factory creating this task's `kotlin { }` block
  */
@@ -56,10 +59,21 @@ import org.gradle.kotlin.dsl.newInstance
 public abstract class KotlinModelGenerate @Inject constructor(objects: ObjectFactory) :
     DefaultTask() {
 
-  /** Directory scanned recursively for `*.json` and `*.avsc` schema files. */
-  @get:InputDirectory
+  /**
+   * Directory scanned recursively for `*.json` and `*.avsc` schema files. Need not exist - a build
+   * without schemas is not an error.
+   */
+  @get:Internal public abstract val sourceDirectory: DirectoryProperty
+
+  /**
+   * The schema files under [sourceDirectory] - the tracked input of this task. See [schemaFilesIn]
+   * for why the tracked input is the filtered file tree rather than the directory itself.
+   */
+  @get:InputFiles
+  @get:IgnoreEmptyDirectories
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  public abstract val sourceDirectory: DirectoryProperty
+  public val schemaFiles: FileTree
+    get() = schemaFilesIn(sourceDirectory)
 
   /**
    * Where the generated Kotlin extensions are written; cleared before each run, and left absent
@@ -129,14 +143,9 @@ public abstract class KotlinModelGenerate @Inject constructor(objects: ObjectFac
 
     kotlinDir.mkdirs()
 
-    val sourceDir = sourceDirectory.get().asFile
-    val schemas =
-        sourceDir
-            .walkTopDown()
-            .filter { it.isFile && (it.extension == "json" || it.extension == "avsc") }
-            .toList()
+    val schemas = schemaFiles.files.sorted()
     if (schemas.isEmpty()) {
-      logger.lifecycle("No model schemas found in {}", sourceDir)
+      logger.lifecycle("No model schemas found in {}", sourceDirectory.get().asFile)
       return
     }
 
