@@ -25,12 +25,11 @@ import java.util.TreeSet;
  * field, the rest fall through to the DTO constructor. A collection-valued field is passed to the
  * constructor as a shallow copy, so the built DTO never aliases the caller's collection.
  *
- * <p>Renders just the class (with its {@code @Generated} annotation); the enclosing class, the
- * {@code package} declaration and the import list are the composing emitter's job.
+ * <p>Renders just the class; the enclosing class, the {@code package} declaration and the import
+ * list are the composing emitter's job.
  */
 final class BuilderRenderer extends AbstractSnippetRenderer {
 
-  private static final String GENERATED_IMPORT = "javax.annotation.processing.Generated";
   private static final String NULLABLE_IMPORT = "org.jspecify.annotations.Nullable";
   private static final String OBJECTS_IMPORT = "java.util.Objects";
   private static final String ARRAY_LIST_IMPORT = "java.util.ArrayList";
@@ -62,13 +61,11 @@ final class BuilderRenderer extends AbstractSnippetRenderer {
   public RenderResult render() {
     String inner = indent + "  ";
     Set<String> imports = new TreeSet<>();
-    imports.add(GENERATED_IMPORT);
     if (properties.stream().anyMatch(p -> p.getType() == PropType.ScalarType.BYTES)) {
       imports.add(BASE64_IMPORT);
     }
 
     StringBuilder code = new StringBuilder();
-    code.append(indent).append("@Generated(\"").append(Constants.GENERATOR_NAME).append("\")\n");
     code.append(indent).append("public static final class Builder implements BuilderMutator {\n\n");
     code.append(inner).append("private Builder() {}\n\n");
 

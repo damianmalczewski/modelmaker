@@ -22,8 +22,11 @@ final class Constants {
   private Constants() {}
 
   /**
-   * The value of the {@code javax.annotation.processing.Generated} annotation stamped on every
-   * generated type, so coverage / style tooling and readers can tell generated code apart.
+   * This generator's name, as it appears in the do-not-edit banner of every generated file.
+   *
+   * <p>Deliberately not emitted as a {@code javax.annotation.processing.Generated} annotation: that
+   * would force every consumer with a {@code module-info.java} to {@code requires java.compiler},
+   * and the banner already says the same thing.
    */
   static final String GENERATOR_NAME = "io.github.malczuuu.modelmaker";
 

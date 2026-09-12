@@ -24,12 +24,11 @@ import java.util.TreeSet;
  * {@code build()}, every method returning {@code BuilderMutator} so a {@code Mutator} reference can
  * never reach {@code build()}.
  *
- * <p>Renders just the interface (with its {@code @Generated} annotation); the enclosing class, the
- * {@code package} declaration and the import list are the composing emitter's job.
+ * <p>Renders just the interface; the enclosing class, the {@code package} declaration and the
+ * import list are the composing emitter's job.
  */
 final class BuilderMutatorRenderer extends AbstractSnippetRenderer {
 
-  private static final String GENERATED_IMPORT = "javax.annotation.processing.Generated";
   private static final String NULLABLE_IMPORT = "org.jspecify.annotations.Nullable";
 
   /** Creates a new {@link BuilderMutatorRenderer}. */
@@ -44,10 +43,8 @@ final class BuilderMutatorRenderer extends AbstractSnippetRenderer {
   public RenderResult render() {
     String inner = indent + "  ";
     Set<String> imports = new TreeSet<>();
-    imports.add(GENERATED_IMPORT);
 
     StringBuilder code = new StringBuilder();
-    code.append(indent).append("@Generated(\"").append(Constants.GENERATOR_NAME).append("\")\n");
     code.append(indent).append("public sealed interface BuilderMutator permits Builder {\n");
     for (Property property : properties) {
       imports.add(NULLABLE_IMPORT);

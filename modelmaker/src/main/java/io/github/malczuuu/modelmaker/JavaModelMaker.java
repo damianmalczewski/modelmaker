@@ -33,7 +33,6 @@ import java.util.TreeSet;
 public final class JavaModelMaker implements ModelMaker {
 
   private final ModelOptions baseOptions;
-  private final String generatedAnnotation;
 
   /**
    * Creates a new {@link JavaModelMaker}.
@@ -43,7 +42,6 @@ public final class JavaModelMaker implements ModelMaker {
    */
   public JavaModelMaker(ModelOptions baseOptions) {
     this.baseOptions = Objects.requireNonNull(baseOptions, "baseOptions must not be null");
-    this.generatedAnnotation = "@Generated(\"" + Constants.GENERATOR_NAME + "\")";
   }
 
   /**
@@ -61,7 +59,6 @@ public final class JavaModelMaker implements ModelMaker {
     ModelOptions options = type.getFeatureOverrides().applyOn(baseOptions);
 
     Set<String> imports = new TreeSet<>();
-    imports.add("javax.annotation.processing.Generated");
     imports.add("org.jspecify.annotations.NullMarked");
     imports.add("org.jspecify.annotations.Nullable");
     imports.add("java.util.Objects");
@@ -89,7 +86,6 @@ public final class JavaModelMaker implements ModelMaker {
   private String renderClass(
       ModelType type, ModelOptions options, Set<String> imports, String indent, boolean topLevel) {
     StringBuilder b = new StringBuilder();
-    b.append(indent).append(generatedAnnotation).append('\n');
     if (topLevel) {
       b.append(indent).append("@NullMarked\n");
     }

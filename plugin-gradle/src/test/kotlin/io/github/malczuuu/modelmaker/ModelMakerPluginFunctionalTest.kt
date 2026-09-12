@@ -296,6 +296,29 @@ class ModelMakerPluginFunctionalTest {
   }
 
   @Test
+  fun `generated sources compile inside a modular consumer`() {
+    project.writeStandardBuild()
+    project.writeSchemas()
+    // No `requires java.compiler` - the generated code must not reference @Generated.
+    project.write(
+        "src/main/java/module-info.java",
+        """
+      module com.example.consumer {
+        requires static org.jspecify;
+
+        exports com.example.dto;
+      }
+      """,
+    )
+
+    val result = project.runner("compileJava").build()
+
+    assertThat(result.task(":compileJava")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+    assertThat(project.generatedJava("com/example/dto/Customer.java").readText())
+        .doesNotContain("@Generated")
+  }
+
+  @Test
   fun `builds without a schema directory at all`() {
     project.writeStandardBuild()
 

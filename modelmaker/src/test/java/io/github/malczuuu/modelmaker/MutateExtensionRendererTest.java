@@ -28,17 +28,16 @@ class MutateExtensionRendererTest {
 
     assertThat(result.getCode())
         .isEqualTo(
-            "@Generated(\"io.github.malczuuu.modelmaker\")\n"
-                + "public inline fun Widget.mutate(block: Widget.BuilderMutator.() -> Unit):"
+            "public inline fun Widget.mutate(block: Widget.BuilderMutator.() -> Unit):"
                 + " Widget =\n"
                 + "    this.mutate().also { it.block() }.build()\n");
   }
 
   @Test
-  void reportsTheGeneratedImportAndNothingElse() {
+  void reportsNoImports() {
     RenderResult result = new MutateExtensionRenderer().init("", "Widget").render();
 
-    assertThat(result.getImports()).containsExactly("javax.annotation.processing.Generated");
+    assertThat(result.getImports()).isEmpty();
   }
 
   @Test

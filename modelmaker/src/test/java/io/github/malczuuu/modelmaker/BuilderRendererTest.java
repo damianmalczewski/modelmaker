@@ -43,8 +43,7 @@ class BuilderRendererTest {
 
     assertThat(result.getCode())
         .isEqualTo(
-            "@Generated(\"io.github.malczuuu.modelmaker\")\n"
-                + "public static final class Builder implements BuilderMutator {\n"
+            "public static final class Builder implements BuilderMutator {\n"
                 + "\n"
                 + "  private Builder() {}\n"
                 + "\n"
@@ -109,7 +108,7 @@ class BuilderRendererTest {
     assertThat(result.getCode())
         .contains("public Empty build() {\n    return new Empty();\n")
         .contains("return \"Empty.Builder[]\";");
-    assertThat(result.getImports()).containsExactly("javax.annotation.processing.Generated");
+    assertThat(result.getImports()).isEmpty();
   }
 
   @Test

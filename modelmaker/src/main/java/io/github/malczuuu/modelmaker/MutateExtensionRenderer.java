@@ -23,12 +23,10 @@ import java.util.Set;
  * block }} function over the Java DTO's {@code BuilderMutator}, so {@code build()} stays out of the
  * block.
  *
- * <p>Renders just that one function (with its {@code @Generated} annotation); the {@code package}
- * declaration, the import list and the do-not-edit banner are the composing emitter's job.
+ * <p>Renders just that one function; the {@code package} declaration, the import list and the
+ * do-not-edit banner are the composing emitter's job.
  */
 final class MutateExtensionRenderer implements SnippetRenderer {
-
-  private static final String GENERATED_IMPORT = "javax.annotation.processing.Generated";
 
   private String indent = "";
   private String type = "";
@@ -60,8 +58,7 @@ final class MutateExtensionRenderer implements SnippetRenderer {
   @Override
   public RenderResult render() {
     String code =
-        (indent + "@Generated(\"" + Constants.GENERATOR_NAME + "\")\n")
-            + (indent
+        (indent
                 + "public inline fun "
                 + type
                 + ".mutate(block: "
@@ -70,6 +67,6 @@ final class MutateExtensionRenderer implements SnippetRenderer {
                 + type
                 + " =\n")
             + (indent + "    this.mutate().also { it.block() }.build()\n");
-    return new RenderResult(Set.of(GENERATED_IMPORT), code);
+    return new RenderResult(Set.of(), code);
   }
 }

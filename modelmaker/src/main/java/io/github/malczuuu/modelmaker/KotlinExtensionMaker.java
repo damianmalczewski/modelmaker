@@ -52,10 +52,12 @@ public final class KotlinExtensionMaker implements ModelMaker {
     StringBuilder out = new StringBuilder();
     out.append("package ").append(type.getPackageName()).append("\n\n");
     if (!body.isEmpty()) {
-      for (String imp : imports) {
-        out.append("import ").append(imp).append("\n");
+      if (!imports.isEmpty()) {
+        for (String imp : imports) {
+          out.append("import ").append(imp).append("\n");
+        }
+        out.append('\n');
       }
-      out.append('\n');
       out.append(Constants.GENERATED_FILE_NOTICE).append("\n\n");
     }
     out.append(body);

@@ -48,8 +48,7 @@ class BuilderMutatorRendererTest {
 
     assertThat(result.getCode())
         .isEqualTo(
-            "@Generated(\"io.github.malczuuu.modelmaker\")\n"
-                + "public sealed interface BuilderMutator permits Builder {\n"
+            "public sealed interface BuilderMutator permits Builder {\n"
                 + "\n"
                 + "  BuilderMutator id(@Nullable String id);\n"
                 + "\n"
@@ -67,14 +66,11 @@ class BuilderMutatorRendererTest {
   }
 
   @Test
-  void reportsGeneratedNullableAndFieldTypeImports() {
+  void reportsNullableAndFieldTypeImports() {
     RenderResult result = new BuilderMutatorRenderer().init("", WIDGET, OPTIONS).render();
 
     assertThat(result.getImports())
-        .containsExactlyInAnyOrder(
-            "javax.annotation.processing.Generated",
-            "org.jspecify.annotations.Nullable",
-            "java.util.List");
+        .containsExactlyInAnyOrder("org.jspecify.annotations.Nullable", "java.util.List");
   }
 
   @Test
@@ -82,11 +78,8 @@ class BuilderMutatorRendererTest {
     RenderResult result = new BuilderMutatorRenderer().init("", type(), OPTIONS).render();
 
     assertThat(result.getCode())
-        .isEqualTo(
-            "@Generated(\"io.github.malczuuu.modelmaker\")\n"
-                + "public sealed interface BuilderMutator permits Builder {\n"
-                + "}\n");
-    assertThat(result.getImports()).containsExactly("javax.annotation.processing.Generated");
+        .isEqualTo("public sealed interface BuilderMutator permits Builder {\n" + "}\n");
+    assertThat(result.getImports()).isEmpty();
   }
 
   @Test
