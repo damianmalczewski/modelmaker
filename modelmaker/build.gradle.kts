@@ -12,7 +12,7 @@ internalBuild {
 }
 
 dependencies {
-    api(libs.gson)
+    implementation(libs.gson)
 
     compileOnly(libs.jspecify)
 

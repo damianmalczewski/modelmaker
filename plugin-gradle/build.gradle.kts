@@ -16,9 +16,6 @@ internalBuild {
 
 dependencies {
     implementation(project(":modelmaker"))
-    implementation(libs.gson) {
-        libs.errorprone.annotations.get().let { exclude(group = it.group, module = it.name) }
-    }
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(platform(libs.assertj.bom))
