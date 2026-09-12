@@ -26,6 +26,9 @@ import org.gradle.kotlin.dsl.newInstance
  *
  * ```
  * modelmaker {
+ *   schemas {
+ *     directory = layout.projectDirectory.dir("src/main/model")
+ *   }
  *   src {
  *     enabled = true | false
  *   }
@@ -42,9 +45,28 @@ import org.gradle.kotlin.dsl.newInstance
  * }
  * ```
  *
- * @param objects factory creating the [src], [kotlin], and [features] blocks
+ * @param objects factory creating the [schemas], [src], [kotlin], and [features] blocks
  */
 public abstract class ModelMakerExtension @Inject constructor(objects: ObjectFactory) {
+
+  /** Where the schema files are read from, see [ModelMakerSchemasSpec]. */
+  internal val schemas: ModelMakerSchemasSpec = objects.newInstance()
+
+  /**
+   * Configures where the schema files are read from, see [ModelMakerSchemasSpec]:
+   * ```
+   * modelmaker {
+   *   schemas {
+   *     directory = layout.projectDirectory.dir("src/main/schemas")
+   *   }
+   * }
+   * ```
+   *
+   * @param configuration action applied to the schema options
+   */
+  public fun schemas(configuration: Action<in ModelMakerSchemasSpec>) {
+    configuration.execute(schemas)
+  }
 
   /** Where generated sources are written, see [ModelMakerSrcSpec]. */
   internal val src: ModelMakerSrcSpec = objects.newInstance()

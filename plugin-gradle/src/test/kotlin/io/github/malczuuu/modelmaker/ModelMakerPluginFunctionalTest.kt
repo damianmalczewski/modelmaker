@@ -296,6 +296,58 @@ class ModelMakerPluginFunctionalTest {
   }
 
   @Test
+  fun `reads schemas from a configured directory and writes next to them`() {
+    project.writeStandardBuild(
+        modelMakerBlock =
+            """
+        modelmaker {
+            schemas { directory = layout.projectDirectory.dir("src/main/schemas") }
+        }
+        """
+    )
+    project.write(
+        "src/main/schemas/com.example.dto.Tag.json",
+        $$"""
+      { "$modelmaker": "v1.0", "title": "com.example.dto.Tag", "type": "object",
+        "required": ["name"],
+        "properties": { "name": { "type": "string" } } }
+      """,
+    )
+
+    val result = project.runner("build").build()
+
+    assertThat(result.task(":generateModelJava")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+    assertThat(File(project.dir, "src/main/schemas/java/com/example/dto/Tag.java")).exists()
+    assertThat(project.generatedJava("com/example/dto/Tag.java")).doesNotExist()
+  }
+
+  @Test
+  fun `a configured schema directory still honours src disabled`() {
+    project.writeStandardBuild(
+        modelMakerBlock =
+            """
+        modelmaker {
+            schemas { directory = layout.projectDirectory.dir("schemas") }
+            src { enabled = false }
+        }
+        """
+    )
+    project.write(
+        "schemas/com.example.dto.Tag.json",
+        $$"""
+      { "$modelmaker": "v1.0", "title": "com.example.dto.Tag", "type": "object",
+        "required": ["name"],
+        "properties": { "name": { "type": "string" } } }
+      """,
+    )
+
+    project.runner("build").build()
+
+    assertThat(project.buildJava("com/example/dto/Tag.java")).exists()
+    assertThat(File(project.dir, "schemas/java")).doesNotExist()
+  }
+
+  @Test
   fun `generated sources compile inside a modular consumer`() {
     project.writeStandardBuild()
     project.writeSchemas()

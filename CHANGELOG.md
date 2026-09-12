@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Add the `jackson`, `validation` and `openApi` features.
 - Add the `withers` and `preferPrimitives` features.
 - Add per-schema feature overrides.
-- Add `modelmaker { src { } }` configuration.
+- Add `modelmaker { schemas { } }` and `modelmaker { src { } }` configuration.
 - Add `io.github.malczuuu:modelmaker`, the build-tool-agnostic core, for use without Gradle.
 - Add `SchemaException`, reporting every schema problem of a run at once.
 

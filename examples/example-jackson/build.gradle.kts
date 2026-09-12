@@ -36,6 +36,9 @@ tasks.named<KotlinCompile>("compileKotlin") {
 }
 
 modelmaker {
+    schemas {
+        directory = layout.projectDirectory.dir("src/main/schemas")
+    }
     features {
         // Each file has an override for it.
         jackson { enabled = false }
@@ -65,7 +68,7 @@ tasks.withType<Test>().configureEach {
 spotless {
     kotlin {
         target("src/**/*.kt")
-        targetExclude("build/**", "src/main/model/kotlin/**")
+        targetExclude("build/**", "src/main/schemas/kotlin/**")
 
         ktfmt().metaStyle().configure {
             it.setMaxWidth(100)
@@ -77,7 +80,7 @@ spotless {
 
     java {
         target("src/**/*.java")
-        targetExclude("build/**", "src/main/model/java/**")
+        targetExclude("build/**", "src/main/schemas/java/**")
 
         googleJavaFormat()
         endWithNewline()

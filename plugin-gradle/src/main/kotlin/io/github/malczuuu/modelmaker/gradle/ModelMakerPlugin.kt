@@ -62,22 +62,24 @@ public class ModelMakerPlugin : Plugin<Project> {
       }
       extension.kotlin.enabled.convention(false)
       extension.src.enabled.convention(true)
+      extension.schemas.directory.convention(layout.projectDirectory.dir("src/main/model"))
 
       val kotlinPluginApplied = objects.property(Boolean::class.java).convention(false)
       pluginManager.withPlugin(KOTLIN_JVM_PLUGIN_ID) { kotlinPluginApplied.set(true) }
 
-      val schemaSourceDirectory = layout.projectDirectory.dir("src/main/model")
+      val schemaSourceDirectory = extension.schemas.directory
 
+      // With `src.enabled` the generated sources sit next to the schemas they come from, so a
+      // relocated schema directory takes its output with it.
       val javaOutputDir =
           extension.src.enabled.flatMap { enabled ->
-            if (enabled) providers.provider { layout.projectDirectory.dir("src/main/model/java") }
+            if (enabled) schemaSourceDirectory.map { it.dir("java") }
             else layout.buildDirectory.dir("generated/sources/modelmaker/java/main")
           }
       val kotlinOutputDir =
           extension.src.enabled.flatMap { enabled ->
-            if (enabled) {
-              providers.provider { layout.projectDirectory.dir("src/main/model/kotlin") }
-            } else layout.buildDirectory.dir("generated/sources/modelmaker/kotlin/main")
+            if (enabled) schemaSourceDirectory.map { it.dir("kotlin") }
+            else layout.buildDirectory.dir("generated/sources/modelmaker/kotlin/main")
           }
 
       val generateModelJava =
