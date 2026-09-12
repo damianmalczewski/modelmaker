@@ -202,4 +202,16 @@ class DelegatingSchemaLoaderTest {
     assertThat(types).hasSize(2);
     assertThat(types).allMatch(t -> t.getName().equals("Widget"));
   }
+
+  @Test
+  void reportsUnsupportedExtensionsAndSchemaProblemsTogether() {
+    Path unsupported = write("x.A.yaml", "title: x.A");
+    Path broken = write("x.B.json", "{ \"$modelmaker\": \"v1.0\", \"type\": \"object\" }");
+
+    assertThatThrownBy(() -> loader.load(List.of(unsupported, broken)))
+        .isInstanceOf(SchemaException.class)
+        .hasMessageContaining("2 schema errors:")
+        .hasMessageContaining("x.A.yaml: unsupported file extension \"yaml\"")
+        .hasMessageContaining("x.B.json: missing \"title\"");
+  }
 }

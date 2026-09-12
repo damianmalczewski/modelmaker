@@ -89,29 +89,43 @@ public final class SchemaLoaders {
       for (int i = 0; i < loaders.size(); i++) {
         byLoader.add(new ArrayList<>());
       }
+      List<SchemaException> errors = new ArrayList<>();
       for (Path file : files) {
         String extension = extension(file);
-        int index = indexOfLoaderFor(file, extension);
-        byLoader.get(index).add(file);
+        int index = indexOfLoaderFor(extension);
+        if (index < 0) {
+          errors.add(
+              new SchemaException(
+                  file.getFileName().toString(),
+                  file.getFileName() + ": unsupported file extension \"" + extension + "\"",
+                  null));
+        } else {
+          byLoader.get(index).add(file);
+        }
       }
 
       List<ModelType> types = new ArrayList<>();
       for (int i = 0; i < loaders.size(); i++) {
-        types.addAll(loaders.get(i).load(byLoader.get(i)));
+        try {
+          types.addAll(loaders.get(i).load(byLoader.get(i)));
+        } catch (SchemaException e) {
+          // Every loader gets its turn, so one run reports the problems of all of them.
+          errors.addAll(e.getErrors());
+        }
+      }
+      if (!errors.isEmpty()) {
+        throw SchemaException.of(errors);
       }
       return List.copyOf(types);
     }
 
-    private int indexOfLoaderFor(Path file, String extension) {
+    private int indexOfLoaderFor(String extension) {
       for (int i = 0; i < loaders.size(); i++) {
         if (loaders.get(i).canLoad(extension)) {
           return i;
         }
       }
-      throw new SchemaException(
-          file.getFileName().toString(),
-          file.getFileName() + ": unsupported file extension \"" + extension + "\"",
-          null);
+      return -1;
     }
   }
 

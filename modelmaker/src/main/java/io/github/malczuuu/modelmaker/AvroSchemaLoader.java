@@ -81,8 +81,17 @@ public final class AvroSchemaLoader implements SchemaLoader {
     List<Path> sorted = new ArrayList<>(files);
     sorted.sort(Comparator.comparing(AvroSchemaLoader::fileName));
     List<ModelType> types = new ArrayList<>();
+    List<SchemaException> errors = new ArrayList<>();
     for (Path f : sorted) {
-      types.add(parseFile(f));
+      try {
+        types.add(parseFile(f));
+      } catch (SchemaException e) {
+        // Keep going: one run should report every broken schema, not just the first one.
+        errors.add(e);
+      }
+    }
+    if (!errors.isEmpty()) {
+      throw SchemaException.of(errors);
     }
     SchemaReferences.validate(types);
     return List.copyOf(types);

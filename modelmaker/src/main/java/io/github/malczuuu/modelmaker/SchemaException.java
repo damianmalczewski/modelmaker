@@ -71,6 +71,26 @@ public class SchemaException extends RuntimeException {
   }
 
   /**
+   * Bundles several problems into one exception: the first when there is only one, otherwise a new
+   * exception listing every message, with each problem attached as a suppressed exception.
+   *
+   * @param errors the collected problems, at least one.
+   * @return the exception to throw.
+   */
+  static SchemaException of(List<SchemaException> errors) {
+    if (errors.size() == 1) {
+      return errors.get(0);
+    }
+    StringBuilder message = new StringBuilder(errors.size() + " schema errors:");
+    for (SchemaException error : errors) {
+      message.append("\n  - ").append(error.getMessage());
+    }
+    SchemaException aggregate = new SchemaException(message.toString());
+    errors.forEach(aggregate::addSuppressed);
+    return aggregate;
+  }
+
+  /**
    * The individual problems this exception reports.
    *
    * @return the collected problems for an exception aggregating several, otherwise a single-element

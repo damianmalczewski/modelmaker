@@ -16,6 +16,7 @@
 
 package io.github.malczuuu.modelmaker;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,8 +42,12 @@ final class SchemaReferences {
       known.add(t.getPackageName() + "." + t.getName());
       collectNestedNames(t, known);
     }
+    List<SchemaException> errors = new ArrayList<>();
     for (ModelType t : types) {
-      validateRefs(t, known);
+      validateRefs(t, known, errors);
+    }
+    if (!errors.isEmpty()) {
+      throw SchemaException.of(errors);
     }
   }
 
@@ -53,21 +58,23 @@ final class SchemaReferences {
     }
   }
 
-  private static void validateRefs(ModelType type, Set<String> known) {
+  private static void validateRefs(
+      ModelType type, Set<String> known, List<SchemaException> errors) {
     for (Property prop : type.getProperties()) {
       String ref = refName(prop.getType());
       if (ref != null && !known.contains(ref)) {
-        throw new SchemaException(
-            type.getName()
-                + "."
-                + prop.getName()
-                + ": $ref \""
-                + ref
-                + "\" does not match any schema title or nested type");
+        errors.add(
+            new SchemaException(
+                type.getName()
+                    + "."
+                    + prop.getName()
+                    + ": $ref \""
+                    + ref
+                    + "\" does not match any schema title or nested type"));
       }
     }
     for (ModelType n : type.getNested()) {
-      validateRefs(n, known);
+      validateRefs(n, known, errors);
     }
   }
 

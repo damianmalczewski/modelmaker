@@ -276,6 +276,54 @@ class SimpleSchemaLoaderTest {
   }
 
   @Test
+  void reportsEveryBrokenSchemaInOneGo() {
+    Path first = write("x.A.json", "{ \"$modelmaker\": \"v1.0\", \"type\": \"object\" }");
+    Path second =
+        schema("x.B", "\"properties\": { \"n\": { \"type\": \"integer\", \"default\": \"x\" } }");
+    Path third = schema("x.C", "\"properties\": { \"s\": { \"type\": \"nope\" } }");
+
+    assertThatThrownBy(() -> loader.load(List.of(first, second, third)))
+        .isInstanceOf(SchemaException.class)
+        .hasMessageContaining("3 schema errors:")
+        .hasMessageContaining("x.A.json: missing \"title\"")
+        .hasMessageContaining("x.B.json: property \"n\": default must be an integer")
+        .hasMessageContaining("x.C.json: property \"s\": unsupported type \"nope\"")
+        .satisfies(
+            e -> {
+              SchemaException aggregate = (SchemaException) e;
+              assertThat(aggregate.getErrors()).hasSize(3);
+              assertThat(aggregate.getErrors())
+                  .extracting(SchemaException::getFile)
+                  .containsExactly("x.A.json", "x.B.json", "x.C.json");
+            });
+  }
+
+  @Test
+  void reportsASingleBrokenSchemaWithoutWrappingIt() {
+    Path f = write("x.A.json", "{ \"$modelmaker\": \"v1.0\", \"type\": \"object\" }");
+
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .isInstanceOf(SchemaException.class)
+        .hasMessage("x.A.json: missing \"title\"")
+        .satisfies(e -> assertThat(e.getSuppressed()).isEmpty());
+  }
+
+  @Test
+  void reportsEveryUnresolvableRefInOneGo() {
+    Path f =
+        schema(
+            "x.B",
+            "\"properties\": { \"a\": { \"$ref\": \"x.Missing\" }, \"b\": { \"$ref\":"
+                + " \"x.AlsoMissing\" } }");
+
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .isInstanceOf(SchemaException.class)
+        .hasMessageContaining("2 schema errors:")
+        .hasMessageContaining("$ref \"x.Missing\"")
+        .hasMessageContaining("$ref \"x.AlsoMissing\"");
+  }
+
+  @Test
   void rejectsAnUnresolvableRef() {
     Path f = schema("x.B", "\"properties\": { \"a\": { \"$ref\": \"x.Missing\" } }");
 
