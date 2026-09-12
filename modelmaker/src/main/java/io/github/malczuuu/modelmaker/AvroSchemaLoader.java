@@ -38,6 +38,11 @@ import org.jspecify.annotations.Nullable;
 /**
  * {@link SchemaLoader} that parses Apache Avro {@code .avsc} record schemas.
  *
+ * <p><b>Experimental.</b> Avro input is not covered by this project's compatibility promise: this
+ * class, and support for {@code .avsc} files in general, may change or be removed in any release,
+ * including a minor one. Code against {@link SimpleSchemaLoader} (or {@link
+ * SchemaLoaders#createDelegatingSchemaLoader()}) for anything that must keep working.
+ *
  * <p>Hand-parsed as plain JSON, the same way {@link SimpleSchemaLoader} parses its own format,
  * rather than depending on {@code org.apache.avro:avro} for this project's intentionally narrow
  * schema subset.

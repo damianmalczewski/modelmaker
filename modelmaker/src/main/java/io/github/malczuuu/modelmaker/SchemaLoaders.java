@@ -31,6 +31,9 @@ public final class SchemaLoaders {
    * build-tool integration (or any other caller with a mixed source directory) should use; {@link
    * SimpleSchemaLoader} and {@link AvroSchemaLoader} both stay usable standalone too.
    *
+   * <p>Avro support is experimental and may be removed - see {@link AvroSchemaLoader}. Schemas in
+   * this project's own format keep loading through this method either way.
+   *
    * @return a new delegating {@link SchemaLoader}.
    */
   public static SchemaLoader createDelegatingSchemaLoader() {
