@@ -532,6 +532,42 @@ class ModelMakerPluginFunctionalTest {
   }
 
   @Test
+  fun `generateModel runs both generation tasks`() {
+    project.writeStandardBuild(
+        languagePlugin = "kotlin(\"jvm\") version \"2.4.10\"",
+        modelMakerBlock = "modelmaker { kotlin { enabled = true } }",
+    )
+    project.writeSchemas()
+
+    val result = project.runner("generateModel").build()
+
+    assertThat(result.task(":generateModelJava")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+    assertThat(result.task(":generateModelKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+    assertThat(result.task(":generateModel")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+    assertThat(project.generatedJava("com/example/dto/Customer.java")).exists()
+    assertThat(project.generatedKotlin("com/example/dto/CustomerExtensions.kt")).exists()
+  }
+
+  @Test
+  fun `generateModel is available without the java plugin`() {
+    project.write("settings.gradle.kts", "rootProject.name = \"under-test\"")
+    project.write(
+        "build.gradle.kts",
+        """
+      plugins {
+          id("io.github.malczuuu.modelmaker")
+      }
+      """,
+    )
+    project.writeSchemas()
+
+    val result = project.runner("generateModel").build()
+
+    assertThat(result.task(":generateModel")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+    assertThat(project.generatedJava("com/example/dto/Customer.java")).exists()
+  }
+
+  @Test
   fun `generateModelKotlin depends on generateModelJava`() {
     project.writeStandardBuild(
         languagePlugin = "id(\"org.jetbrains.kotlin.jvm\") version \"2.4.0\"",

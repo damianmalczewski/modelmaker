@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 ### Added
 
 - Add the `io.github.malczuuu.modelmaker` Gradle plugin, generating immutable Java DTOs from schema files.
-- Add the `generateModelJava` and `generateModelKotlin` tasks.
+- Add the `generateModelJava`, `generateModelKotlin` and `generateModel` tasks.
 - Add the Simple Schema format (`$modelmaker: "v1.0"`).
 - Add Kotlin `mutate { }` extensions.
 - Add the `jackson`, `validation` and `openApi` features.

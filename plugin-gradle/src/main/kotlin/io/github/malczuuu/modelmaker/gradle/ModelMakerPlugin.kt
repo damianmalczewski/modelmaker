@@ -34,8 +34,9 @@ import org.gradle.kotlin.dsl.withType
  *
  * 1. Registers the `modelmaker { }` extension.
  * 2. Registers a `generateModelJava` task that compiles every `*.json` and `*.avsc` under
- *    `src/main/model` into `.java` models, and a `generateModelKotlin` (depending on
- *    `generateModelJava`) that writes Kotlin extensions.
+ *    `src/main/model` into `.java` models, a `generateModelKotlin` (depending on
+ *    `generateModelJava`) that writes Kotlin extensions, and a `generateModel` lifecycle task
+ *    running both.
  * 3. Registers output dirs as source directories of the `main` source set, built by their
  *    respective tasks (`javac` picks up the `.java`; the Kotlin plugin, if present, the `.kt`).
  *
@@ -106,6 +107,12 @@ public class ModelMakerPlugin : Plugin<Project> {
             inheritKotlin(extension.kotlin.enabled)
             this.kotlinPluginApplied.set(kotlinPluginApplied)
           }
+
+      tasks.register("generateModel") {
+        group = "modelmaker"
+        description = "Generates all ModelMaker sources"
+        dependsOn(generateModelJava, generateModelKotlin)
+      }
 
       plugins.withType<JavaPlugin> {
         extensions.configure<SourceSetContainer> {
