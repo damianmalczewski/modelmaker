@@ -13,7 +13,7 @@ maven-plugin-api = "3.9.16"
 maven-plugin-development = "1.0.3"
 nullaway = "0.14.1"
 plugin-compatibility = "1.1.0"
-plugin-publish = "2.2.0"
+plugin-publish = "2.2.1"
 spotless = "8.10.2"
 
 [plugins]
