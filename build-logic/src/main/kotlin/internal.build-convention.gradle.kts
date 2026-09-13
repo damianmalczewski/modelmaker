@@ -13,8 +13,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("java")
     id("maven-publish")
+    id("signing")
     id("net.ltgt.errorprone")
 }
+
+/** Releases sign their artifacts (`-Psign`); local and CI builds do not. */
+fun getBooleanProperty(name: String, defaultValue: Boolean = false): Boolean =
+    if (hasProperty(name)) findProperty(name)?.toString() != "false" else defaultValue
 
 val internalBuild = extensions.create("internalBuild", InternalBuildExtension::class.java)
 internalBuild.kover.convention(false)
@@ -139,3 +144,14 @@ afterEvaluate {
  * static-analysis checks on test compilation.
  */
 fun Task.isTestTask(): Boolean = name.matches(Regex(".*[tT]est.*"))
+
+if (getBooleanProperty("sign")) {
+    signing {
+        useInMemoryPgpKeys(System.getenv("SIGNING_KEY"), System.getenv("SIGNING_PASSWORD"))
+        sign(publishing.publications)
+    }
+} else {
+    tasks.withType<Sign>().configureEach {
+        enabled = false
+    }
+}
