@@ -12,7 +12,9 @@ internalBuild {
 }
 
 dependencies {
-    implementation(libs.gson)
+    implementation(libs.gson) {
+        libs.errorprone.annotations.get().let { exclude(group = it.group, module = it.name) }
+    }
 
     compileOnly(libs.jspecify)
 

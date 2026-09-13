@@ -1,0 +1,31 @@
+{
+  "$modelmaker": "v1.0",
+  "title": "com.example.dto.Customer",
+  "description": "Combines Jackson binding, jakarta.validation constraints and OpenAPI @Schema metadata on one type.",
+  "type": "object",
+  "required": ["id", "email", "shippingAddress"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^C\\d+$",
+      "description": "Customer identifier, C followed by digits.",
+      "example": "C42"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Primary contact email.",
+      "example": "ada@example.com"
+    },
+    "loyaltyPoints": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100000,
+      "default": 0,
+      "description": "Accrued loyalty points."
+    },
+    "shippingAddress": {
+      "$ref": "com.example.dto.Address"
+    }
+  }
+}

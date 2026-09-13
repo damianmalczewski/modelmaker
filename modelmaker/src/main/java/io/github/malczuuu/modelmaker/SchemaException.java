@@ -37,6 +37,12 @@ public class SchemaException extends RuntimeException {
 
   @Serial private static final long serialVersionUID = 1L;
 
+  /**
+   * Name of the schema file the problem was found in, or {@code null} when it is not attributable
+   * to one. Part of this exception's serialized form.
+   *
+   * @serial
+   */
   private final @Nullable String file;
 
   /**
