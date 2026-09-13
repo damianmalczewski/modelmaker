@@ -21,9 +21,9 @@ import org.gradle.api.file.DirectoryProperty
 /**
  * Where the schema files are read from, configured via `modelmaker { schemas { } }`.
  *
- * @property directory scanned recursively for schema files, `src/main/model` by default. It need
- *   not exist. With `modelmaker { src { enabled = true } }` the generated sources are written into
- *   its `java` and `kotlin` subdirectories, so moving the schemas moves the output with them.
+ * @property directory scanned recursively for schema files; it need not exist. With `modelmaker {
+ *   src { enabled = true } }` the generated sources are written into its `java` and `kotlin`
+ *   subdirectories, so moving the schemas moves the output with them.
  */
 public abstract class ModelMakerSchemasSpec {
 

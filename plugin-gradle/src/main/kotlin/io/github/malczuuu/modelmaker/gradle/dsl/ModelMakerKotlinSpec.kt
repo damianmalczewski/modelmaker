@@ -23,7 +23,7 @@ import org.gradle.api.provider.Property
  * Kotlin JVM plugin (`org.jetbrains.kotlin.jvm`) is applied to the project.
  *
  * @property enabled emit a `<Name>Extensions.kt` per schema, adding a `mutate { }` extension
- *   function over the Java DTO's `Builder`. Default `false`.
+ *   function over the Java DTO's `Builder`.
  */
 public abstract class ModelMakerKotlinSpec {
 

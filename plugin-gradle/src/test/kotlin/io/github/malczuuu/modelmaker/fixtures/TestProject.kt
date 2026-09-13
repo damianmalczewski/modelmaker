@@ -95,17 +95,23 @@ class TestProject(val dir: File) {
   fun runner(vararg arguments: String): GradleRunner =
       GradleRunner.create().withProjectDir(dir).withPluginClasspath().withArguments(*arguments)
 
-  /** Where `generateModelJava` writes by default (`modelmaker.src.enabled` defaults `true`). */
-  fun generatedJava(relativePath: String): File = File(dir, "src/main/model/java/$relativePath")
-
-  /** Where `generateModelKotlin` writes by default (`modelmaker.src.enabled` defaults `true`). */
-  fun generatedKotlin(relativePath: String): File = File(dir, "src/main/model/kotlin/$relativePath")
-
-  /** Where `generateModelJava` writes with `modelmaker { src { enabled = false } }`. */
-  fun buildJava(relativePath: String): File =
+  /** Where `generateModelJava` writes by default (`modelmaker.src.enabled` defaults `false`). */
+  fun generatedJava(relativePath: String): File =
       File(dir, "build/generated/sources/modelmaker/java/main/$relativePath")
 
-  /** Where `generateModelKotlin` writes with `modelmaker { src { enabled = false } }`. */
-  fun buildKotlin(relativePath: String): File =
+  /** Where `generateModelKotlin` writes by default (`modelmaker.src.enabled` defaults `false`). */
+  fun generatedKotlin(relativePath: String): File =
       File(dir, "build/generated/sources/modelmaker/kotlin/main/$relativePath")
+
+  /** Alias of [generatedJava], for tests that name the build directory explicitly. */
+  fun buildJava(relativePath: String): File = generatedJava(relativePath)
+
+  /** Alias of [generatedKotlin], for tests that name the build directory explicitly. */
+  fun buildKotlin(relativePath: String): File = generatedKotlin(relativePath)
+
+  /** Where `generateModelJava` writes with `modelmaker { src { enabled = true } }`. */
+  fun srcJava(relativePath: String): File = File(dir, "src/main/model/java/$relativePath")
+
+  /** Where `generateModelKotlin` writes with `modelmaker { src { enabled = true } }`. */
+  fun srcKotlin(relativePath: String): File = File(dir, "src/main/model/kotlin/$relativePath")
 }

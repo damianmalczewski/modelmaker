@@ -368,6 +368,7 @@ class ModelMakerPluginFunctionalTest {
             """
         modelmaker {
             schemas { directory = layout.projectDirectory.dir("src/main/schemas") }
+            src { enabled = true }
         }
         """
     )
@@ -449,7 +450,7 @@ class ModelMakerPluginFunctionalTest {
 
   @Test
   fun `generateModelJava writing into src is up-to-date on the second run`() {
-    project.writeStandardBuild()
+    project.writeStandardBuild(modelMakerBlock = "modelmaker { src { enabled = true } }")
     project.writeSchemas()
 
     assertThat(project.runner("generateModelJava").build().task(":generateModelJava")?.outcome)
@@ -463,11 +464,11 @@ class ModelMakerPluginFunctionalTest {
 
   @Test
   fun `generateModelJava writing into src restores from the build cache`() {
-    project.writeStandardBuild()
+    project.writeStandardBuild(modelMakerBlock = "modelmaker { src { enabled = true } }")
     project.writeSchemas()
 
     project.runner("generateModelJava", "--build-cache").build()
-    assertThat(project.generatedJava("com/example/dto/Customer.java")).exists()
+    assertThat(project.srcJava("com/example/dto/Customer.java")).exists()
 
     File(project.dir, "src/main/model/java").deleteRecursively()
 
@@ -479,7 +480,7 @@ class ModelMakerPluginFunctionalTest {
                 ?.outcome
         )
         .isEqualTo(TaskOutcome.FROM_CACHE)
-    assertThat(project.generatedJava("com/example/dto/Customer.java")).exists()
+    assertThat(project.srcJava("com/example/dto/Customer.java")).exists()
   }
 
   @Test
@@ -582,18 +583,18 @@ class ModelMakerPluginFunctionalTest {
   }
 
   @Test
-  fun `src disabled writes into build{ generated,sources,modelmaker} instead of src`() {
+  fun `src enabled writes into the source tree instead of build{ generated,sources,modelmaker}`() {
     project.writeStandardBuild(
         languagePlugin = "id(\"org.jetbrains.kotlin.jvm\") version \"2.4.0\"",
-        modelMakerBlock = "modelmaker { kotlin { enabled = true }; src { enabled = false } }",
+        modelMakerBlock = "modelmaker { kotlin { enabled = true }; src { enabled = true } }",
     )
     project.writeSchemas()
 
     val result = project.runner("compileKotlin").build()
 
     assertThat(result.task(":compileKotlin")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-    assertThat(project.buildJava("com/example/dto/Customer.java")).exists()
-    assertThat(project.buildKotlin("com/example/dto/CustomerExtensions.kt")).exists()
+    assertThat(project.srcJava("com/example/dto/Customer.java")).exists()
+    assertThat(project.srcKotlin("com/example/dto/CustomerExtensions.kt")).exists()
     assertThat(project.generatedJava("com/example/dto/Customer.java")).doesNotExist()
     assertThat(project.generatedKotlin("com/example/dto/CustomerExtensions.kt")).doesNotExist()
   }

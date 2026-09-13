@@ -28,8 +28,6 @@ import org.gradle.api.tasks.Input
  * }
  * ```
  *
- * Default: `enabled = false`.
- *
  * @property enabled whether the feature is on.
  */
 public abstract class ModelMakerPreferPrimitivesSpec {

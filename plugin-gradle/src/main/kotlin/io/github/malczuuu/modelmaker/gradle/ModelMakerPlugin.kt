@@ -63,7 +63,7 @@ public class ModelMakerPlugin : Plugin<Project> {
         preferPrimitives.enabled.convention(false)
       }
       extension.kotlin.enabled.convention(false)
-      extension.src.enabled.convention(true)
+      extension.src.enabled.convention(false)
       extension.schemas.directory.convention(layout.projectDirectory.dir("src/main/model"))
 
       val kotlinPluginApplied = objects.property(Boolean::class.java).convention(false)
@@ -71,8 +71,9 @@ public class ModelMakerPlugin : Plugin<Project> {
 
       val schemaSourceDirectory = extension.schemas.directory
 
-      // With `src.enabled` the generated sources sit next to the schemas they come from, so a
-      // relocated schema directory takes its output with it.
+      // Generated sources live under `build` unless `src.enabled` opts into the source tree, where
+      // they sit next to the schemas they come from - so a relocated schema directory takes its
+      // output with it.
       val javaOutputDir =
           extension.src.enabled.flatMap { enabled ->
             if (enabled) schemaSourceDirectory.map { it.dir("java") }

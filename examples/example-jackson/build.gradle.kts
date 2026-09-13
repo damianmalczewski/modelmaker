@@ -36,6 +36,9 @@ tasks.named<KotlinCompile>("compileKotlin") {
 }
 
 modelmaker {
+    src {
+        enabled = true
+    }
     schemas {
         directory = layout.projectDirectory.dir("src/main/schemas")
     }

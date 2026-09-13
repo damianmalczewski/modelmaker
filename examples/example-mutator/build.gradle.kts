@@ -36,6 +36,9 @@ tasks.named<KotlinCompile>("compileKotlin") {
 }
 
 modelmaker {
+    src {
+        enabled = true
+    }
     features {
         jackson { enabled = false }
         validation { enabled = false }

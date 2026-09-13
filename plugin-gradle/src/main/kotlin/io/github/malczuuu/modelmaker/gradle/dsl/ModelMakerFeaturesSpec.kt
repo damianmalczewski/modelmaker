@@ -34,9 +34,8 @@ import org.gradle.api.tasks.Nested
  * ```
  *
  * `jackson` / `validation` / `openApi` carry on/off plus field / getter placement; `withers` /
- * `preferPrimitives` are plain on/off. Every flag defaults to `false` except each annotation
- * feature's `annotateGetters` (defaults to `true`), and every flag can be overridden per schema
- * through a top-level `"features"` object in the schema file.
+ * `preferPrimitives` are plain on/off. Every flag can be overridden per schema through a top-level
+ * `"features"` object in the schema file.
  *
  * @property jackson Jackson annotations (`@JsonCreator`, `@JsonProperty`, ...).
  * @property validation `jakarta.validation` constraint annotations and `@Valid` cascades.

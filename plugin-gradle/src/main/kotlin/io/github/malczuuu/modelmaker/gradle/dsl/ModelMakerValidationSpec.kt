@@ -30,8 +30,7 @@ import org.gradle.api.tasks.Input
  * }
  * ```
  *
- * Defaults: `enabled = false`, `annotateFields = false`, `annotateGetters = true`. With both
- * `annotateFields` and `annotateGetters` on, the annotations are emitted on both.
+ * With both `annotateFields` and `annotateGetters` on, the annotations are emitted on both.
  *
  * @property enabled whether the feature emits any annotations.
  * @property annotateFields place the annotations on the generated fields.
