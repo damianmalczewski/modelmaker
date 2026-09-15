@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-15
+
 ### Added
 
 - Add `io.github.malczuuu:modelmaker`, the schema loaders and source emitters shared by the build-tool plugins.
@@ -15,7 +17,6 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Add the `"sensitive"` property keyword.
 - Add per-schema feature overrides.
 - Add Kotlin `mutate { }` extensions.
-- Add `SchemaException`, reporting every schema problem of a run at once.
 
 [keepachangelog]: https://keepachangelog.com/en/1.1.0/
 
