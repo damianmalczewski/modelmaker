@@ -4,22 +4,26 @@
 #
 #   An utility script to create git tags for versioning releases.
 #
-#   This script creates an annotated git tag for versioning releases. Version
-#   argument must follow semver-alike format ('1.2.3' or '1.2.3-suffix'). Tag
-#   name will add a 'v' prefix by default, unless --no-tag-prefix is specified.
+#   Each module of this project is released on its own, so a tag names both
+#   the module and the version: '<module>/v<version>'. The slash keeps the
+#   module and the version unambiguous, whatever suffix the version carries.
+#   Version argument must follow semver-alike format ('1.2.3' or '1.2.3-suffix').
 #
-#   Usage: tagrelease [OPTIONS] <version>
+#   Usage: tagrelease <module> <version>
 #
-#   Example: tagrelease 1.2.3
-#       Which creates tag 'v1.2.3' with message 'Release 1.2.3'.
+#   Example: tagrelease modelmaker 1.2.3
+#       Which creates tag 'modelmaker/v1.2.3' with message 'Release modelmaker 1.2.3'.
 #
-#   Example: tagrelease --no-tag-prefix 1.2.3
-#       Which creates tag '1.2.3' with message 'Release 1.2.3'.
+#   The script refuses to tag when the version does not match the one declared
+#   in the module's 'gradle.properties', which is what the release workflow
+#   publishes.
 #
 #   On success, the script prints:
 #       info: successfully created annotated tag '<tag_name>', with message '<tag_message>'
 #
 ###############################################################################
+
+modules="modelmaker plugin-gradle plugin-maven"
 
 info() {
     echo "info: $*" >&2
@@ -30,53 +34,65 @@ fatal() {
 }
 
 if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-    echo "Usage: $0 [OPTIONS] <version>"
+    echo "Usage: $0 <module> <version>"
     echo ""
-    echo "Create a git tag with version number."
+    echo "Create a git tag releasing a single module."
     echo ""
     echo "Arguments:"
+    echo "  module     One of: $modules"
     echo "  version    Version number in format: 1.2.3 or 1.2.3-suffix"
     echo ""
     echo "Options:"
-    echo "  -h, --help         Show this help message"
-    echo "  --no-tag-prefix    Create tag without 'v' prefix ('1.2.3' instead of 'v1.2.3')"
+    echo "  -h, --help    Show this help message"
     echo ""
     echo "Examples:"
-    echo "  $0 1.2.3"
-    echo "  $0 2.0.0-beta"
-    echo "  $0 --no-tag-prefix 1.2.4"
+    echo "  $0 modelmaker 1.2.3"
+    echo "  $0 plugin-gradle 0.1.0"
+    echo "  $0 plugin-maven 0.1.0-rc1"
     echo ""
-    echo "This will create an annotated tag 'v<version>' with message 'Release <version>'."
+    echo "This will create an annotated tag '<module>/v<version>' with message"
+    echo "'Release <module> <version>'."
     exit 0
 fi
 
-no_tag_prefix=false
-if [ "$1" = "--no-tag-prefix" ]; then
-    no_tag_prefix=true
-    shift
-fi
-
-if [ $# -ne 1 ]; then
-    fatal "exactly one argument required"
-    fatal "usage: $0 [OPTIONS] <version>"
+if [ $# -ne 2 ]; then
+    fatal "exactly two arguments required"
+    fatal "usage: $0 <module> <version>"
+    fatal "module must be one of: $modules"
     fatal "version format: 1.2.3 or 1.2.3-suffix"
     exit 1
 fi
 
-version="$1"
+module="$1"
+version="$2"
+
+if ! echo "$modules" | grep -qw "$module"; then
+    fatal "unknown module, provided: '$module', expected one of: $modules"
+    exit 1
+fi
 
 if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
     fatal "invalid version format, provided: '$version', expected pattern: '1.2.3' or '1.2.3-suffix'"
     exit 1
 fi
 
-if [ "$no_tag_prefix" = true ]; then
-    tag_name="${version}"
-else
-    tag_name="v${version}"
+properties="${module}/gradle.properties"
+
+if [ ! -f "$properties" ]; then
+    fatal "missing '$properties', run this script from the repository root"
+    exit 1
 fi
 
-tag_message="Release ${version}"
+declared=$(grep -E '^version=' "$properties" | cut -d= -f2)
+
+if [ "$declared" != "$version" ]; then
+    fatal "version mismatch, tag says '$version' but '$properties' declares '$declared'"
+    fatal "update the module version first, the release workflow publishes what the file says"
+    exit 1
+fi
+
+tag_name="${module}/v${version}"
+tag_message="Release ${module} ${version}"
 
 git tag -a "$tag_name" -m "$tag_message"
 

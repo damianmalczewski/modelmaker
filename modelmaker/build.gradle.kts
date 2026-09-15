@@ -1,12 +1,13 @@
 plugins {
     `java-library`
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.nmcp)
 
     id("internal.build-convention")
 }
 
 internalBuild {
-    displayName = "ModelMaker Core"
+    displayName = "ModelMaker"
     description = "Shared core of the ModelMaker project, generating Java model classes from schema files."
     kover = true
 }

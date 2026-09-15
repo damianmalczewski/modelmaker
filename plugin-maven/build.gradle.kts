@@ -1,6 +1,7 @@
 plugins {
     `java-library`
     alias(libs.plugins.maven.plugin.development)
+    alias(libs.plugins.nmcp)
 
     id("internal.build-convention")
 }
@@ -8,12 +9,6 @@ plugins {
 internalBuild {
     displayName = "ModelMaker Maven Plugin"
     description = "Maven plugin of the ModelMaker project, generating Java model classes from schema files."
-}
-
-mavenPlugin {
-    artifactId = "modelmaker-maven-plugin"
-    name = "ModelMaker Maven Plugin"
-    description = "Generates immutable Java model classes from schema files."
 }
 
 dependencies {
@@ -40,6 +35,13 @@ dependencies {
 
     errorprone(libs.errorprone.core)
     errorprone(libs.nullaway)
+}
+
+mavenPlugin {
+    artifactId = "modelmaker-maven-plugin"
+    name = "ModelMaker Maven Plugin"
+    description =
+        "Wires generation of Java model classes with various annotation support from schema files into compilation process."
 }
 
 publishing {

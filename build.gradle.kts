@@ -3,10 +3,30 @@ import com.diffplug.spotless.LineEnding
 plugins {
     alias(libs.plugins.spotless)
     alias(libs.plugins.kover)
+    alias(libs.plugins.nmcp) apply false
+    alias(libs.plugins.nmcp.aggregation)
+}
+
+// Central Portal publishing. Nmcp publishes an aggregation, and `-PreleaseModule` decides which
+// module goes into it, so a release uploads exactly one module - see RELEASING.md.
+nmcpAggregation {
+    centralPortal {
+        username = providers.environmentVariable("PUBLISHING_USERNAME").orNull
+        password = providers.environmentVariable("PUBLISHING_PASSWORD").orNull
+
+        publishingType = "USER_MANAGED"
+    }
 }
 
 dependencies {
     kover(project(":modelmaker"))
+
+    when (val module = providers.gradleProperty("releaseModule").orNull) {
+        null -> Unit
+        "modelmaker" -> nmcpAggregation(project(":modelmaker"))
+        "plugin-maven" -> nmcpAggregation(project(":modelmaker-maven-plugin"))
+        else -> throw GradleException("Unknown releaseModule '$module', expected 'modelmaker' or 'plugin-maven'")
+    }
 }
 
 spotless {
