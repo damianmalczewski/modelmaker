@@ -10,7 +10,7 @@ on:
       - ".github/workflows/gradle-dependency-submission.yml"
       - "gradle/**"
       - "**/*.gradle.kts"
-      - "gradle.properties"
+      - "**/gradle.properties"
       - "gradlew"
       - "gradlew.bat"
 

@@ -11,6 +11,7 @@ maven-plugin-annotations = "3.16.0"
 maven-core = "3.9.16"
 maven-plugin-api = "3.9.16"
 maven-plugin-development = "1.0.3"
+modelmaker = "0.1.0"
 nmcp = "1.6.2"
 nullaway = "0.14.1"
 plugin-compatibility = "1.1.0"
@@ -40,6 +41,7 @@ jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 maven-plugin-annotations = { module = "org.apache.maven.plugin-tools:maven-plugin-annotations", version.ref = "maven-plugin-annotations" }
 maven-core = { module = "org.apache.maven:maven-core", version.ref = "maven-core" }
 maven-plugin-api = { module = "org.apache.maven:maven-plugin-api", version.ref = "maven-plugin-api" }
+modelmaker = { module = "io.github.malczuuu:modelmaker", version.ref = "modelmaker" }
 nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
 
 # versions managed by BOMs

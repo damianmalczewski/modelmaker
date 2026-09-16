@@ -12,7 +12,11 @@ internalBuild {
 }
 
 dependencies {
-    implementation(project(":modelmaker"))
+    if (version.toString().endsWith("-SNAPSHOT")) {
+        implementation(project(":modelmaker"))
+    } else {
+        implementation(libs.modelmaker)
+    }
 
     // Provided by Maven itself at execution time, so they stay off the published POM.
     compileOnly(libs.jspecify)

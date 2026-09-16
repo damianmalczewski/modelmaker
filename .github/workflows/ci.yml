@@ -12,7 +12,7 @@ on:
       - "gradle/**"
       - "**/src/**"
       - "**/*.gradle.kts"
-      - "gradle.properties"
+      - "**/gradle.properties"
       - "gradlew"
       - "gradlew.bat"
   pull_request:

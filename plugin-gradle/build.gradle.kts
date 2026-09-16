@@ -14,7 +14,11 @@ internalBuild {
 }
 
 dependencies {
-    implementation(project(":modelmaker"))
+    if (version.toString().endsWith("-SNAPSHOT")) {
+        implementation(project(":modelmaker"))
+    } else {
+        implementation(libs.modelmaker)
+    }
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(platform(libs.assertj.bom))
