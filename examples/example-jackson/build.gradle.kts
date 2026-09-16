@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "2.4.10"
     id("com.diffplug.spotless") version "8.8.0"
-    id("io.github.malczuuu.modelmaker") version "1.0.0-SNAPSHOT"
+    id("io.github.malczuuu.modelmaker") version "0.1.0"
 }
 
 java {

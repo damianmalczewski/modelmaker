@@ -19,7 +19,7 @@ layout and wires code generation into the `main` source set.
 
 ```kotlin
 plugins {
-    id("io.github.malczuuu.modelmaker") version "..."
+    id("io.github.malczuuu.modelmaker") version "0.1.0"
 }
 
 modelmaker {
