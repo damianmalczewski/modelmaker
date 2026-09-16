@@ -6,10 +6,11 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-16
+
 ### Added
 
-- Add the `io.github.malczuuu:modelmaker-maven-plugin` Maven plugin, generating immutable Java DTOs from schema
-  files.
+- Add the `io.github.malczuuu:modelmaker-maven-plugin` Maven plugin, generating immutable Java DTOs from schema files.
 - Add a `generate-java` goal bound to `generate-sources`, registering its output as a compile source root.
 - Add a `<features>` configuration, exposing the core's features and their per-schema overrides.
 

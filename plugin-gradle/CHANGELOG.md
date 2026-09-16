@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-16
+
 ### Added
 
 - Add the `io.github.malczuuu.modelmaker` Gradle plugin, generating immutable Java DTOs from schema files.
