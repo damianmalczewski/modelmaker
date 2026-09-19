@@ -47,6 +47,7 @@ import org.gradle.kotlin.dsl.newInstance
  *
  * @param objects factory creating the [schemas], [src], [kotlin], and [features] blocks
  */
+@ModelMakerDslMarker
 public abstract class ModelMakerExtension @Inject constructor(objects: ObjectFactory) {
 
   /** Where the schema files are read from, see [ModelMakerSchemasSpec]. */

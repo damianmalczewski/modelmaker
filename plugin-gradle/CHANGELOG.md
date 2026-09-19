@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 
 ## [Unreleased]
 
+### Fixed
+
+- Mark the `modelmaker { }` DSL with `@DslMarker`, so a nested Kotlin DSL block can no longer implicitly call an
+  enclosing block's method (e.g. `features { jackson { withers { } } }` now fails to compile instead of configuring
+  `features.withers`).
+
 ## [0.1.0] - 2026-09-16
 
 ### Added

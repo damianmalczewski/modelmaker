@@ -16,22 +16,12 @@
 
 package io.github.malczuuu.modelmaker.gradle.dsl
 
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-
 /**
- * The `preferPrimitives` feature - a plain on/off toggle.
- *
- * ```
- * preferPrimitives {
- *     enabled = true | false
- * }
- * ```
- *
- * @property enabled whether the feature is on.
+ * DSL marker for the `modelmaker { }` configuration blocks. Stops a nested block from implicitly
+ * calling a method of an enclosing block, so `features { jackson { withers { } } }` fails to
+ * compile instead of silently configuring `features.withers`.
  */
-@ModelMakerDslMarker
-public abstract class ModelMakerPreferPrimitivesSpec {
-
-  @get:Input public abstract val enabled: Property<Boolean>
-}
+@DslMarker
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.BINARY)
+internal annotation class ModelMakerDslMarker

@@ -30,6 +30,7 @@ import org.gradle.api.tasks.Input
  *
  * @property enabled whether the feature is on.
  */
+@ModelMakerDslMarker
 public abstract class ModelMakerWithersSpec {
 
   @get:Input public abstract val enabled: Property<Boolean>

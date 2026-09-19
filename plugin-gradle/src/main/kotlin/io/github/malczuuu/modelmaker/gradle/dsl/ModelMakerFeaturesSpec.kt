@@ -44,6 +44,7 @@ import org.gradle.api.tasks.Nested
  * @property preferPrimitives always-set scalar fields use the primitive type (`int`, `double`,
  *   `boolean`) instead of the boxed default.
  */
+@ModelMakerDslMarker
 public abstract class ModelMakerFeaturesSpec {
 
   @get:Nested public abstract val jackson: ModelMakerJacksonSpec

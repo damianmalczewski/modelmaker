@@ -27,6 +27,7 @@ import org.gradle.api.provider.Property
  *   `build/generated/sources/modelmaker/{java,kotlin}/main` instead. Either way the directory is
  *   wiped and rebuilt on every run, so it is never hand-edited.
  */
+@ModelMakerDslMarker
 public abstract class ModelMakerSrcSpec {
 
   public abstract val enabled: Property<Boolean>

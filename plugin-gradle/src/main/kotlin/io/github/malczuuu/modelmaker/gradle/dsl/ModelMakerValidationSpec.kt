@@ -36,6 +36,7 @@ import org.gradle.api.tasks.Input
  * @property annotateFields place the annotations on the generated fields.
  * @property annotateGetters place the annotations on the generated getters.
  */
+@ModelMakerDslMarker
 public abstract class ModelMakerValidationSpec {
 
   @get:Input public abstract val enabled: Property<Boolean>
