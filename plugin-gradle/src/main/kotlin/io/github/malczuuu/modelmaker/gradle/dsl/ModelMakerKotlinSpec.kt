@@ -25,6 +25,7 @@ import org.gradle.api.provider.Property
  * @property enabled emit a `<Name>Extensions.kt` per schema, adding a `mutate { }` extension
  *   function over the Java DTO's `Builder`.
  */
+@ModelMakerDslMarker
 public abstract class ModelMakerKotlinSpec {
 
   public abstract val enabled: Property<Boolean>

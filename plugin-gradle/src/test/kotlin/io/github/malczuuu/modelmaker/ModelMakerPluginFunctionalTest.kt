@@ -215,6 +215,17 @@ class ModelMakerPluginFunctionalTest {
   }
 
   @Test
+  fun `a nested block cannot implicitly call an enclosing block's method`() {
+    project.writeStandardBuild(
+        modelMakerBlock = "modelmaker { features { jackson { withers { enabled = true } } } }"
+    )
+
+    val result = project.runner("help").buildAndFail()
+
+    assertThat(result.output).contains("cannot be called in this context with an implicit receiver")
+  }
+
+  @Test
   fun `a schema's features override applies per file, project default untouched`() {
     project.writeStandardBuild()
     project.writeSchemas()

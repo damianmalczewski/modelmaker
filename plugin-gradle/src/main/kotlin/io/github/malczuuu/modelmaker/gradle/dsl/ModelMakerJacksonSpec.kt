@@ -40,6 +40,7 @@ import org.gradle.api.tasks.Input
  *   class, so a property left unset is omitted from the serialized JSON instead of written as
  *   `null`.
  */
+@ModelMakerDslMarker
 public abstract class ModelMakerJacksonSpec {
 
   @get:Input public abstract val enabled: Property<Boolean>

@@ -25,6 +25,7 @@ import org.gradle.api.file.DirectoryProperty
  *   src { enabled = true } }` the generated sources are written into its `java` and `kotlin`
  *   subdirectories, so moving the schemas moves the output with them.
  */
+@ModelMakerDslMarker
 public abstract class ModelMakerSchemasSpec {
 
   public abstract val directory: DirectoryProperty
