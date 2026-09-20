@@ -76,8 +76,8 @@ class SchemaFormatParityTest {
             }
             """);
 
-    ModelType fromJson = new SimpleSchemaLoader().load(List.of(json)).get(0);
-    ModelType fromAvro = new AvroSchemaLoader().load(List.of(avro)).get(0);
+    ModelType fromJson = new SimpleSchemaLoader().load(List.of(json)).getFirst();
+    ModelType fromAvro = new AvroSchemaLoader().load(List.of(avro)).getFirst();
 
     ModelOptions options =
         ModelOptions.builder().jackson(true).validation(true).withers(true).build();

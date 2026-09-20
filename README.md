@@ -3,6 +3,8 @@
 <p align="center">
   <a href="https://github.com/damianmalczewski/modelmaker/actions/workflows/ci.yml"><img src="https://github.com/damianmalczewski/modelmaker/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://codecov.io/gh/damianmalczewski/modelmaker"><img src="https://codecov.io/gh/damianmalczewski/modelmaker/graph/badge.svg?token=LHOTD2U0J2" alt="Codecov"></a>
+  <a href="https://plugins.gradle.org/plugin/io.github.malczuuu.modelmaker"><img src="https://img.shields.io/gradle-plugin-portal/v/io.github.malczuuu.modelmaker?filter=!*-*&label=gradle%20plugin" alt="Gradle Plugin Portal"></a>
+  <a href="https://central.sonatype.com/artifact/io.github.malczuuu/modelmaker-maven-plugin"><img src="https://img.shields.io/maven-central/v/io.github.malczuuu/modelmaker-maven-plugin?filter=!*-*&label=maven%20plugin" alt="Maven Central"></a>
   <a href="https://github.com/damianmalczewski/modelmaker/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
 </p>
 

@@ -117,7 +117,7 @@ class SimpleSchemaLoaderTest {
                 + " \"items\": { \"type\": \"string\", \"minLength\": 1, \"maxLength\": 255,"
                 + " \"pattern\": \"^[a-z]+$\" } } }");
 
-    Constraints c = prop(loader.load(List.of(f)).get(0), "tags").getConstraints();
+    Constraints c = prop(loader.load(List.of(f)).getFirst(), "tags").getConstraints();
 
     assertThat(c.getMinItems()).isEqualTo(1);
     assertThat(c.getMaxItems()).isEqualTo(8);
@@ -136,7 +136,7 @@ class SimpleSchemaLoaderTest {
             "\"properties\": { \"tags\": { \"type\": \"array\", \"minLength\": 2, \"pattern\":"
                 + " \"^x$\", \"items\": { \"type\": \"string\" } } }");
 
-    Constraints c = prop(loader.load(List.of(f)).get(0), "tags").getConstraints();
+    Constraints c = prop(loader.load(List.of(f)).getFirst(), "tags").getConstraints();
 
     assertThat(c.getMinLength()).isNull();
     assertThat(c.getPattern()).isNull();
@@ -151,7 +151,7 @@ class SimpleSchemaLoaderTest {
             "\"properties\": { \"tags\": { \"type\": \"array\", \"maxItems\": 3, \"items\": {"
                 + " \"type\": \"string\" } } }");
 
-    Constraints c = prop(loader.load(List.of(f)).get(0), "tags").getConstraints();
+    Constraints c = prop(loader.load(List.of(f)).getFirst(), "tags").getConstraints();
 
     assertThat(c.getMaxItems()).isEqualTo(3);
     assertThat(c.getElementConstraints()).isNull();
@@ -172,10 +172,10 @@ class SimpleSchemaLoaderTest {
             }
             """);
 
-    ModelType order = loader.load(List.of(f)).get(0);
+    ModelType order = loader.load(List.of(f)).getFirst();
 
     assertThat(order.getNested().stream().map(ModelType::getName)).containsExactly("ShipAddress");
-    assertThat(order.getProperties().get(0).getType())
+    assertThat(order.getProperties().getFirst().getType())
         .isEqualTo(PropType.RefType.of("ShipAddress"));
   }
 
@@ -186,7 +186,8 @@ class SimpleSchemaLoaderTest {
             "com.example.dto.U",
             "\"properties\": { \"ship_to\": { \"type\": \"object\", \"properties\": { \"a\": {"
                 + " \"type\": \"string\" } } } }");
-    assertThat(loader.load(List.of(f)).get(0).getNested().get(0).getName()).isEqualTo("ShipTo");
+    assertThat(loader.load(List.of(f)).getFirst().getNested().getFirst().getName())
+        .isEqualTo("ShipTo");
   }
 
   @Test
@@ -200,7 +201,7 @@ class SimpleSchemaLoaderTest {
               "plain": { "type": "string", "minimum": 5 }
             }
             """);
-    ModelType money = loader.load(List.of(f)).get(0);
+    ModelType money = loader.load(List.of(f)).getFirst();
     Constraints auto = prop(money, "auto").getConstraints();
     assertThat(auto.getPattern()).isEqualTo("^-?\\d+(\\.\\d+)?$");
     assertThat(auto.getDecimalMinimum()).isEqualTo("0");
@@ -218,7 +219,7 @@ class SimpleSchemaLoaderTest {
               "u": { "type": "string", "format": "uuid" }
             }
             """);
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
     assertThat(prop(m, "d").getConstraints().getPattern()).isEqualTo("^\\d{4}-\\d{2}-\\d{2}$");
     assertThat(prop(m, "d").getConstraints().getPatternMessage())
         .isEqualTo("must be a date in yyyy-MM-dd format");
@@ -232,7 +233,7 @@ class SimpleSchemaLoaderTest {
             "x.U",
             "\"properties\": { \"user_id\": { \"type\": \"string\" }, \"lastLoginAt\": { \"type\":"
                 + " \"string\" }, \"AccountType\": { \"type\": \"string\" } }");
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
     assertThat(propNames(m)).containsExactlyInAnyOrder("userId", "lastLoginAt", "accountType");
     assertThat(prop(m, "userId").getJsonName()).isEqualTo("user_id");
     assertThat(prop(m, "lastLoginAt").getJsonName()).isEqualTo("lastLoginAt");
@@ -246,7 +247,7 @@ class SimpleSchemaLoaderTest {
             "x.U",
             "\"properties\": { \"__metadata\": { \"type\": \"string\" }, \"_userId\": { \"type\":"
                 + " \"string\" }, \"__account_type\": { \"type\": \"string\" } }");
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
     assertThat(propNames(m)).containsExactlyInAnyOrder("__metadata", "_userId", "__accountType");
     assertThat(prop(m, "__metadata").getJsonName()).isEqualTo("__metadata");
     assertThat(prop(m, "_userId").getJsonName()).isEqualTo("_userId");
@@ -266,7 +267,7 @@ class SimpleSchemaLoaderTest {
               "roles":    { "type": "array", "items": { "type": "string" }, "default": ["user"] }
             }
             """);
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(prop(m, "active").getDefaultValue()).isEqualTo(DefaultValue.Bool.of(true));
     assertThat(prop(m, "currency").getDefaultValue()).isEqualTo(DefaultValue.Str.of("USD"));
@@ -334,7 +335,7 @@ class SimpleSchemaLoaderTest {
 
     List<ModelType> types = loader.load(List.of(f));
 
-    assertThat(types.get(0).getProperties())
+    assertThat(types.getFirst().getProperties())
         .extracting(Property::getName, Property::isSensitive)
         .containsExactly(tuple("secret", true), tuple("name", false));
   }
@@ -348,7 +349,7 @@ class SimpleSchemaLoaderTest {
 
     List<ModelType> types = loader.load(List.of(f));
 
-    assertThat(types.get(0).getProperties().get(0).isSensitive()).isFalse();
+    assertThat(types.getFirst().getProperties().getFirst().isSensitive()).isFalse();
   }
 
   @Test
@@ -383,7 +384,7 @@ class SimpleSchemaLoaderTest {
             "x.Blob",
             "\"required\": [\"payload\"], \"properties\": { \"payload\": { \"type\": \"bytes\" },"
                 + " \"signature\": { \"type\": \"bytes\" } }");
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(prop(m, "payload").getType()).isEqualTo(PropType.ScalarType.BYTES);
     assertThat(prop(m, "payload").isRequired()).isTrue();
@@ -415,7 +416,7 @@ class SimpleSchemaLoaderTest {
   @Test
   void parsesAValidIntegerDefault() {
     Path f = schema("x.D", "\"properties\": { \"n\": { \"type\": \"integer\", \"default\": 42 } }");
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
     assertThat(prop(m, "n").getDefaultValue()).isEqualTo(DefaultValue.Num.of("42"));
   }
 
@@ -572,11 +573,11 @@ class SimpleSchemaLoaderTest {
 
     List<ModelType> types = loader.load(List.of(f));
 
-    assertThat(types.get(0).getFeatureOverrides().getJackson().getIncludeNonNull())
+    assertThat(types.getFirst().getFeatureOverrides().getJackson().getIncludeNonNull())
         .contains(Boolean.TRUE);
     assertThat(
             types
-                .get(0)
+                .getFirst()
                 .getFeatureOverrides()
                 .applyOn(ModelOptions.defaults())
                 .getJackson()
@@ -668,8 +669,8 @@ class SimpleSchemaLoaderTest {
             "\"properties\": { \"since\": { \"$ref\": \"java.time.Instant\" }, \"ids\": { \"type\":"
                 + " \"array\", \"items\": { \"$ref\": \"java.util.UUID\" } } }");
 
-    ModelType t = loader.load(List.of(f)).get(0);
-    assertThat(t.getProperties().get(0).getType())
+    ModelType t = loader.load(List.of(f)).getFirst();
+    assertThat(t.getProperties().getFirst().getType())
         .isEqualTo(PropType.ExternalType.of("java.time.Instant"));
     assertThat(t.getProperties().get(1).getType())
         .isEqualTo(PropType.ArrayType.of(PropType.ExternalType.of("java.util.UUID")));
@@ -749,7 +750,7 @@ class SimpleSchemaLoaderTest {
             "x.Order",
             "\"properties\": { \"status\": { \"type\": \"string\", \"enum\": [\"NEW\", \"PAID\","
                 + " \"SHIPPED\"] } }");
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
     Property status = prop(m, "status");
 
     assertThat(status.getType()).isEqualTo(PropType.ScalarType.STRING);
@@ -766,7 +767,7 @@ class SimpleSchemaLoaderTest {
             "x.Order",
             "\"properties\": { \"status\": { \"type\": \"string\", \"enum\": [\"NEW\", \"PAID\"],"
                 + " \"pattern\": \"^X\" } }");
-    Constraints c = prop(loader.load(List.of(f)).get(0), "status").getConstraints();
+    Constraints c = prop(loader.load(List.of(f)).getFirst(), "status").getConstraints();
 
     assertThat(c.getPattern()).isEqualTo("^X");
     assertThat(c.getPatternMessage()).isNull();
@@ -776,7 +777,7 @@ class SimpleSchemaLoaderTest {
   void anEmptyEnumIsIgnored() {
     Path f =
         schema("x.Order", "\"properties\": { \"status\": { \"type\": \"string\", \"enum\": [] } }");
-    Constraints c = prop(loader.load(List.of(f)).get(0), "status").getConstraints();
+    Constraints c = prop(loader.load(List.of(f)).getFirst(), "status").getConstraints();
 
     assertThat(c.getPattern()).isNull();
     assertThat(c.getPatternMessage()).isNull();
@@ -794,7 +795,7 @@ class SimpleSchemaLoaderTest {
               "c": { "type": "integer", "format": "long" }
             }
             """);
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(prop(m, "a").getType()).isEqualTo(PropType.ScalarType.INTEGER);
     assertThat(prop(m, "b").getType()).isEqualTo(PropType.ScalarType.INTEGER);
@@ -822,7 +823,7 @@ class SimpleSchemaLoaderTest {
               "c": { "type": "number", "format": "float" }
             }
             """);
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(prop(m, "a").getType()).isEqualTo(PropType.ScalarType.NUMBER);
     assertThat(prop(m, "b").getType()).isEqualTo(PropType.ScalarType.NUMBER);
@@ -848,7 +849,7 @@ class SimpleSchemaLoaderTest {
               "small": { "type": "number", "format": "float", "minimum": 0, "maximum": 1 }
             }
             """);
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(prop(m, "big").getConstraints().getMinimum()).isEqualTo(0L);
     assertThat(prop(m, "big").getConstraints().getMaximum()).isEqualTo(10L);

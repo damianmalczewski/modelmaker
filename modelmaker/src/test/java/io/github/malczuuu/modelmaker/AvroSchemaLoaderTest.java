@@ -77,7 +77,7 @@ class AvroSchemaLoaderTest {
               { "name": "nickname", "type": ["null", "string"], "default": null }
             ]
             """);
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(m.getName()).isEqualTo("Person");
     assertThat(m.getPackageName()).isEqualTo("com.example.dto");
@@ -99,7 +99,7 @@ class AvroSchemaLoaderTest {
               { "name": "b", "type": "long" }
             ]
             """);
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(prop(m, "a").getType()).isEqualTo(PropType.ScalarType.INTEGER);
     assertThat(prop(m, "b").getType()).isEqualTo(PropType.ScalarType.LONG);
@@ -117,7 +117,7 @@ class AvroSchemaLoaderTest {
               { "name": "b", "type": "double" }
             ]
             """);
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(prop(m, "a").getType()).isEqualTo(PropType.ScalarType.FLOAT);
     assertThat(prop(m, "b").getType()).isEqualTo(PropType.ScalarType.NUMBER);
@@ -135,7 +135,7 @@ class AvroSchemaLoaderTest {
               { "name": "b", "type": "boolean" }
             ]
             """);
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(prop(m, "a").getType()).isEqualTo(PropType.ScalarType.BYTES);
     assertThat(prop(m, "b").getType()).isEqualTo(PropType.ScalarType.BOOLEAN);
@@ -170,7 +170,7 @@ class AvroSchemaLoaderTest {
             ]
             """);
 
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
     assertThat(prop(m, "a").getType()).isEqualTo(PropType.ScalarType.BYTES);
     assertThat(prop(m, "a").isRequired()).isFalse();
   }
@@ -187,7 +187,7 @@ class AvroSchemaLoaderTest {
                 "symbols": ["NEW", "PAID", "SHIPPED"] } }
             ]
             """);
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
     Property status = prop(m, "status");
 
     assertThat(status.getType()).isEqualTo(PropType.ScalarType.STRING);
@@ -209,11 +209,11 @@ class AvroSchemaLoaderTest {
                 "fields": [ { "name": "city", "type": "string" } ] } }
             ]
             """);
-    ModelType order = loader.load(List.of(f)).get(0);
+    ModelType order = loader.load(List.of(f)).getFirst();
 
     assertThat(order.getNested().stream().map(ModelType::getName)).containsExactly("Address");
     assertThat(prop(order, "shipTo").getType()).isEqualTo(PropType.RefType.of("Address"));
-    assertThat(order.getNested().get(0).getPackageName()).isEqualTo("x");
+    assertThat(order.getNested().getFirst().getPackageName()).isEqualTo("x");
   }
 
   @Test
@@ -226,7 +226,7 @@ class AvroSchemaLoaderTest {
                 + " \"validation\": { \"enabled\": false }, \"withers\": { \"enabled\": true },"
                 + " \"preferPrimitives\": { \"enabled\": false },"
                 + " \"openApi\": { \"enabled\": true } }, \"fields\": [] }");
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(m.getFeatureOverrides())
         .isEqualTo(
@@ -247,7 +247,7 @@ class AvroSchemaLoaderTest {
             "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Account\", \"fields\": ["
                 + " { \"name\": \"id\", \"type\": \"string\", \"doc\": \"the account id\" },"
                 + " { \"name\": \"plain\", \"type\": \"string\" } ] }");
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(
             m.getProperties().stream()
@@ -268,7 +268,7 @@ class AvroSchemaLoaderTest {
   @Test
   void aSchemaWithNoFeaturesNodeHasNoOverrides() {
     Path f = schema("x", "None", "\"fields\": []");
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(m.getFeatureOverrides()).isEqualTo(FeatureOverrides.none());
   }
@@ -284,11 +284,12 @@ class AvroSchemaLoaderTest {
                 + " \"type\": \"record\", \"name\": \"Address\", \"fields\": [ { \"name\":"
                 + " \"city\", \"type\": \"string\" } ] } } ] }");
     List<ModelType> types = loader.load(List.of(f));
-    ModelType order = types.get(0);
+    ModelType order = types.getFirst();
 
     assertThat(order.getFeatureOverrides())
         .isEqualTo(FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build());
-    assertThat(order.getNested().get(0).getFeatureOverrides()).isEqualTo(FeatureOverrides.none());
+    assertThat(order.getNested().getFirst().getFeatureOverrides())
+        .isEqualTo(FeatureOverrides.none());
   }
 
   @Test
@@ -321,7 +322,7 @@ class AvroSchemaLoaderTest {
             "Order",
             "\"fields\": [ { \"name\": \"tags\", \"type\": { \"type\": \"array\", \"items\":"
                 + " \"string\" } } ]");
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(prop(m, "tags").getType())
         .isEqualTo(PropType.ArrayType.of(PropType.ScalarType.STRING));
@@ -360,7 +361,7 @@ class AvroSchemaLoaderTest {
                 "default": ["user"] }
             ]
             """);
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(prop(m, "active").getDefaultValue()).isEqualTo(DefaultValue.Bool.of(true));
     assertThat(prop(m, "currency").getDefaultValue()).isEqualTo(DefaultValue.Str.of("USD"));
@@ -418,7 +419,7 @@ class AvroSchemaLoaderTest {
             "D",
             "\"fields\": [ { \"name\": \"at\", \"type\": { \"type\": \"long\", \"logicalType\":"
                 + " \"timestamp-millis\" } } ]");
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(prop(m, "at").getType()).isEqualTo(PropType.ScalarType.LONG);
   }
@@ -525,7 +526,7 @@ class AvroSchemaLoaderTest {
             "x",
             "D",
             "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"int\"], \"default\": 42 } ]");
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
     assertThat(prop(m, "a").getDefaultValue()).isEqualTo(DefaultValue.Num.of("42"));
   }
 
@@ -549,7 +550,7 @@ class AvroSchemaLoaderTest {
             "D",
             "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"double\"], \"default\": 1.5 }"
                 + " ]");
-    ModelType m = loader.load(List.of(f)).get(0);
+    ModelType m = loader.load(List.of(f)).getFirst();
     assertThat(prop(m, "a").getDefaultValue()).isEqualTo(DefaultValue.Num.of("1.5"));
   }
 
@@ -665,7 +666,7 @@ class AvroSchemaLoaderTest {
 
     List<ModelType> types = loader.load(List.of(f));
 
-    assertThat(types.get(0).getProperties())
+    assertThat(types.getFirst().getProperties())
         .extracting(Property::getName, Property::isSensitive)
         .containsExactly(tuple("secret", true), tuple("name", false));
   }
