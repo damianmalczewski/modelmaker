@@ -1,6 +1,6 @@
 [versions]
 assertj = "3.27.7"
-errorprone = "2.50.0"
+errorprone = "2.51.0"
 errorprone-plugin = "5.1.1"
 gson = "2.14.0"
 junit = "6.1.3"
