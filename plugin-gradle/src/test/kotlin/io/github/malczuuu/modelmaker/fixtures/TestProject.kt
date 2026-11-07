@@ -19,10 +19,7 @@ package io.github.malczuuu.modelmaker.fixtures
 import java.io.File
 import org.gradle.testkit.runner.GradleRunner
 
-/**
- * Temporary Gradle project driven through [GradleRunner] for the `io.github.malczuuu.modelmaker`
- * plugin.
- */
+/** Temporary Gradle project driven through [GradleRunner] for the `io.github.malczuuu.modelmaker` plugin. */
 class TestProject(val dir: File) {
 
   fun write(relativePath: String, content: String): File =

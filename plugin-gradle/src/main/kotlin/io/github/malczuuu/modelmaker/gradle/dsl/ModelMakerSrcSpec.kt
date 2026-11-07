@@ -21,11 +21,10 @@ import org.gradle.api.provider.Property
 /**
  * Where generated sources are written, configured via `modelmaker { src { } }`.
  *
- * @property enabled when `true`, the generated sources are placed into the source tree, in the
- *   `java` and `kotlin` subdirectories of the schema directory, where they are meant to be reviewed
- *   and committed; when `false`, they are written to
- *   `build/generated/sources/modelmaker/{java,kotlin}/main` instead. Either way the directory is
- *   wiped and rebuilt on every run, so it is never hand-edited.
+ * @property enabled when `true`, the generated sources are placed into the source tree, in the `java` and `kotlin`
+ *   subdirectories of the schema directory, where they are meant to be reviewed and committed; when `false`, they are
+ *   written to `build/generated/sources/modelmaker/{java,kotlin}/main` instead. Either way the directory is wiped and
+ *   rebuilt on every run, so it is never hand-edited.
  */
 @ModelMakerDslMarker
 public abstract class ModelMakerSrcSpec {

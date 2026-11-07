@@ -21,13 +21,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Emits a Kotlin extensions file for the Java models of a {@link ModelType} tree: a {@code
- * receiver.mutate { }} extension for every type (top-level and nested), taking a {@code Mutator.()
- * -> Unit} block and going through the Java {@code mutate()} member.
+ * Emits a Kotlin extensions file for the Java models of a {@link ModelType} tree: a {@code receiver.mutate { }}
+ * extension for every type (top-level and nested), taking a {@code Mutator.() -> Unit} block and going through the Java
+ * {@code mutate()} member.
  *
- * <p>{@link #emit} is called once per schema. Each extension is rendered by {@link
- * MutateExtensionRenderer}; this class only lays out the file - {@code package}, imports and the
- * do-not-edit banner.
+ * <p>{@link #emit} is called once per schema. Each extension is rendered by {@link MutateExtensionRenderer}; this class
+ * only lays out the file - {@code package}, imports and the do-not-edit banner.
  */
 public final class KotlinExtensionMaker implements ModelMaker {
 
@@ -35,8 +34,8 @@ public final class KotlinExtensionMaker implements ModelMaker {
   public KotlinExtensionMaker() {}
 
   /**
-   * Renders one {@code mutate { }} extension per type in the tree (top-level and nested), laid out
-   * with {@code package}, imports and the do-not-edit banner.
+   * Renders one {@code mutate { }} extension per type in the tree (top-level and nested), laid out with {@code
+   * package}, imports and the do-not-edit banner.
    *
    * @param type the schema-derived model to emit.
    * @return the generated file's full source text.

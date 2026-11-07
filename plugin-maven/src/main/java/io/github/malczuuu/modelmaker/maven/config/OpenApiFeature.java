@@ -17,8 +17,7 @@
 package io.github.malczuuu.modelmaker.maven.config;
 
 /**
- * The {@code openApi} feature: whether its OpenAPI {@code @Schema} annotations are emitted, and
- * where they sit.
+ * The {@code openApi} feature: whether its OpenAPI {@code @Schema} annotations are emitted, and where they sit.
  *
  * <pre>
  * &lt;openApi&gt;
@@ -28,8 +27,7 @@ package io.github.malczuuu.modelmaker.maven.config;
  * &lt;/openApi&gt;
  * </pre>
  *
- * <p>With both {@code annotateFields} and {@code annotateGetters} on, the annotations are emitted
- * on both.
+ * <p>With both {@code annotateFields} and {@code annotateGetters} on, the annotations are emitted on both.
  */
 public class OpenApiFeature {
 

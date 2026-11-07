@@ -31,23 +31,14 @@ class KotlinExtensionMakerTest {
           "com.example.dto",
           null,
           List.of(
-              property(
-                  "ref", PropType.RefType.of("Address"), true, Constraints.none(), "ref", null),
-              property(
-                  "line", PropType.RefType.of("Line"), true, Constraints.none(), "line", null)),
+              property("ref", PropType.RefType.of("Address"), true, Constraints.none(), "ref", null),
+              property("line", PropType.RefType.of("Line"), true, Constraints.none(), "line", null)),
           List.of(
               new ModelType(
                   "Line",
                   "",
                   "An inline nested object.",
-                  List.of(
-                      property(
-                          "sku",
-                          PropType.ScalarType.STRING,
-                          true,
-                          Constraints.none(),
-                          "sku",
-                          null)),
+                  List.of(property("sku", PropType.ScalarType.STRING, true, Constraints.none(), "sku", null)),
                   List.of(),
                   FeatureOverrides.none())),
           FeatureOverrides.none());
@@ -68,8 +59,7 @@ class KotlinExtensionMakerTest {
     // Nested types get a mutate extension too.
     assertThat(out)
         .contains(
-            "public inline fun Order.Line.mutate(block: Order.Line.BuilderMutator.() -> Unit):"
-                + " Order.Line =");
+            "public inline fun Order.Line.mutate(block: Order.Line.BuilderMutator.() -> Unit):" + " Order.Line =");
     // No constructor-alike factory extension.
     assertThat(out).doesNotContain("Order.builder().apply(block)");
     assertThat(out).doesNotContain("public inline fun Order(block");
@@ -77,9 +67,7 @@ class KotlinExtensionMakerTest {
 
   @Test
   void aPropertyLessTypeGetsNoExtension() {
-    ModelType empty =
-        new ModelType(
-            "Empty", "com.example.dto", null, List.of(), List.of(), FeatureOverrides.none());
+    ModelType empty = new ModelType("Empty", "com.example.dto", null, List.of(), List.of(), FeatureOverrides.none());
     assertThat(new KotlinExtensionMaker().emit(empty)).isEqualTo("package com.example.dto\n\n");
   }
 

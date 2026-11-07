@@ -21,9 +21,9 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Maps a {@link Property}'s schema constraints to {@code jakarta.validation} annotations. Every
- * constraint annotation carries a hardcoded English {@code message = "..."}, so validation output
- * does not depend on the resource bundle / locale.
+ * Maps a {@link Property}'s schema constraints to {@code jakarta.validation} annotations. Every constraint annotation
+ * carries a hardcoded English {@code message = "..."}, so validation output does not depend on the resource bundle /
+ * locale.
  */
 final class ConstraintUtils {
 
@@ -56,16 +56,15 @@ final class ConstraintUtils {
   }
 
   /**
-   * Maps the constraints applied to each element of an {@code array} property to their {@code
-   * jakarta.validation} annotations, for a container-element position (e.g. {@code List<@Size(...)
-   * String>}). Never emits {@code @NotNull} or {@code @Valid}.
+   * Maps the constraints applied to each element of an {@code array} property to their {@code jakarta.validation}
+   * annotations, for a container-element position (e.g. {@code List<@Size(...) String>}). Never emits {@code @NotNull}
+   * or {@code @Valid}.
    *
    * @param elementConstraints the element constraints, or {@code null} when unset.
-   * @return the element annotations, in a stable order; empty when {@code elementConstraints} is
-   *     {@code null} or carries no facet.
+   * @return the element annotations, in a stable order; empty when {@code elementConstraints} is {@code null} or
+   *     carries no facet.
    */
-  static List<AnnotationSpec> elementConstraintAnnotationsOf(
-      @Nullable Constraints elementConstraints) {
+  static List<AnnotationSpec> elementConstraintAnnotationsOf(@Nullable Constraints elementConstraints) {
     List<AnnotationSpec> out = new ArrayList<>();
     if (elementConstraints != null) {
       appendValueConstraints(elementConstraints, out);
@@ -74,9 +73,9 @@ final class ConstraintUtils {
   }
 
   /**
-   * Appends the value constraints shared by a property and a list element - {@code @Email},
-   * {@code @Pattern}, {@code @Size} (from {@code minLength}/{@code maxLength}),
-   * {@code @Min}/{@code @Max} and {@code @DecimalMin}/{@code @DecimalMax} - in a stable order.
+   * Appends the value constraints shared by a property and a list element - {@code @Email}, {@code @Pattern},
+   * {@code @Size} (from {@code minLength}/{@code maxLength}), {@code @Min}/{@code @Max} and
+   * {@code @DecimalMin}/{@code @DecimalMax} - in a stable order.
    *
    * @param c the constraints to map.
    * @param out the list to append to.
@@ -100,8 +99,7 @@ final class ConstraintUtils {
     }
     Long minimum = c.getMinimum();
     if (minimum != null) {
-      out.add(
-          constraint("Min", "must be greater than or equal to " + minimum, "value = " + minimum));
+      out.add(constraint("Min", "must be greater than or equal to " + minimum, "value = " + minimum));
     }
     Long maximum = c.getMaximum();
     if (maximum != null) {
@@ -119,15 +117,12 @@ final class ConstraintUtils {
     if (decimalMaximum != null) {
       out.add(
           constraint(
-              "DecimalMax",
-              "must be less than or equal to " + decimalMaximum,
-              "value = \"" + decimalMaximum + "\""));
+              "DecimalMax", "must be less than or equal to " + decimalMaximum, "value = \"" + decimalMaximum + "\""));
     }
   }
 
   /**
-   * Escapes a string for use inside a Java double-quoted literal (the escapes are the same in
-   * Kotlin).
+   * Escapes a string for use inside a Java double-quoted literal (the escapes are the same in Kotlin).
    *
    * @param s the raw string.
    * @return the escaped string.
@@ -137,8 +132,8 @@ final class ConstraintUtils {
   }
 
   /**
-   * A {@code jakarta.validation.constraints.<name>} annotation - the package is always the same, so
-   * only the simple name is given. {@code args} come first, then the hardcoded {@code message}.
+   * A {@code jakarta.validation.constraints.<name>} annotation - the package is always the same, so only the simple
+   * name is given. {@code args} come first, then the hardcoded {@code message}.
    *
    * @param name the annotation's simple name, e.g. {@code NotNull}.
    * @param message the hardcoded {@code message} value.
@@ -151,8 +146,7 @@ final class ConstraintUtils {
     return new AnnotationSpec(name, CONSTRAINTS + "." + name, List.copyOf(all));
   }
 
-  private static @Nullable AnnotationSpec sizeConstraint(
-      @Nullable Integer min, @Nullable Integer max) {
+  private static @Nullable AnnotationSpec sizeConstraint(@Nullable Integer min, @Nullable Integer max) {
     if (min == null && max == null) {
       return null;
     }

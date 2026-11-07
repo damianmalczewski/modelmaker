@@ -25,9 +25,7 @@ class AnnotationSpecTest {
 
   private static AnnotationSpec full() {
     return new AnnotationSpec(
-        "NotNull",
-        "jakarta.validation.constraints.NotNull",
-        List.of("message = \"must not be null\""));
+        "NotNull", "jakarta.validation.constraints.NotNull", List.of("message = \"must not be null\""));
   }
 
   @Test
@@ -39,17 +37,14 @@ class AnnotationSpecTest {
   void notEqualWhenSimpleNameDiffers() {
     AnnotationSpec other =
         new AnnotationSpec(
-            "Email",
-            "jakarta.validation.constraints.NotNull",
-            List.of("message = \"must not be null\""));
+            "Email", "jakarta.validation.constraints.NotNull", List.of("message = \"must not be null\""));
 
     assertThat(full()).isNotEqualTo(other);
   }
 
   @Test
   void notEqualWhenArgsDiffer() {
-    AnnotationSpec other =
-        new AnnotationSpec("NotNull", "jakarta.validation.constraints.NotNull", List.of());
+    AnnotationSpec other = new AnnotationSpec("NotNull", "jakarta.validation.constraints.NotNull", List.of());
 
     assertThat(full()).isNotEqualTo(other);
   }

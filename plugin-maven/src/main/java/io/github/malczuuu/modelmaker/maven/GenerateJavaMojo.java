@@ -39,15 +39,14 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 /**
- * Generates one immutable Java DTO per schema file found under <code>schemaDirectory</code>, and
- * puts the output directory on the project's compile source roots.
+ * Generates one immutable Java DTO per schema file found under <code>schemaDirectory</code>, and puts the output
+ * directory on the project's compile source roots.
  *
- * <p>Bound to <code>generate-sources</code> by default, so <code>mvn compile</code> picks the
- * generated types up with no further setup. The output directory is wiped and rebuilt on every run
- * - never edit generated sources by hand.
+ * <p>Bound to <code>generate-sources</code> by default, so <code>mvn compile</code> picks the generated types up with
+ * no further setup. The output directory is wiped and rebuilt on every run - never edit generated sources by hand.
  *
- * <p>Every parameter is injected by Maven before <code>execute()</code> runs, which the nullness
- * analysis cannot see - hence the <code>NullAway.Init</code> suppressions on those fields.
+ * <p>Every parameter is injected by Maven before <code>execute()</code> runs, which the nullness analysis cannot see -
+ * hence the <code>NullAway.Init</code> suppressions on those fields.
  */
 @Mojo(name = "generate-java", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 public class GenerateJavaMojo extends AbstractMojo {
@@ -56,9 +55,7 @@ public class GenerateJavaMojo extends AbstractMojo {
   public GenerateJavaMojo() {}
 
   /** Directory scanned recursively for schema files. Need not exist. */
-  @Parameter(
-      defaultValue = "${project.basedir}/src/main/model",
-      property = "modelmaker.schemaDirectory")
+  @Parameter(defaultValue = "${project.basedir}/src/main/model", property = "modelmaker.schemaDirectory")
   @SuppressWarnings("NullAway.Init")
   private File schemaDirectory;
 
@@ -106,8 +103,7 @@ public class GenerateJavaMojo extends AbstractMojo {
     try {
       Files.createDirectories(outputDir);
       for (ModelType type : SchemaLoaders.createDelegatingSchemaLoader().load(schemas)) {
-        write(
-            outputDir, type.getPackageName(), type.getName() + ".java", javaModelMaker.emit(type));
+        write(outputDir, type.getPackageName(), type.getName() + ".java", javaModelMaker.emit(type));
         getLog().debug("Generated " + type.getPackageName() + "." + type.getName());
       }
     } catch (SchemaException e) {
@@ -145,8 +141,7 @@ public class GenerateJavaMojo extends AbstractMojo {
     return name.endsWith(".json") || name.endsWith(".avsc");
   }
 
-  private static void write(Path root, String packageName, String fileName, String code)
-      throws IOException {
+  private static void write(Path root, String packageName, String fileName, String code) throws IOException {
     Path dir = root.resolve(packageName.replace('.', '/'));
     Files.createDirectories(dir);
     Files.writeString(dir.resolve(fileName), code, StandardCharsets.UTF_8);

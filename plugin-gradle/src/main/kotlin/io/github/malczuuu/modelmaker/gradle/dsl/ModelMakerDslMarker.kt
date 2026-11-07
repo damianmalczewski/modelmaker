@@ -17,9 +17,9 @@
 package io.github.malczuuu.modelmaker.gradle.dsl
 
 /**
- * DSL marker for the `modelmaker { }` configuration blocks. Stops a nested block from implicitly
- * calling a method of an enclosing block, so `features { jackson { withers { } } }` fails to
- * compile instead of silently configuring `features.withers`.
+ * DSL marker for the `modelmaker { }` configuration blocks. Stops a nested block from implicitly calling a method of an
+ * enclosing block, so `features { jackson { withers { } } }` fails to compile instead of silently configuring
+ * `features.withers`.
  */
 @DslMarker
 @Target(AnnotationTarget.CLASS)

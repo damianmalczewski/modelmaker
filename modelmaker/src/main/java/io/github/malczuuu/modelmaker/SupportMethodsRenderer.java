@@ -23,14 +23,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Renders {@code equals}, {@code hashCode} and {@code toString} for one model type, each over every
- * property in declaration order. Always rendered - unlike the other renderers, nothing here is
- * gated by a {@link ModelOptions} feature flag; {@code options} is only consulted to decide whether
- * a primitive scalar field compares with {@code ==} instead of {@code Objects.equals} in the
- * generated {@code equals()}.
+ * Renders {@code equals}, {@code hashCode} and {@code toString} for one model type, each over every property in
+ * declaration order. Always rendered - unlike the other renderers, nothing here is gated by a {@link ModelOptions}
+ * feature flag; {@code options} is only consulted to decide whether a primitive scalar field compares with {@code ==}
+ * instead of {@code Objects.equals} in the generated {@code equals()}.
  *
- * <p>Renders just these three methods; the enclosing class and everything else are the composing
- * emitter's job.
+ * <p>Renders just these three methods; the enclosing class and everything else are the composing emitter's job.
  */
 final class SupportMethodsRenderer implements SnippetRenderer {
 
@@ -43,9 +41,8 @@ final class SupportMethodsRenderer implements SnippetRenderer {
   SupportMethodsRenderer() {}
 
   /**
-   * Captures the indent, the type's name, every property and the options - the latter only used to
-   * decide, per property, whether {@code equals()} compares with {@code ==} or {@code
-   * Objects.equals}.
+   * Captures the indent, the type's name, every property and the options - the latter only used to decide, per
+   * property, whether {@code equals()} compares with {@code ==} or {@code Objects.equals}.
    *
    * @param indent leading whitespace prepended to every rendered line.
    * @param type the model type to render.
@@ -83,9 +80,7 @@ final class SupportMethodsRenderer implements SnippetRenderer {
     String comparisons =
         properties.isEmpty()
             ? "true"
-            : properties.stream()
-                .map(this::equalsComparison)
-                .collect(joining("\n" + indent + "    && "));
+            : properties.stream().map(this::equalsComparison).collect(joining("\n" + indent + "    && "));
     return (indent + "@Override\n")
         + (indent + "public boolean equals(@Nullable Object obj) {\n")
         + (indent + "  if (this == obj) {\n")
@@ -99,8 +94,8 @@ final class SupportMethodsRenderer implements SnippetRenderer {
   }
 
   /**
-   * The {@code equals()} comparison for one property: {@code ==} for a primitive scalar (avoids
-   * autoboxing, and is exact for {@code int} / {@code boolean}), {@code Objects.equals} otherwise.
+   * The {@code equals()} comparison for one property: {@code ==} for a primitive scalar (avoids autoboxing, and is
+   * exact for {@code int} / {@code boolean}), {@code Objects.equals} otherwise.
    *
    * @param prop the property to compare.
    * @return the rendered comparison expression.
@@ -110,9 +105,7 @@ final class SupportMethodsRenderer implements SnippetRenderer {
     if (prop.getType() == PropType.ScalarType.BYTES) {
       return "Arrays.equals(" + n + ", other." + n + ")";
     }
-    return isPrimitiveScalar(prop)
-        ? n + " == other." + n
-        : "Objects.equals(" + n + ", other." + n + ")";
+    return isPrimitiveScalar(prop) ? n + " == other." + n : "Objects.equals(" + n + ", other." + n + ")";
   }
 
   /**
@@ -140,23 +133,19 @@ final class SupportMethodsRenderer implements SnippetRenderer {
   }
 
   /**
-   * The {@code hashCode()} term for one property: a {@code byte[]} field folds in its content hash
-   * via {@code Arrays.hashCode} (a bare reference would hash by identity), any other field goes in
-   * by name.
+   * The {@code hashCode()} term for one property: a {@code byte[]} field folds in its content hash via {@code
+   * Arrays.hashCode} (a bare reference would hash by identity), any other field goes in by name.
    *
    * @param prop the property to hash.
    * @return the rendered term.
    */
   private String hashCodeTerm(Property prop) {
-    return prop.getType() == PropType.ScalarType.BYTES
-        ? "Arrays.hashCode(" + prop.getName() + ")"
-        : prop.getName();
+    return prop.getType() == PropType.ScalarType.BYTES ? "Arrays.hashCode(" + prop.getName() + ")" : prop.getName();
   }
 
   /**
-   * The {@code toString()} term for one property: a {@code byte[]} field is rendered as its base64
-   * string (the same form it serializes as), null-guarded; any other field goes in by name. A
-   * masked property never reaches this method.
+   * The {@code toString()} term for one property: a {@code byte[]} field is rendered as its base64 string (the same
+   * form it serializes as), null-guarded; any other field goes in by name. A masked property never reaches this method.
    *
    * @param prop the property to render.
    * @return the rendered term.

@@ -1,11 +1,9 @@
-import com.diffplug.spotless.LineEnding
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.4.10"
-    id("com.diffplug.spotless") version "8.8.0"
+    kotlin("jvm") version "2.4.21"
     id("io.github.malczuuu.modelmaker") version "0.1.0"
 }
 
@@ -53,7 +51,7 @@ modelmaker {
 }
 
 dependencies {
-    implementation(platform("tools.jackson:jackson-bom:3.2.2"))
+    implementation(platform("tools.jackson:jackson-bom:3.2.4"))
     implementation("tools.jackson.core:jackson-databind")
     implementation("tools.jackson.module:jackson-module-kotlin")
 
@@ -68,38 +66,4 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-spotless {
-    kotlin {
-        target("src/**/*.kt")
-        targetExclude("build/**", "src/main/schemas/kotlin/**")
-
-        ktfmt().metaStyle().configure {
-            it.setMaxWidth(100)
-            it.setRemoveUnusedImports(true)
-        }
-        endWithNewline()
-        lineEndings = LineEnding.UNIX
-    }
-
-    java {
-        target("src/**/*.java")
-        targetExclude("build/**", "src/main/schemas/java/**")
-
-        googleJavaFormat()
-        endWithNewline()
-        lineEndings = LineEnding.UNIX
-    }
-
-    kotlinGradle {
-        target("*.gradle.kts")
-        targetExclude("build/**")
-
-        ktlint().editorConfigOverride(
-            mapOf("max_line_length" to "120"),
-        )
-        endWithNewline()
-        lineEndings = LineEnding.UNIX
-    }
-}
-
-defaultTasks("spotlessApply", "build")
+defaultTasks("build")

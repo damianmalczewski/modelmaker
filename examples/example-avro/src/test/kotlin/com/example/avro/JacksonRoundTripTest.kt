@@ -21,112 +21,112 @@ import tools.jackson.module.kotlin.KotlinModule
  */
 class JacksonRoundTripTest {
 
-  private val mapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
+    private val mapper = JsonMapper.builder().addModule(KotlinModule.Builder().build()).build()
 
-  @Test
-  fun `enum-as-pattern field round trips as a plain string`() {
-    val address =
-        Address.builder().street("1 Main St").city("Springfield").kind("RESIDENTIAL").build()
-    val item = LineItem.builder().sku("A1").quantity(2L).unit("EACH").build()
-    val order =
-        Order.builder().id("O1").status("PAID").shippingAddress(address).items(listOf(item)).build()
+    @Test
+    fun `enum-as-pattern field round trips as a plain string`() {
+        val address =
+            Address.builder().street("1 Main St").city("Springfield").kind("RESIDENTIAL").build()
+        val item = LineItem.builder().sku("A1").quantity(2L).unit("EACH").build()
+        val order =
+            Order.builder().id("O1").status("PAID").shippingAddress(address).items(listOf(item)).build()
 
-    val json = mapper.writeValueAsString(order)
-    val node = mapper.readTree(json)
-    assertThat(node.get("status").asString()).isEqualTo("PAID")
-    assertThat(node.get("shippingAddress").get("city").asString()).isEqualTo("Springfield")
-    assertThat(node.get("shippingAddress").get("kind").asString()).isEqualTo("RESIDENTIAL")
-    assertThat(node.get("items").get(0).get("quantity").asLong()).isEqualTo(2L)
-    assertThat(node.get("discountRate").isNull).isTrue()
+        val json = mapper.writeValueAsString(order)
+        val node = mapper.readTree(json)
+        assertThat(node.get("status").asString()).isEqualTo("PAID")
+        assertThat(node.get("shippingAddress").get("city").asString()).isEqualTo("Springfield")
+        assertThat(node.get("shippingAddress").get("kind").asString()).isEqualTo("RESIDENTIAL")
+        assertThat(node.get("items").get(0).get("quantity").asLong()).isEqualTo(2L)
+        assertThat(node.get("discountRate").isNull).isTrue()
 
-    val back = mapper.readValue(json, Order::class.java)
-    assertThat(back).isNotSameAs(order).isEqualTo(order)
+        val back = mapper.readValue(json, Order::class.java)
+        assertThat(back).isNotSameAs(order).isEqualTo(order)
 
-    // modelmaker.kotlin.enabled: the generated Kotlin `mutate { }` extension over the builder.
-    val discounted = back.mutate { discountRate(0.1f) }
-    assertThat(discounted.discountRate).isEqualTo(0.1f)
-    assertThat(back.discountRate).isNull()
-  }
+        // modelmaker.kotlin.enabled: the generated Kotlin `mutate { }` extension over the builder.
+        val discounted = back.mutate { discountRate(0.1f) }
+        assertThat(discounted.discountRate).isEqualTo(0.1f)
+        assertThat(back.discountRate).isNull()
+    }
 
-  @Test
-  fun `a nullable enum field left unset is filled in with its non-null default`() {
-    val address =
-        Address.builder().street("1 Main St").city("Springfield").kind("RESIDENTIAL").build()
-    val item = LineItem.builder().sku("A1").quantity(2L).unit("EACH").build()
-    val order =
-        Order.builder().id("O1").status("PAID").shippingAddress(address).items(listOf(item)).build()
+    @Test
+    fun `a nullable enum field left unset is filled in with its non-null default`() {
+        val address =
+            Address.builder().street("1 Main St").city("Springfield").kind("RESIDENTIAL").build()
+        val item = LineItem.builder().sku("A1").quantity(2L).unit("EACH").build()
+        val order =
+            Order.builder().id("O1").status("PAID").shippingAddress(address).items(listOf(item)).build()
 
-    // "priority" was never set - "default": "NORMAL" on the enum's nullable union is applied by
-    // the constructor, not something the caller has to do.
-    assertThat(order.priority).isEqualTo("NORMAL")
+        // "priority" was never set - "default": "NORMAL" on the enum's nullable union is applied by
+        // the constructor, not something the caller has to do.
+        assertThat(order.priority).isEqualTo("NORMAL")
 
-    val json = mapper.writeValueAsString(order)
-    assertThat(mapper.readTree(json).get("priority").asString()).isEqualTo("NORMAL")
+        val json = mapper.writeValueAsString(order)
+        assertThat(mapper.readTree(json).get("priority").asString()).isEqualTo("NORMAL")
 
-    val urgent = order.mutate { priority("HIGH") }
-    assertThat(urgent.priority).isEqualTo("HIGH")
-    assertThat(order.priority).isEqualTo("NORMAL")
-  }
+        val urgent = order.mutate { priority("HIGH") }
+        assertThat(urgent.priority).isEqualTo("HIGH")
+        assertThat(order.priority).isEqualTo("NORMAL")
+    }
 
-  @Test
-  fun `long, double, int and boolean each round trip as their own distinct type`() {
-    val money = Money.builder().currency("USD").amount(19.99).scale(2).taxable(true).build()
+    @Test
+    fun `long, double, int and boolean each round trip as their own distinct type`() {
+        val money = Money.builder().currency("USD").amount(19.99).scale(2).taxable(true).build()
 
-    val json = mapper.writeValueAsString(money)
-    val node = mapper.readTree(json)
-    assertThat(node.get("amount").asDouble()).isEqualTo(19.99)
-    assertThat(node.get("scale").asInt()).isEqualTo(2)
-    assertThat(node.get("taxable").asBoolean()).isTrue()
+        val json = mapper.writeValueAsString(money)
+        val node = mapper.readTree(json)
+        assertThat(node.get("amount").asDouble()).isEqualTo(19.99)
+        assertThat(node.get("scale").asInt()).isEqualTo(2)
+        assertThat(node.get("taxable").asBoolean()).isTrue()
 
-    val back = mapper.readValue(json, Money::class.java)
-    assertThat(back).isNotSameAs(money).isEqualTo(money)
-  }
+        val back = mapper.readValue(json, Money::class.java)
+        assertThat(back).isNotSameAs(money).isEqualTo(money)
+    }
 
-  @Test
-  fun `an inline nested record and an array of inline nested records round trip`() {
-    val billTo = Invoice.Contact.builder().name("Jane Doe").email("jane@example.com").build()
-    val notes =
-        listOf(
-            Invoice.Note.builder().author("ops").text("shipped early").build(),
-            Invoice.Note.builder().author("billing").text("net 30").build(),
-        )
-    val invoice = Invoice.builder().id("INV-1").billTo(billTo).notes(notes).build()
+    @Test
+    fun `an inline nested record and an array of inline nested records round trip`() {
+        val billTo = Invoice.Contact.builder().name("Jane Doe").email("jane@example.com").build()
+        val notes =
+            listOf(
+                Invoice.Note.builder().author("ops").text("shipped early").build(),
+                Invoice.Note.builder().author("billing").text("net 30").build(),
+            )
+        val invoice = Invoice.builder().id("INV-1").billTo(billTo).notes(notes).build()
 
-    val json = mapper.writeValueAsString(invoice)
-    val node = mapper.readTree(json)
-    assertThat(node.get("billTo").get("email").asString()).isEqualTo("jane@example.com")
-    assertThat(node.get("notes")).hasSize(2)
-    assertThat(node.get("notes").get(1).get("author").asString()).isEqualTo("billing")
+        val json = mapper.writeValueAsString(invoice)
+        val node = mapper.readTree(json)
+        assertThat(node.get("billTo").get("email").asString()).isEqualTo("jane@example.com")
+        assertThat(node.get("notes")).hasSize(2)
+        assertThat(node.get("notes").get(1).get("author").asString()).isEqualTo("billing")
 
-    val back = mapper.readValue(json, Invoice::class.java)
-    assertThat(back).isNotSameAs(invoice).isEqualTo(invoice)
-    assertThat(back.billTo).isNotSameAs(billTo).isEqualTo(billTo)
-    assertThat(back.notes).isNotSameAs(notes).isEqualTo(notes)
-  }
+        val back = mapper.readValue(json, Invoice::class.java)
+        assertThat(back).isNotSameAs(invoice).isEqualTo(invoice)
+        assertThat(back.billTo).isNotSameAs(billTo).isEqualTo(billTo)
+        assertThat(back.notes).isNotSameAs(notes).isEqualTo(notes)
+    }
 
-  @Test
-  fun `an Avro bytes field serializes as base64, round trips, and every accessor is a defensive copy`() {
-    val payload = byteArrayOf(1, 2, 3, 4, 5)
-    val blob = Blob.builder().id("B1").payload(payload).build()
+    @Test
+    fun `an Avro bytes field serializes as base64, round trips, and every accessor is a defensive copy`() {
+        val payload = byteArrayOf(1, 2, 3, 4, 5)
+        val blob = Blob.builder().id("B1").payload(payload).build()
 
-    val json = mapper.writeValueAsString(blob)
-    val node = mapper.readTree(json)
-    assertThat(node.get("payload").asString())
-        .isEqualTo(Base64.getEncoder().encodeToString(payload))
-    assertThat(node.get("signature").isNull).isTrue()
+        val json = mapper.writeValueAsString(blob)
+        val node = mapper.readTree(json)
+        assertThat(node.get("payload").asString())
+            .isEqualTo(Base64.getEncoder().encodeToString(payload))
+        assertThat(node.get("signature").isNull).isTrue()
 
-    val back = mapper.readValue(json, Blob::class.java)
-    assertThat(back).isNotSameAs(blob).isEqualTo(blob)
-    assertThat(back.payload).containsExactly(1, 2, 3, 4, 5)
+        val back = mapper.readValue(json, Blob::class.java)
+        assertThat(back).isNotSameAs(blob).isEqualTo(blob)
+        assertThat(back.payload).containsExactly(1, 2, 3, 4, 5)
 
-    // mutating the caller's array can't reach into the DTO, and each getter hands back a fresh copy
-    payload[0] = 99
-    assertThat(blob.payload).containsExactly(1, 2, 3, 4, 5)
-    assertThat(blob.payload).isNotSameAs(blob.payload)
+        // mutating the caller's array can't reach into the DTO, and each getter hands back a fresh copy
+        payload[0] = 99
+        assertThat(blob.payload).containsExactly(1, 2, 3, 4, 5)
+        assertThat(blob.payload).isNotSameAs(blob.payload)
 
-    // the generated Kotlin `mutate { }` extension goes through the same defensive builder
-    val rotated = blob.mutate { payload(byteArrayOf(9, 9)) }
-    assertThat(rotated.payload).containsExactly(9, 9)
-    assertThat(blob.payload).containsExactly(1, 2, 3, 4, 5)
-  }
+        // the generated Kotlin `mutate { }` extension goes through the same defensive builder
+        val rotated = blob.mutate { payload(byteArrayOf(9, 9)) }
+        assertThat(rotated.payload).containsExactly(9, 9)
+        assertThat(blob.payload).containsExactly(1, 2, 3, 4, 5)
+    }
 }

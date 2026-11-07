@@ -48,8 +48,7 @@ class PropTypeTest {
 
     @Test
     void toStringReportsItems() {
-      assertThat(PropType.ArrayType.of(PropType.ScalarType.STRING).toString())
-          .isEqualTo("ArrayType[items=STRING]");
+      assertThat(PropType.ArrayType.of(PropType.ScalarType.STRING).toString()).isEqualTo("ArrayType[items=STRING]");
     }
   }
 
@@ -101,9 +100,7 @@ class PropTypeTest {
 
     @Test
     void notEqualToNullOrAnotherType() {
-      assertThat(PropType.ExternalType.of("java.time.Instant"))
-          .isNotEqualTo(null)
-          .isNotEqualTo("java.time.Instant");
+      assertThat(PropType.ExternalType.of("java.time.Instant")).isNotEqualTo(null).isNotEqualTo("java.time.Instant");
     }
 
     @Test

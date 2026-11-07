@@ -25,15 +25,13 @@ class BuilderFactoryRendererTest {
 
   private static final ModelOptions OPTIONS = ModelOptions.builder().build();
   private static final ModelType WIDGET =
-      new ModelType(
-          "Widget", "com.example.dto", null, List.of(), List.of(), FeatureOverrides.none());
+      new ModelType("Widget", "com.example.dto", null, List.of(), List.of(), FeatureOverrides.none());
 
   @Test
   void rendersTheStaticFactoryMethod() {
     RenderResult result = new BuilderFactoryRenderer().init("", WIDGET, OPTIONS).render();
 
-    assertThat(result.getCode())
-        .isEqualTo("public static Builder builder() {\n  return new Builder();\n}\n");
+    assertThat(result.getCode()).isEqualTo("public static Builder builder() {\n  return new Builder();\n}\n");
     assertThat(result.getImports()).isEmpty();
   }
 
@@ -46,7 +44,6 @@ class BuilderFactoryRendererTest {
 
   @Test
   void implementsTheRendererContract() {
-    assertThat(new BuilderFactoryRenderer().init("", WIDGET, OPTIONS))
-        .isInstanceOf(SnippetRenderer.class);
+    assertThat(new BuilderFactoryRenderer().init("", WIDGET, OPTIONS)).isInstanceOf(SnippetRenderer.class);
   }
 }

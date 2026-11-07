@@ -1,11 +1,9 @@
-import com.diffplug.spotless.LineEnding
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.4.10"
-    id("com.diffplug.spotless") version "8.8.0"
+    kotlin("jvm") version "2.4.21"
     id("io.github.malczuuu.modelmaker") version "0.1.0"
 }
 
@@ -60,38 +58,4 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-spotless {
-    kotlin {
-        target("src/**/*.kt")
-        targetExclude("build/**", "src/main/model/kotlin/**")
-
-        ktfmt().metaStyle().configure {
-            it.setMaxWidth(100)
-            it.setRemoveUnusedImports(true)
-        }
-        endWithNewline()
-        lineEndings = LineEnding.UNIX
-    }
-
-    java {
-        target("src/**/*.java")
-        targetExclude("build/**", "src/main/model/java/**")
-
-        googleJavaFormat()
-        endWithNewline()
-        lineEndings = LineEnding.UNIX
-    }
-
-    kotlinGradle {
-        target("*.gradle.kts")
-        targetExclude("build/**")
-
-        ktlint().editorConfigOverride(
-            mapOf("max_line_length" to "120"),
-        )
-        endWithNewline()
-        lineEndings = LineEnding.UNIX
-    }
-}
-
-defaultTasks("spotlessApply", "build")
+defaultTasks("build")

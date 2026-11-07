@@ -29,19 +29,16 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 
 /**
- * Generates immutable Java models from a lightweight JSON-Schema subset, or from Avro `.avsc`
- * record schemas:
+ * Generates immutable Java models from a lightweight JSON-Schema subset, or from Avro `.avsc` record schemas:
  *
  * 1. Registers the `modelmaker { }` extension.
- * 2. Registers a `generateModelJava` task that compiles every `*.json` and `*.avsc` under
- *    `src/main/model` into `.java` models, a `generateModelKotlin` (depending on
- *    `generateModelJava`) that writes Kotlin extensions, and a `generateModel` lifecycle task
- *    running both.
- * 3. Registers output dirs as source directories of the `main` source set, built by their
- *    respective tasks (`javac` picks up the `.java`; the Kotlin plugin, if present, the `.kt`).
+ * 2. Registers a `generateModelJava` task that compiles every `*.json` and `*.avsc` under `src/main/model` into `.java`
+ *    models, a `generateModelKotlin` (depending on `generateModelJava`) that writes Kotlin extensions, and a
+ *    `generateModel` lifecycle task running both.
+ * 3. Registers output dirs as source directories of the `main` source set, built by their respective tasks (`javac`
+ *    picks up the `.java`; the Kotlin plugin, if present, the `.kt`).
  *
- * The plugin contributes `org.jspecify:jspecify` on `compileOnly`, if the build script has not
- * already declared it.
+ * The plugin contributes `org.jspecify:jspecify` on `compileOnly`, if the build script has not already declared it.
  */
 public class ModelMakerPlugin : Plugin<Project> {
 
@@ -56,8 +53,9 @@ public class ModelMakerPlugin : Plugin<Project> {
         listOf(jackson.annotateFields, validation.annotateFields, openApi.annotateFields).forEach {
           it.convention(false)
         }
-        listOf(jackson.annotateGetters, validation.annotateGetters, openApi.annotateGetters)
-            .forEach { it.convention(true) }
+        listOf(jackson.annotateGetters, validation.annotateGetters, openApi.annotateGetters).forEach {
+          it.convention(true)
+        }
         jackson.includeNonNull.convention(false)
         withers.enabled.convention(false)
         preferPrimitives.enabled.convention(false)

@@ -46,8 +46,7 @@ class MutateExtensionRendererTest {
 
     assertThat(result.getCode())
         .contains(
-            "public inline fun Order.Line.mutate(block: Order.Line.BuilderMutator.() -> Unit):"
-                + " Order.Line =");
+            "public inline fun Order.Line.mutate(block: Order.Line.BuilderMutator.() -> Unit):" + " Order.Line =");
   }
 
   @Test

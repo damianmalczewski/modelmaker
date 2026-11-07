@@ -20,9 +20,8 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Jackson annotation configuration: whether the feature is on, and whether its annotations sit on
- * the generated fields, the getters, or both. Built through {@link #builder()}; read back through
- * {@code ModelOptions}.
+ * Jackson annotation configuration: whether the feature is on, and whether its annotations sit on the generated fields,
+ * the getters, or both. Built through {@link #builder()}; read back through {@code ModelOptions}.
  */
 public final class JacksonConfig {
 
@@ -33,8 +32,7 @@ public final class JacksonConfig {
   private final boolean annotateGetters;
   private final boolean includeNonNull;
 
-  private JacksonConfig(
-      boolean enabled, boolean annotateFields, boolean annotateGetters, boolean includeNonNull) {
+  private JacksonConfig(boolean enabled, boolean annotateFields, boolean annotateGetters, boolean includeNonNull) {
     this.enabled = enabled;
     this.annotateFields = annotateFields;
     this.annotateGetters = annotateGetters;
@@ -42,8 +40,8 @@ public final class JacksonConfig {
   }
 
   /**
-   * The default configuration - disabled, getter placement ({@code enabled=false}, {@code
-   * annotateFields=false}, {@code annotateGetters=true}).
+   * The default configuration - disabled, getter placement ({@code enabled=false}, {@code annotateFields=false}, {@code
+   * annotateGetters=true}).
    *
    * @return the shared default instance.
    */
@@ -88,8 +86,8 @@ public final class JacksonConfig {
   }
 
   /**
-   * Whether {@code @JsonInclude(JsonInclude.Include.NON_NULL)} is put on the generated class, so a
-   * property left unset is omitted from the serialized JSON instead of written as {@code null}.
+   * Whether {@code @JsonInclude(JsonInclude.Include.NON_NULL)} is put on the generated class, so a property left unset
+   * is omitted from the serialized JSON instead of written as {@code null}.
    *
    * @return {@code true} when on.
    */
@@ -98,8 +96,8 @@ public final class JacksonConfig {
   }
 
   /**
-   * Whether the generated class carries {@code @JsonInclude} - the {@code includeNonNull} option,
-   * but only while the feature itself is enabled.
+   * Whether the generated class carries {@code @JsonInclude} - the {@code includeNonNull} option, but only while the
+   * feature itself is enabled.
    *
    * @return {@code true} when the annotation is emitted.
    */
@@ -126,8 +124,7 @@ public final class JacksonConfig {
   }
 
   /**
-   * Applies a per-schema {@link JacksonOverride} over this config; unset override flags keep this
-   * instance's value.
+   * Applies a per-schema {@link JacksonOverride} over this config; unset override flags keep this instance's value.
    *
    * @param override the override.
    * @return the resolved config.
@@ -213,8 +210,7 @@ public final class JacksonConfig {
     }
 
     /**
-     * Emit {@code @JsonInclude(JsonInclude.Include.NON_NULL)} on the generated class when {@code
-     * true}.
+     * Emit {@code @JsonInclude(JsonInclude.Include.NON_NULL)} on the generated class when {@code true}.
      *
      * @param value {@code true} to turn it on.
      * @return {@code this}.

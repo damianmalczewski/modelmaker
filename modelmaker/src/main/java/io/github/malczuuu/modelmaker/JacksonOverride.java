@@ -21,9 +21,9 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Per-schema override of a {@link JacksonConfig}, parsed from a schema file's top-level {@code
- * "features"} object. Each flag is {@code null} when the schema does not set it - {@link
- * JacksonConfig#withOverride} then keeps the project default.
+ * Per-schema override of a {@link JacksonConfig}, parsed from a schema file's top-level {@code "features"} object. Each
+ * flag is {@code null} when the schema does not set it - {@link JacksonConfig#withOverride} then keeps the project
+ * default.
  */
 public final class JacksonOverride {
 

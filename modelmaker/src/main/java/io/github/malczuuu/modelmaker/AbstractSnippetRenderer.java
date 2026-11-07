@@ -20,8 +20,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A common base for a {@link SnippetRenderer} implementations that need the standard {@code
- * (indent, properties, options, types)} shape.
+ * A common base for a {@link SnippetRenderer} implementations that need the standard {@code (indent, properties,
+ * options, types)} shape.
  */
 abstract sealed class AbstractSnippetRenderer implements SnippetRenderer
     permits BuilderRenderer,
@@ -40,13 +40,13 @@ abstract sealed class AbstractSnippetRenderer implements SnippetRenderer
   AbstractSnippetRenderer() {}
 
   /**
-   * Fills {@link #indent}, {@link #properties}, {@link #options} and {@link #types} from {@code
-   * type}, then delegates to {@link #initInternal} for any renderer-specific setup.
+   * Fills {@link #indent}, {@link #properties}, {@link #options} and {@link #types} from {@code type}, then delegates
+   * to {@link #initInternal} for any renderer-specific setup.
    *
    * @param indent leading whitespace prepended to every rendered line.
    * @param type the model type to render.
-   * @param options settings that decide boxed vs primitive, whether Jackson/validation annotations
-   *     are emitted, and so on.
+   * @param options settings that decide boxed vs primitive, whether Jackson/validation annotations are emitted, and so
+   *     on.
    * @return {@code this}, so the call can chain into {@link #render()}.
    */
   @Override
@@ -60,8 +60,8 @@ abstract sealed class AbstractSnippetRenderer implements SnippetRenderer
   }
 
   /**
-   * Extension point for a subclass that also needs the type's own name or other setup beyond the
-   * standard four fields. No-op by default.
+   * Extension point for a subclass that also needs the type's own name or other setup beyond the standard four fields.
+   * No-op by default.
    *
    * @param indent leading whitespace prepended to every rendered line.
    * @param type the model type to render.

@@ -17,8 +17,8 @@
 package io.github.malczuuu.modelmaker.maven.config;
 
 /**
- * The {@code withers} feature - a plain on/off toggle. Emits a {@code withXyz(value)} single-field
- * copy method per property.
+ * The {@code withers} feature - a plain on/off toggle. Emits a {@code withXyz(value)} single-field copy method per
+ * property.
  *
  * <pre>
  * &lt;withers&gt;

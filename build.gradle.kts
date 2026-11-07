@@ -35,7 +35,7 @@ spotless {
         targetExclude("examples/**", "**/build/**", "**/package-info.java", "**/module-info.java")
 
         licenseHeaderFile("${rootProject.rootDir}/gradle/license-header.txt")
-        googleJavaFormat()
+        googleJavaFormat().maxLineLength(120)
         formatAnnotations()
         forbidWildcardImports()
         endWithNewline()
@@ -69,7 +69,7 @@ spotless {
 
         licenseHeaderFile("${rootProject.rootDir}/gradle/license-header.txt")
         ktfmt().metaStyle().configure {
-            it.setMaxWidth(100)
+            it.setMaxWidth(120)
             it.setRemoveUnusedImports(true)
         }
         endWithNewline()

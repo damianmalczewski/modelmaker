@@ -25,14 +25,13 @@ internal val SCHEMA_INCLUDES: List<String> = listOf("**/*.json", "**/*.avsc")
 /**
  * The schema files under [directory], the tracked input of both generation tasks.
  *
- * Filtering by extension is what keeps generated sources out of a task's own inputs: with
- * `modelmaker { src { enabled = true } }` they are written into a subdirectory of the schema
- * directory. The directories themselves must be left out of the fingerprint too (hence
- * `@IgnoreEmptyDirectories` on the properties built from this), or creating the output directory
- * would dirty the very task that created it.
+ * Filtering by extension is what keeps generated sources out of a task's own inputs: with `modelmaker { src { enabled =
+ * true } }` they are written into a subdirectory of the schema directory. The directories themselves must be left out
+ * of the fingerprint too (hence `@IgnoreEmptyDirectories` on the properties built from this), or creating the output
+ * directory would dirty the very task that created it.
  *
- * A directory that does not exist yields an empty tree rather than a validation failure, so
- * applying the plugin to a project without schemas is not an error.
+ * A directory that does not exist yields an empty tree rather than a validation failure, so applying the plugin to a
+ * project without schemas is not an error.
  */
 internal fun schemaFilesIn(directory: DirectoryProperty): FileTree =
     directory.asFileTree.matching { include(SCHEMA_INCLUDES) }

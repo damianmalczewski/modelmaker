@@ -20,13 +20,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Renders the {@code Builder} nested class for one model type - a mutable, prefix-free builder that
- * implements {@code BuilderMutator}; {@code build()} {@code Objects.requireNonNull}s every required
- * field, the rest fall through to the DTO constructor. A collection-valued field is passed to the
- * constructor as a shallow copy, so the built DTO never aliases the caller's collection.
+ * Renders the {@code Builder} nested class for one model type - a mutable, prefix-free builder that implements {@code
+ * BuilderMutator}; {@code build()} {@code Objects.requireNonNull}s every required field, the rest fall through to the
+ * DTO constructor. A collection-valued field is passed to the constructor as a shallow copy, so the built DTO never
+ * aliases the caller's collection.
  *
- * <p>Renders just the class; the enclosing class, the {@code package} declaration and the import
- * list are the composing emitter's job.
+ * <p>Renders just the class; the enclosing class, the {@code package} declaration and the import list are the composing
+ * emitter's job.
  */
 final class BuilderRenderer extends AbstractSnippetRenderer {
 
@@ -98,12 +98,7 @@ final class BuilderRenderer extends AbstractSnippetRenderer {
         // Defensive copy on the way in, so a later change to the caller's array can't leak through.
         assigned = name + " != null ? " + name + ".clone() : null";
       }
-      code.append(inner)
-          .append("  this.")
-          .append(name)
-          .append(" = ")
-          .append(assigned)
-          .append(";\n");
+      code.append(inner).append("  this.").append(name).append(" = ").append(assigned).append(";\n");
       code.append(inner).append("  return this;\n");
       code.append(inner).append("}\n\n");
     }
@@ -132,10 +127,7 @@ final class BuilderRenderer extends AbstractSnippetRenderer {
                   ? "new ArrayList<>(" + value + ")"
                   : name + " != null ? new ArrayList<>(" + name + ") : null";
         }
-        code.append(inner)
-            .append("      ")
-            .append(value)
-            .append(i == properties.size() - 1 ? ");\n" : ",\n");
+        code.append(inner).append("      ").append(value).append(i == properties.size() - 1 ? ");\n" : ",\n");
       }
     }
     code.append(inner).append("}\n");
@@ -167,11 +159,7 @@ final class BuilderRenderer extends AbstractSnippetRenderer {
       // The builder field is always a @Nullable byte[], so the base64 term is null-guarded.
       String value =
           property.getType() == PropType.ScalarType.BYTES
-              ? "("
-                  + name
-                  + " != null ? Base64.getEncoder().encodeToString("
-                  + name
-                  + ") : \"null\")"
+              ? "(" + name + " != null ? Base64.getEncoder().encodeToString(" + name + ") : \"null\")"
               : name;
       parts.append(label).append('"').append(" + ").append(value);
     }

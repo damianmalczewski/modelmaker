@@ -38,18 +38,17 @@ import org.jspecify.annotations.Nullable;
 /**
  * {@link SchemaLoader} that parses Apache Avro {@code .avsc} record schemas.
  *
- * <p><b>Experimental.</b> Avro input is not covered by this project's compatibility promise: this
- * class, and support for {@code .avsc} files in general, may change or be removed in any release,
- * including a minor one. Code against {@link SimpleSchemaLoader} (or {@link
- * SchemaLoaders#createDelegatingSchemaLoader()}) for anything that must keep working.
+ * <p><b>Experimental.</b> Avro input is not covered by this project's compatibility promise: this class, and support
+ * for {@code .avsc} files in general, may change or be removed in any release, including a minor one. Code against
+ * {@link SimpleSchemaLoader} (or {@link SchemaLoaders#createDelegatingSchemaLoader()}) for anything that must keep
+ * working.
  *
- * <p>Hand-parsed as plain JSON, the same way {@link SimpleSchemaLoader} parses its own format,
- * rather than depending on {@code org.apache.avro:avro} for this project's intentionally narrow
- * schema subset.
+ * <p>Hand-parsed as plain JSON, the same way {@link SimpleSchemaLoader} parses its own format, rather than depending on
+ * {@code org.apache.avro:avro} for this project's intentionally narrow schema subset.
  *
- * <p>Not supported (fails fast with a clear message): {@code map}, {@code fixed}, a union with
- * anything other than exactly one non-null branch, and Avro IDL ({@code .avdl}) files. A {@code
- * logicalType} is ignored - the field maps to its base Avro type.
+ * <p>Not supported (fails fast with a clear message): {@code map}, {@code fixed}, a union with anything other than
+ * exactly one non-null branch, and Avro IDL ({@code .avdl}) files. A {@code logicalType} is ignored - the field maps to
+ * its base Avro type.
  */
 public final class AvroSchemaLoader implements SchemaLoader {
 
@@ -70,8 +69,7 @@ public final class AvroSchemaLoader implements SchemaLoader {
   /**
    * Parses each file independently, then validates every named-type reference across all of them.
    *
-   * @param files schema files to parse; processing order is by file name, independent of the list
-   *     order.
+   * @param files schema files to parse; processing order is by file name, independent of the list order.
    * @return one {@link ModelType} per file, with all named-type references resolved and validated.
    */
   @Override
@@ -102,8 +100,7 @@ public final class AvroSchemaLoader implements SchemaLoader {
     try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
       parsed = JsonParser.parseReader(reader);
     } catch (Exception e) {
-      throw new SchemaException(
-          fileName(file), fileName(file) + ": not valid JSON (" + e.getMessage() + ")", e);
+      throw new SchemaException(fileName(file), fileName(file) + ": not valid JSON (" + e.getMessage() + ")", e);
     }
     if (!parsed.isJsonObject()) {
       throw fail(file, "root must be a JSON object");
@@ -116,24 +113,19 @@ public final class AvroSchemaLoader implements SchemaLoader {
     String name = requireString(file, root, "name", "top-level record");
     String expectedFileName = namespace + "." + name + ".avsc";
     if (!fileName(file).equals(expectedFileName)) {
-      throw fail(
-          file, "file must be named \"" + expectedFileName + "\" to match its namespace and name");
+      throw fail(file, "file must be named \"" + expectedFileName + "\" to match its namespace and name");
     }
     return parseRecord(file, root, name, namespace, parseFeatureOverrides(file, root));
   }
 
   /**
-   * Parses one Avro {@code record} - the top-level record, or an inline nested one - into a {@link
-   * ModelType}. Nested records carry the same {@code packageName} as their enclosing type, just
-   * like the JSON format's inline {@code object}s, and always get {@link FeatureOverrides#none()} -
-   * only the top-level record's own {@code "features"} applies.
+   * Parses one Avro {@code record} - the top-level record, or an inline nested one - into a {@link ModelType}. Nested
+   * records carry the same {@code packageName} as their enclosing type, just like the JSON format's inline {@code
+   * object}s, and always get {@link FeatureOverrides#none()} - only the top-level record's own {@code "features"}
+   * applies.
    */
   private static ModelType parseRecord(
-      Path file,
-      JsonObject node,
-      String name,
-      String packageName,
-      FeatureOverrides featureOverrides) {
+      Path file, JsonObject node, String name, String packageName, FeatureOverrides featureOverrides) {
     JsonElement fieldsNode = get(node, "fields");
     if (fieldsNode == null || !fieldsNode.isJsonArray()) {
       throw fail(file, "type \"" + name + "\": missing \"fields\" array");
@@ -146,29 +138,24 @@ public final class AvroSchemaLoader implements SchemaLoader {
       if (!fieldElement.isJsonObject()) {
         throw fail(file, "type \"" + name + "\": each field must be an object");
       }
-      Property property =
-          parseField(file, name, packageName, fieldElement.getAsJsonObject(), nested);
+      Property property = parseField(file, name, packageName, fieldElement.getAsJsonObject(), nested);
       if (!fieldNames.add(property.getName())) {
-        throw fail(
-            file, "type \"" + name + "\": field \"" + property.getName() + "\" is declared twice");
+        throw fail(file, "type \"" + name + "\": field \"" + property.getName() + "\" is declared twice");
       }
       properties.add(property);
     }
 
     String doc = stringOrNull(node, "doc");
-    return new ModelType(
-        name, packageName, doc, List.copyOf(properties), List.copyOf(nested), featureOverrides);
+    return new ModelType(name, packageName, doc, List.copyOf(properties), List.copyOf(nested), featureOverrides);
   }
 
   /**
-   * Reads a top-level record's {@code "features"} object, a per-schema override of {@code
-   * modelmaker { features { } }} - same keys, same semantics, as the Simple Schema format's
-   * top-level {@code "features"}.
+   * Reads a top-level record's {@code "features"} object, a per-schema override of {@code modelmaker { features { } }}
+   * - same keys, same semantics, as the Simple Schema format's top-level {@code "features"}.
    *
    * @param file the schema file being parsed, for error messages.
    * @param root the top-level record node.
-   * @return the parsed overrides, {@link FeatureOverrides#none()} when {@code "features"} is
-   *     absent.
+   * @return the parsed overrides, {@link FeatureOverrides#none()} when {@code "features"} is absent.
    */
   private static FeatureOverrides parseFeatureOverrides(Path file, JsonObject root) {
     JsonElement featuresNode = get(root, "features");
@@ -180,11 +167,7 @@ public final class AvroSchemaLoader implements SchemaLoader {
   }
 
   private static Property parseField(
-      Path file,
-      String typeName,
-      String packageName,
-      JsonObject field,
-      List<ModelType> nestedSink) {
+      Path file, String typeName, String packageName, JsonObject field, List<ModelType> nestedSink) {
     String fieldName = requireString(file, field, "name", "type \"" + typeName + "\": field");
     JsonElement typeNode = get(field, "type");
     if (typeNode == null) {
@@ -215,14 +198,12 @@ public final class AvroSchemaLoader implements SchemaLoader {
 
     PropType type = resolveType(file, fieldName, packageName, effective, nestedSink);
     Constraints constraints = Constraints.none();
-    if (effective.isJsonObject()
-        && "enum".equals(stringOrNull(effective.getAsJsonObject(), "type"))) {
+    if (effective.isJsonObject() && "enum".equals(stringOrNull(effective.getAsJsonObject(), "type"))) {
       constraints = enumConstraints(file, fieldName, effective.getAsJsonObject());
     }
 
     boolean required = !nullable;
-    DefaultValue defaultValue =
-        required ? null : parseDefault(file, fieldName, get(field, "default"), type);
+    DefaultValue defaultValue = required ? null : parseDefault(file, fieldName, get(field, "default"), type);
 
     return new Property(
         fieldName,
@@ -237,16 +218,12 @@ public final class AvroSchemaLoader implements SchemaLoader {
   }
 
   /**
-   * Resolves one Avro type node - already past any nullable-union unwrapping - to a {@link
-   * PropType}. Recurses for {@code array} items; a nested {@code record} is appended to {@code
-   * nestedSink} and referenced back by name, the same as the JSON format's inline {@code object}.
+   * Resolves one Avro type node - already past any nullable-union unwrapping - to a {@link PropType}. Recurses for
+   * {@code array} items; a nested {@code record} is appended to {@code nestedSink} and referenced back by name, the
+   * same as the JSON format's inline {@code object}.
    */
   private static PropType resolveType(
-      Path file,
-      String nameHint,
-      String packageName,
-      JsonElement typeNode,
-      List<ModelType> nestedSink) {
+      Path file, String nameHint, String packageName, JsonElement typeNode, List<ModelType> nestedSink) {
     if (isString(typeNode)) {
       return scalarOrRef(typeNode.getAsString());
     }
@@ -301,8 +278,8 @@ public final class AvroSchemaLoader implements SchemaLoader {
   }
 
   /**
-   * {@code {"type": "enum", "symbols": [...]}} - rendered as an {@code @Pattern} alternation over
-   * the symbols, never a Java {@code enum}.
+   * {@code {"type": "enum", "symbols": [...]}} - rendered as an {@code @Pattern} alternation over the symbols, never a
+   * Java {@code enum}.
    */
   private static Constraints enumConstraints(Path file, String fieldName, JsonObject enumNode) {
     JsonElement symbolsNode = get(enumNode, "symbols");
@@ -359,8 +336,7 @@ public final class AvroSchemaLoader implements SchemaLoader {
         throw fail(file, "field \"" + fieldName + "\": default must be an array");
       }
       if (!(array.getItems() instanceof PropType.ScalarType)) {
-        throw fail(
-            file, "field \"" + fieldName + "\": array default is only supported for scalar items");
+        throw fail(file, "field \"" + fieldName + "\": array default is only supported for scalar items");
       }
       JsonArray elementsNode = node.getAsJsonArray();
       List<DefaultValue> elements = new ArrayList<>();
@@ -372,8 +348,7 @@ public final class AvroSchemaLoader implements SchemaLoader {
     throw fail(file, "field \"" + fieldName + "\": default is not supported for this type");
   }
 
-  private static DefaultValue parseDefaultElement(
-      Path file, String fieldName, JsonElement node, PropType itemType) {
+  private static DefaultValue parseDefaultElement(Path file, String fieldName, JsonElement node, PropType itemType) {
     DefaultValue value = parseDefault(file, fieldName + "[]", node, itemType);
     if (value == null) {
       throw fail(file, "field \"" + fieldName + "\": array default elements must not be null");
@@ -407,8 +382,8 @@ public final class AvroSchemaLoader implements SchemaLoader {
   }
 
   /**
-   * Reads a boolean field attribute, treating anything but {@code true} - including an absent or
-   * non-boolean node - as {@code false}.
+   * Reads a boolean field attribute, treating anything but {@code true} - including an absent or non-boolean node - as
+   * {@code false}.
    *
    * @param node the field node.
    * @param key the attribute to read.

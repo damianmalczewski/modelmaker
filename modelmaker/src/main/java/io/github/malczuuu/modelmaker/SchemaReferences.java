@@ -23,15 +23,15 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Validates {@link PropType.RefType} references across a set of {@link ModelType}s parsed from one
- * format's files - shared by {@link SimpleSchemaLoader} and {@link AvroSchemaLoader}. Each format
- * validates only within its own file set; there is no cross-format reference resolution.
+ * Validates {@link PropType.RefType} references across a set of {@link ModelType}s parsed from one format's files -
+ * shared by {@link SimpleSchemaLoader} and {@link AvroSchemaLoader}. Each format validates only within its own file
+ * set; there is no cross-format reference resolution.
  */
 final class SchemaReferences {
 
   /**
-   * Every {@link PropType.RefType} in {@code types} (including nested types, recursively) must
-   * resolve to a top-level type's {@code packageName + "." + name} or a nested type's plain name.
+   * Every {@link PropType.RefType} in {@code types} (including nested types, recursively) must resolve to a top-level
+   * type's {@code packageName + "." + name} or a nested type's plain name.
    *
    * @param types the parsed top-level types to validate.
    */
@@ -58,8 +58,7 @@ final class SchemaReferences {
     }
   }
 
-  private static void validateRefs(
-      ModelType type, Set<String> known, List<SchemaException> errors) {
+  private static void validateRefs(ModelType type, Set<String> known, List<SchemaException> errors) {
     for (Property prop : type.getProperties()) {
       String ref = refName(prop.getType());
       if (ref != null && !known.contains(ref)) {

@@ -25,15 +25,7 @@ import org.junit.jupiter.api.Test;
 class OpenApiUtilsTest {
 
   private static Property prop(boolean required, String description, String example) {
-    return property(
-        "id",
-        PropType.ScalarType.STRING,
-        required,
-        Constraints.none(),
-        "id",
-        null,
-        description,
-        example);
+    return property("id", PropType.ScalarType.STRING, required, Constraints.none(), "id", null, description, example);
   }
 
   @Test
@@ -48,8 +40,7 @@ class OpenApiUtilsTest {
     assertThat(spec).isNotNull();
     assertThat(spec.render())
         .isEqualTo(
-            "@Schema(description = \"an id\", example = \"P1\","
-                + " requiredMode = Schema.RequiredMode.REQUIRED)");
+            "@Schema(description = \"an id\", example = \"P1\"," + " requiredMode = Schema.RequiredMode.REQUIRED)");
     assertThat(spec.getImportName()).isEqualTo("io.swagger.v3.oas.annotations.media.Schema");
   }
 
@@ -71,17 +62,14 @@ class OpenApiUtilsTest {
 
   @Test
   void typeAnnotationIsNullWhenTypeHasNoDescription() {
-    ModelType type =
-        new ModelType("T", "com.example", null, List.of(), List.of(), FeatureOverrides.none());
+    ModelType type = new ModelType("T", "com.example", null, List.of(), List.of(), FeatureOverrides.none());
 
     assertThat(OpenApiUtils.schemaAnnotationForType(type)).isNull();
   }
 
   @Test
   void typeAnnotationCarriesTheTypeDescription() {
-    ModelType type =
-        new ModelType(
-            "T", "com.example", "A thing.", List.of(), List.of(), FeatureOverrides.none());
+    ModelType type = new ModelType("T", "com.example", "A thing.", List.of(), List.of(), FeatureOverrides.none());
 
     AnnotationSpec spec = OpenApiUtils.schemaAnnotationForType(type);
 

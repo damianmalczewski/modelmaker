@@ -1,8 +1,5 @@
-import com.diffplug.spotless.LineEnding
-
 plugins {
     java
-    id("com.diffplug.spotless") version "8.8.0"
     id("io.github.malczuuu.modelmaker") version "0.1.0"
 }
 
@@ -29,13 +26,13 @@ modelmaker {
 }
 
 dependencies {
-    implementation(platform("com.fasterxml.jackson:jackson-bom:2.22.2"))
+    implementation(platform("com.fasterxml.jackson:jackson-bom:2.22.4"))
     implementation("com.fasterxml.jackson.core:jackson-databind")
 
     implementation("jakarta.validation:jakarta.validation-api:3.1.1")
-    implementation("org.hibernate.validator:hibernate-validator:9.1.3.Final")
+    implementation("org.hibernate.validator:hibernate-validator:9.1.6.Final")
 
-    implementation("io.swagger.core.v3:swagger-annotations-jakarta:2.2.30")
+    implementation("io.swagger.core.v3:swagger-annotations-jakarta:2.2.55")
 
     testImplementation(platform("org.junit:junit-bom:6.1.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -48,26 +45,4 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-spotless {
-    java {
-        target("src/**/*.java")
-        targetExclude("build/**", "src/main/model/java/**")
-
-        googleJavaFormat()
-        endWithNewline()
-        lineEndings = LineEnding.UNIX
-    }
-
-    kotlinGradle {
-        target("*.gradle.kts")
-        targetExclude("build/**")
-
-        ktlint().editorConfigOverride(
-            mapOf("max_line_length" to "120"),
-        )
-        endWithNewline()
-        lineEndings = LineEnding.UNIX
-    }
-}
-
-defaultTasks("spotlessApply", "build")
+defaultTasks("build")

@@ -28,8 +28,7 @@ package io.github.malczuuu.modelmaker.maven.config;
  * &lt;/jackson&gt;
  * </pre>
  *
- * <p>With both {@code annotateFields} and {@code annotateGetters} on, the annotations are emitted
- * on both.
+ * <p>With both {@code annotateFields} and {@code annotateGetters} on, the annotations are emitted on both.
  */
 public class JacksonFeature {
 
@@ -105,8 +104,8 @@ public class JacksonFeature {
   }
 
   /**
-   * Emits {@code @JsonInclude(JsonInclude.Include.NON_NULL)} on the generated class, so a property
-   * left unset is omitted from the serialized JSON instead of written as {@code null}.
+   * Emits {@code @JsonInclude(JsonInclude.Include.NON_NULL)} on the generated class, so a property left unset is
+   * omitted from the serialized JSON instead of written as {@code null}.
    *
    * @param includeNonNull {@code true} to emit it.
    */

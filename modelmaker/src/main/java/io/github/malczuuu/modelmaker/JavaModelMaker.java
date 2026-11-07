@@ -24,11 +24,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Emits an immutable Java POJO (final class, final fields, no setters, all-args constructor) for a
- * {@link ModelType}. The constructor is private, unless {@link ModelOptions#getJackson()} is on, in
- * which case it is package-private and carries {@code @JsonCreator}/{@code @JsonProperty} so
- * Jackson deserializes through it directly. Instances are also built through the nested {@code
- * Builder}. Inline objects become {@code static final} nested classes.
+ * Emits an immutable Java POJO (final class, final fields, no setters, all-args constructor) for a {@link ModelType}.
+ * The constructor is private, unless {@link ModelOptions#getJackson()} is on, in which case it is package-private and
+ * carries {@code @JsonCreator}/{@code @JsonProperty} so Jackson deserializes through it directly. Instances are also
+ * built through the nested {@code Builder}. Inline objects become {@code static final} nested classes.
  */
 public final class JavaModelMaker implements ModelMaker {
 
@@ -37,17 +36,15 @@ public final class JavaModelMaker implements ModelMaker {
   /**
    * Creates a new {@link JavaModelMaker}.
    *
-   * @param baseOptions the project's default {@link ModelOptions}, before any per-schema feature
-   *     overrides are applied.
+   * @param baseOptions the project's default {@link ModelOptions}, before any per-schema feature overrides are applied.
    */
   public JavaModelMaker(ModelOptions baseOptions) {
     this.baseOptions = Objects.requireNonNull(baseOptions, "baseOptions must not be null");
   }
 
   /**
-   * Applies {@code type}'s feature overrides over the base options, then renders the whole file:
-   * {@code package}, imports, the do-not-edit banner, and the top-level class (recursing into
-   * nested types).
+   * Applies {@code type}'s feature overrides over the base options, then renders the whole file: {@code package},
+   * imports, the do-not-edit banner, and the top-level class (recursing into nested types).
    *
    * @param type the schema-derived model to emit.
    * @return the generated file's full source text.
@@ -147,8 +144,7 @@ public final class JavaModelMaker implements ModelMaker {
     imports.addAll(support.getImports());
     b.append(support.getCode());
 
-    RenderResult builderFactory =
-        new BuilderFactoryRenderer().init(innerIndent, type, options).render();
+    RenderResult builderFactory = new BuilderFactoryRenderer().init(innerIndent, type, options).render();
     imports.addAll(builderFactory.getImports());
     b.append('\n').append(builderFactory.getCode());
 

@@ -20,11 +20,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Renders the {@code private final} field declarations for one model type, one per property, each
- * preceded by the annotations of any feature whose config {@code emitsOnFields()}.
+ * Renders the {@code private final} field declarations for one model type, one per property, each preceded by the
+ * annotations of any feature whose config {@code emitsOnFields()}.
  *
- * <p>Renders just the fields; the enclosing class, its constructor and everything else are the
- * composing emitter's job.
+ * <p>Renders just the fields; the enclosing class, its constructor and everything else are the composing emitter's job.
  */
 final class FieldsRenderer extends AbstractSnippetRenderer {
 
@@ -46,8 +45,7 @@ final class FieldsRenderer extends AbstractSnippetRenderer {
     boolean jackson = options.getJackson().emitsOnFields();
     boolean validation = options.getValidation().emitsOnFields();
     for (Property p : properties) {
-      for (String a :
-          PropertyAnnotations.declarationAnnotations(p, openApi, jackson, validation, imports)) {
+      for (String a : PropertyAnnotations.declarationAnnotations(p, openApi, jackson, validation, imports)) {
         code.append(indent).append(a).append('\n');
       }
       code.append(indent)
@@ -61,10 +59,10 @@ final class FieldsRenderer extends AbstractSnippetRenderer {
   }
 
   /**
-   * Type of the stored field: non-null when the value is always set, and a primitive scalar only
-   * when {@link ModelOptions#isPreferPrimitives()} is on. A {@code List} field carries its
-   * element's {@code jakarta.validation} constraints (and {@code @Valid} for a DTO element) in the
-   * container-element position when {@code validation} annotates fields.
+   * Type of the stored field: non-null when the value is always set, and a primitive scalar only when {@link
+   * ModelOptions#isPreferPrimitives()} is on. A {@code List} field carries its element's {@code jakarta.validation}
+   * constraints (and {@code @Valid} for a DTO element) in the container-element position when {@code validation}
+   * annotates fields.
    *
    * @param prop the property to type.
    * @param validation whether {@code jakarta.validation} emits on fields.
@@ -74,10 +72,7 @@ final class FieldsRenderer extends AbstractSnippetRenderer {
   private String fieldType(Property prop, boolean validation, Set<String> imports) {
     if (prop.getType() instanceof PropType.ArrayType array) {
       String list =
-          types.listType(
-              array,
-              PropertyAnnotations.elementAnnotations(prop, array, validation, imports),
-              imports);
+          types.listType(array, PropertyAnnotations.elementAnnotations(prop, array, validation, imports), imports);
       if (prop.nonNull()) {
         return list;
       }

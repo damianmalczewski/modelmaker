@@ -54,8 +54,7 @@ class ModelMakerPluginFunctionalTest {
     assertThat(java).doesNotContain("@JsonProperty")
     assertThat(java).doesNotContain("@NotNull")
 
-    val classpath =
-        project.runner("dependencies", "--configuration", "compileClasspath").build().output
+    val classpath = project.runner("dependencies", "--configuration", "compileClasspath").build().output
     assertThat(classpath).doesNotContain("jackson")
     assertThat(classpath).doesNotContain("jakarta.validation")
     assertThat(classpath).contains("org.jspecify:jspecify")
@@ -80,7 +79,7 @@ class ModelMakerPluginFunctionalTest {
   @Test
   fun `a schema's own features override wins over the project default`() {
     project.writeStandardBuild(
-        dependencies = "implementation(\"com.fasterxml.jackson.core:jackson-annotations:2.18.2\")"
+        dependencies = "implementation(\"com.fasterxml.jackson.core:jackson-annotations:2.18.2\")",
     )
     project.writeSchemas()
     project.write(
@@ -150,7 +149,7 @@ class ModelMakerPluginFunctionalTest {
     assertThat(java)
         .contains(
             "@Schema(description = \"the account id\", example = \"A-1\"," +
-                " requiredMode = Schema.RequiredMode.REQUIRED)"
+                " requiredMode = Schema.RequiredMode.REQUIRED)",
         )
   }
 
@@ -168,11 +167,11 @@ class ModelMakerPluginFunctionalTest {
     val java = project.generatedJava("com/example/dto/Customer.java").readText()
     assertThat(java)
         .contains(
-            "@Pattern(regexp = \"^C\", message = \"must match \\\"^C\\\"\")\n  private final String id;"
+            "@Pattern(regexp = \"^C\", message = \"must match \\\"^C\\\"\")\n  private final String id;",
         )
     assertThat(java)
         .doesNotContain(
-            "@Pattern(regexp = \"^C\", message = \"must match \\\"^C\\\"\")\n  public String getId()"
+            "@Pattern(regexp = \"^C\", message = \"must match \\\"^C\\\"\")\n  public String getId()",
         )
   }
 
@@ -181,8 +180,7 @@ class ModelMakerPluginFunctionalTest {
     project.writeStandardBuild(dependencies = "implementation(\"org.jspecify:jspecify:1.0.0\")")
     project.writeSchemas()
 
-    val classpath =
-        project.runner("dependencies", "--configuration", "compileClasspath").build().output
+    val classpath = project.runner("dependencies", "--configuration", "compileClasspath").build().output
     assertThat(classpath).contains("org.jspecify:jspecify:1.0.0")
     assertThat(classpath).doesNotContain("1.0.1")
   }
@@ -190,7 +188,7 @@ class ModelMakerPluginFunctionalTest {
   @Test
   fun `preferPrimitives switches always-set scalars to primitives`() {
     project.writeStandardBuild(
-        modelMakerBlock = "modelmaker { features { preferPrimitives { enabled = true } } }"
+        modelMakerBlock = "modelmaker { features { preferPrimitives { enabled = true } } }",
     )
     project.writeSchemas()
 
@@ -205,8 +203,7 @@ class ModelMakerPluginFunctionalTest {
     project.writeStandardBuild()
     project.writeSchemas()
     project.runner("compileJava").build()
-    assertThat(project.generatedJava("com/example/dto/Customer.java").readText())
-        .doesNotContain("withHome")
+    assertThat(project.generatedJava("com/example/dto/Customer.java").readText()).doesNotContain("withHome")
 
     project.appendToBuildScript("modelmaker { features { withers { enabled = true } } }")
     project.runner("compileJava").build()
@@ -217,7 +214,7 @@ class ModelMakerPluginFunctionalTest {
   @Test
   fun `a nested block cannot implicitly call an enclosing block's method`() {
     project.writeStandardBuild(
-        modelMakerBlock = "modelmaker { features { jackson { withers { enabled = true } } } }"
+        modelMakerBlock = "modelmaker { features { jackson { withers { enabled = true } } } }",
     )
 
     val result = project.runner("help").buildAndFail()
@@ -274,7 +271,7 @@ class ModelMakerPluginFunctionalTest {
     assertThat(ext).exists()
     assertThat(ext.readText())
         .contains(
-            "public inline fun Customer.mutate(block: Customer.BuilderMutator.() -> Unit): Customer ="
+            "public inline fun Customer.mutate(block: Customer.BuilderMutator.() -> Unit): Customer =",
         )
   }
 
@@ -287,21 +284,13 @@ class ModelMakerPluginFunctionalTest {
 
     project.runner("generateModelJava", "--build-cache").build()
     assertThat(
-            project
-                .runner("generateModelJava", "--build-cache")
-                .build()
-                .task(":generateModelJava")
-                ?.outcome
+            project.runner("generateModelJava", "--build-cache").build().task(":generateModelJava")?.outcome,
         )
         .isEqualTo(TaskOutcome.UP_TO_DATE)
 
     project.runner("clean", "--build-cache").build()
     assertThat(
-            project
-                .runner("generateModelJava", "--build-cache")
-                .build()
-                .task(":generateModelJava")
-                ?.outcome
+            project.runner("generateModelJava", "--build-cache").build().task(":generateModelJava")?.outcome,
         )
         .isEqualTo(TaskOutcome.FROM_CACHE)
   }
@@ -343,8 +332,7 @@ class ModelMakerPluginFunctionalTest {
 
     project.runner("build").build()
 
-    assertThat(project.generatedJava("com/example/dto/Customer.java").readText())
-        .doesNotContain("@JsonInclude")
+    assertThat(project.generatedJava("com/example/dto/Customer.java").readText()).doesNotContain("@JsonInclude")
   }
 
   @Test
@@ -381,7 +369,7 @@ class ModelMakerPluginFunctionalTest {
             schemas { directory = layout.projectDirectory.dir("src/main/schemas") }
             src { enabled = true }
         }
-        """
+        """,
     )
     project.write(
         "src/main/schemas/com.example.dto.Tag.json",
@@ -408,7 +396,7 @@ class ModelMakerPluginFunctionalTest {
             schemas { directory = layout.projectDirectory.dir("schemas") }
             src { enabled = false }
         }
-        """
+        """,
     )
     project.write(
         "schemas/com.example.dto.Tag.json",
@@ -444,8 +432,7 @@ class ModelMakerPluginFunctionalTest {
     val result = project.runner("compileJava").build()
 
     assertThat(result.task(":compileJava")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-    assertThat(project.generatedJava("com/example/dto/Customer.java").readText())
-        .doesNotContain("@Generated")
+    assertThat(project.generatedJava("com/example/dto/Customer.java").readText()).doesNotContain("@Generated")
   }
 
   @Test
@@ -484,11 +471,7 @@ class ModelMakerPluginFunctionalTest {
     File(project.dir, "src/main/model/java").deleteRecursively()
 
     assertThat(
-            project
-                .runner("generateModelJava", "--build-cache")
-                .build()
-                .task(":generateModelJava")
-                ?.outcome
+            project.runner("generateModelJava", "--build-cache").build().task(":generateModelJava")?.outcome,
         )
         .isEqualTo(TaskOutcome.FROM_CACHE)
     assertThat(project.srcJava("com/example/dto/Customer.java")).exists()
@@ -497,7 +480,7 @@ class ModelMakerPluginFunctionalTest {
   @Test
   fun `generateModelKotlin generates nothing without kotlin extensions opt-in, then runs once enabled`() {
     project.writeStandardBuild(
-        languagePlugin = "id(\"org.jetbrains.kotlin.jvm\") version \"2.4.0\""
+        languagePlugin = "id(\"org.jetbrains.kotlin.jvm\") version \"2.4.0\"",
     )
     project.writeSchemas()
 
@@ -589,8 +572,7 @@ class ModelMakerPluginFunctionalTest {
 
     val result = project.runner("generateModelKotlin").build()
     val tasks = result.tasks.map { it.path }
-    assertThat(tasks.indexOf(":generateModelJava"))
-        .isLessThan(tasks.indexOf(":generateModelKotlin"))
+    assertThat(tasks.indexOf(":generateModelJava")).isLessThan(tasks.indexOf(":generateModelKotlin"))
   }
 
   @Test

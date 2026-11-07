@@ -53,9 +53,9 @@ public final class SimpleSchemaLoader implements SchemaLoader {
   private static final Pattern UPPER_CAMEL_CASE = Pattern.compile("[A-Z][a-zA-Z0-9]*");
 
   /**
-   * {@code @Pattern} (regex, message) per {@code string} {@code format}. {@code decimal} also
-   * enables {@code minimum}/{@code maximum} as {@code @DecimalMin}/{@code @DecimalMax}; {@code
-   * email} is handled separately as {@code @Email}.
+   * {@code @Pattern} (regex, message) per {@code string} {@code format}. {@code decimal} also enables {@code
+   * minimum}/{@code maximum} as {@code @DecimalMin}/{@code @DecimalMax}; {@code email} is handled separately as
+   * {@code @Email}.
    */
   private record Format(String pattern, String message) {}
 
@@ -63,16 +63,14 @@ public final class SimpleSchemaLoader implements SchemaLoader {
       Map.of(
           "decimal", new Format("^-?\\d+(\\.\\d+)?$", "must be a decimal number"),
           "date", new Format("^\\d{4}-\\d{2}-\\d{2}$", "must be a date in yyyy-MM-dd format"),
-          "time",
-              new Format("^\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?$", "must be a time in HH:mm:ss format"),
+          "time", new Format("^\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?$", "must be a time in HH:mm:ss format"),
           "date-time",
               new Format(
                   "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$",
                   "must be an ISO-8601 date-time"),
           "uuid",
               new Format(
-                  "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                  "must be a UUID"));
+                  "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", "must be a UUID"));
 
   /**
    * Accepts only {@code "json"} files.
@@ -88,8 +86,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
   /**
    * Parses each file independently, then validates every {@code $ref} across all of them.
    *
-   * @param files schema files to parse; processing order is by file name, independent of the list
-   *     order.
+   * @param files schema files to parse; processing order is by file name, independent of the list order.
    * @return one {@link ModelType} per file, with all {@code $ref}s resolved and validated.
    */
   @Override
@@ -120,8 +117,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
     try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
       parsed = JsonParser.parseReader(reader);
     } catch (Exception e) {
-      throw new SchemaException(
-          fileName(file), fileName(file) + ": not valid JSON (" + e.getMessage() + ")", e);
+      throw new SchemaException(fileName(file), fileName(file) + ": not valid JSON (" + e.getMessage() + ")", e);
     }
     JsonObject root = parsed.isJsonObject() ? parsed.getAsJsonObject() : new JsonObject();
 
@@ -132,12 +128,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
     if (!SUPPORTED_VERSION.equals(version)) {
       throw fail(
           file,
-          "unsupported \"$modelmaker\": \""
-              + version
-              + "\" (only \""
-              + SUPPORTED_VERSION
-              + "\" is"
-              + " supported)");
+          "unsupported \"$modelmaker\": \"" + version + "\" (only \"" + SUPPORTED_VERSION + "\" is" + " supported)");
     }
 
     String title = stringOrNull(root, "title");
@@ -145,8 +136,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
       throw fail(file, "missing \"title\"");
     }
     if (!title.contains(".")) {
-      throw fail(
-          file, "\"title\" must be a fully-qualified class name, e.g. \"com.example.dto.Foo\"");
+      throw fail(file, "\"title\" must be a fully-qualified class name, e.g. \"com.example.dto.Foo\"");
     }
     if (!fileName(file).equals(title + ".json")) {
       throw fail(file, "file must be named \"" + title + ".json\" to match its title");
@@ -158,15 +148,10 @@ public final class SimpleSchemaLoader implements SchemaLoader {
     if (featuresNode != null && !featuresNode.isJsonObject()) {
       throw fail(file, "\"features\" must be an object");
     }
-    FeatureOverrides overrides =
-        parseFeatures(file, featuresNode != null ? featuresNode.getAsJsonObject() : null);
+    FeatureOverrides overrides = parseFeatures(file, featuresNode != null ? featuresNode.getAsJsonObject() : null);
 
     return parseObject(
-        file,
-        root,
-        title.substring(title.lastIndexOf('.') + 1),
-        title.substring(0, title.lastIndexOf('.')),
-        overrides);
+        file, root, title.substring(title.lastIndexOf('.') + 1), title.substring(0, title.lastIndexOf('.')), overrides);
   }
 
   private static FeatureOverrides parseFeatures(Path file, @Nullable JsonObject features) {
@@ -174,11 +159,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
   }
 
   private static ModelType parseObject(
-      Path file,
-      JsonObject node,
-      String name,
-      String packageName,
-      FeatureOverrides featureOverrides) {
+      Path file, JsonObject node, String name, String packageName, FeatureOverrides featureOverrides) {
     Set<String> required = new LinkedHashSet<>();
     JsonElement requiredNode = get(node, "required");
     if (requiredNode != null && requiredNode.isJsonArray()) {
@@ -199,8 +180,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
     for (Map.Entry<String, JsonElement> entry : propertiesNode.getAsJsonObject().entrySet()) {
       String jsonKey = entry.getKey();
       JsonElement propValue = entry.getValue();
-      JsonObject propNode =
-          propValue.isJsonObject() ? propValue.getAsJsonObject() : new JsonObject();
+      JsonObject propNode = propValue.isJsonObject() ? propValue.getAsJsonObject() : new JsonObject();
       String identifier = toIdentifier(file, name, jsonKey);
       String clashingKey = identifiers.putIfAbsent(identifier, jsonKey);
       if (clashingKey != null) {
@@ -218,8 +198,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
       }
       PropType type = parseType(file, identifier, packageName, propNode, nested);
       boolean isRequired = required.contains(jsonKey);
-      DefaultValue defaultValue =
-          isRequired ? null : parseDefault(file, identifier, propNode, type);
+      DefaultValue defaultValue = isRequired ? null : parseDefault(file, identifier, propNode, type);
       properties.add(
           new Property(
               identifier,
@@ -260,9 +239,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
       case "object" -> {
         String nestedTitle = stringOrNull(node, "title");
         if (nestedTitle != null && nestedTitle.contains(".")) {
-          throw fail(
-              file,
-              "nested object \"title\" must be a plain class name, not \"" + nestedTitle + "\"");
+          throw fail(file, "nested object \"title\" must be a plain class name, not \"" + nestedTitle + "\"");
         }
         String nestedName = nestedTitle != null ? nestedTitle : capitalize(nameHint);
         nestedSink.add(parseObject(file, node, nestedName, packageName, FeatureOverrides.none()));
@@ -273,8 +250,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
         if (items == null || !items.isJsonObject()) {
           throw fail(file, "property \"" + nameHint + "\": array needs \"items\"");
         }
-        PropType itemType =
-            parseType(file, nameHint, packageName, items.getAsJsonObject(), nestedSink);
+        PropType itemType = parseType(file, nameHint, packageName, items.getAsJsonObject(), nestedSink);
         if (itemType instanceof PropType.ArrayType) {
           throw fail(file, "property \"" + nameHint + "\": nested arrays are not supported");
         }
@@ -292,8 +268,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
   }
 
   /**
-   * {@code "integer"}'s {@code format}: {@code "int"} (the default, absent included) or {@code
-   * "long"}.
+   * {@code "integer"}'s {@code format}: {@code "int"} (the default, absent included) or {@code "long"}.
    *
    * @param file the schema file being parsed, for error messages.
    * @param nameHint the property name, for error messages.
@@ -318,8 +293,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
   }
 
   /**
-   * {@code "number"}'s {@code format}: {@code "double"} (the default, absent included) or {@code
-   * "float"}.
+   * {@code "number"}'s {@code format}: {@code "double"} (the default, absent included) or {@code "float"}.
    *
    * @param file the schema file being parsed, for error messages.
    * @param nameHint the property name, for error messages.
@@ -343,14 +317,12 @@ public final class SimpleSchemaLoader implements SchemaLoader {
             + "\" for type \"number\" (allowed: float, double)");
   }
 
-  private static @Nullable DefaultValue parseDefault(
-      Path file, String prop, JsonObject node, PropType type) {
+  private static @Nullable DefaultValue parseDefault(Path file, String prop, JsonObject node, PropType type) {
     JsonElement d = get(node, "default");
     return d == null ? null : toDefaultValue(file, prop, d, type);
   }
 
-  private static DefaultValue toDefaultValue(
-      Path file, String prop, JsonElement node, PropType type) {
+  private static DefaultValue toDefaultValue(Path file, String prop, JsonElement node, PropType type) {
     if (type == PropType.ScalarType.STRING) {
       if (!isString(node)) {
         throw fail(file, "property \"" + prop + "\": default must be a string");
@@ -385,8 +357,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
         throw fail(file, "property \"" + prop + "\": default must be an array");
       }
       if (!(array.getItems() instanceof PropType.ScalarType)) {
-        throw fail(
-            file, "property \"" + prop + "\": array default is only supported for scalar items");
+        throw fail(file, "property \"" + prop + "\": array default is only supported for scalar items");
       }
       JsonArray elementsNode = node.getAsJsonArray();
       List<DefaultValue> elements = new ArrayList<>();
@@ -395,15 +366,13 @@ public final class SimpleSchemaLoader implements SchemaLoader {
       }
       return DefaultValue.Arr.of(List.copyOf(elements));
     }
-    throw fail(
-        file, "property \"" + prop + "\": default is not supported for object / $ref properties");
+    throw fail(file, "property \"" + prop + "\": default is not supported for object / $ref properties");
   }
 
   /**
-   * Constraints for one property. An {@code array} node contributes only {@code minItems} / {@code
-   * maxItems} (as {@code @Size} on the {@code List}); the facets inside its {@code items} schema
-   * become {@link Constraints#getElementConstraints()}, rendered as container-element annotations
-   * on the field.
+   * Constraints for one property. An {@code array} node contributes only {@code minItems} / {@code maxItems} (as
+   * {@code @Size} on the {@code List}); the facets inside its {@code items} schema become {@link
+   * Constraints#getElementConstraints()}, rendered as container-element annotations on the field.
    *
    * @param node the property node.
    * @param type the property's resolved type.
@@ -430,9 +399,9 @@ public final class SimpleSchemaLoader implements SchemaLoader {
   }
 
   /**
-   * The {@code string} / {@code integer} / {@code number} value facets ({@code pattern}, {@code
-   * enum}, {@code format}, {@code minLength} / {@code maxLength}, {@code minimum} / {@code
-   * maximum}) of a scalar schema node - a property's own, or an {@code array}'s {@code items}.
+   * The {@code string} / {@code integer} / {@code number} value facets ({@code pattern}, {@code enum}, {@code format},
+   * {@code minLength} / {@code maxLength}, {@code minimum} / {@code maximum}) of a scalar schema node - a property's
+   * own, or an {@code array}'s {@code items}.
    *
    * @param node the schema node carrying the facets.
    * @param type the resolved scalar type of that node.
@@ -456,9 +425,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
                 ? explicitPattern
                 : enumPattern != null ? enumPattern.pattern() : mapPattern(formatPattern))
         .patternMessage(
-            explicitPattern != null
-                ? null
-                : enumPattern != null ? enumPattern.message() : mapMessage(formatPattern))
+            explicitPattern != null ? null : enumPattern != null ? enumPattern.message() : mapMessage(formatPattern))
         .minLength(intOrNull(node, "minLength"))
         .maxLength(intOrNull(node, "maxLength"))
         .email("email".equals(format))
@@ -470,8 +437,8 @@ public final class SimpleSchemaLoader implements SchemaLoader {
   }
 
   /**
-   * {@code "enum": [...]}, a fixed set of allowed string values - rendered as {@code @Pattern}
-   * alternation, never a Java {@code enum}. {@code null} when {@code "enum"} is absent or empty.
+   * {@code "enum": [...]}, a fixed set of allowed string values - rendered as {@code @Pattern} alternation, never a
+   * Java {@code enum}. {@code null} when {@code "enum"} is absent or empty.
    *
    * @param node the property node.
    * @return the pattern and message pair, or {@code null}.
@@ -514,9 +481,8 @@ public final class SimpleSchemaLoader implements SchemaLoader {
   }
 
   /**
-   * Requires a property key to be camelCase, snake_case, or UpperCamelCase, optionally prefixed
-   * with one or more underscores (e.g. {@code __metadata}); returns its camelCase form, with the
-   * underscore prefix preserved.
+   * Requires a property key to be camelCase, snake_case, or UpperCamelCase, optionally prefixed with one or more
+   * underscores (e.g. {@code __metadata}); returns its camelCase form, with the underscore prefix preserved.
    *
    * @param file the schema file being parsed, for error messages.
    * @param typeName the enclosing type's name, for error messages.
@@ -576,8 +542,8 @@ public final class SimpleSchemaLoader implements SchemaLoader {
   }
 
   /**
-   * Reads a boolean keyword, treating anything but {@code true} - including an absent or
-   * non-boolean node - as {@code false}.
+   * Reads a boolean keyword, treating anything but {@code true} - including an absent or non-boolean node - as {@code
+   * false}.
    *
    * @param node the property node.
    * @param key the keyword to read.
@@ -598,8 +564,7 @@ public final class SimpleSchemaLoader implements SchemaLoader {
 
   /**
    * @param node the JSON node to check.
-   * @return {@code true} for a number literal with no fractional or exponent part, e.g. {@code 5}
-   *     but not {@code 5.0}.
+   * @return {@code true} for a number literal with no fractional or exponent part, e.g. {@code 5} but not {@code 5.0}.
    */
   private static boolean isIntegralNumber(@Nullable JsonElement node) {
     if (node == null || !isNumber(node)) {
@@ -615,9 +580,8 @@ public final class SimpleSchemaLoader implements SchemaLoader {
   }
 
   /**
-   * Reads a property's {@code "example"} as a string, for {@code @Schema(example = "...")}. A
-   * scalar ({@code string}, number or boolean) is taken verbatim; an object / array example is
-   * ignored.
+   * Reads a property's {@code "example"} as a string, for {@code @Schema(example = "...")}. A scalar ({@code string},
+   * number or boolean) is taken verbatim; an object / array example is ignored.
    *
    * @param node the property node.
    * @return the example rendered as a string, or {@code null} when absent or not a scalar.

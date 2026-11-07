@@ -21,9 +21,9 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Per-schema override of a {@link ValidationConfig}, parsed from a schema file's top-level {@code
- * "features"} object. Each flag is {@code null} when the schema does not set it - {@link
- * ValidationConfig#withOverride} then keeps the project default.
+ * Per-schema override of a {@link ValidationConfig}, parsed from a schema file's top-level {@code "features"} object.
+ * Each flag is {@code null} when the schema does not set it - {@link ValidationConfig#withOverride} then keeps the
+ * project default.
  */
 public final class ValidationOverride {
 
@@ -40,10 +40,7 @@ public final class ValidationOverride {
    * @param annotateFields the {@code annotateFields} override, or {@code null}.
    * @param annotateGetters the {@code annotateGetters} override, or {@code null}.
    */
-  ValidationOverride(
-      @Nullable Boolean enabled,
-      @Nullable Boolean annotateFields,
-      @Nullable Boolean annotateGetters) {
+  ValidationOverride(@Nullable Boolean enabled, @Nullable Boolean annotateFields, @Nullable Boolean annotateGetters) {
     this.enabled = enabled;
     this.annotateFields = annotateFields;
     this.annotateGetters = annotateGetters;

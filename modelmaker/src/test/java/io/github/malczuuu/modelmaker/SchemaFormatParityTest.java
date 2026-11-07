@@ -27,10 +27,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * The whole point of {@link AvroSchemaLoader} is that its output is indistinguishable from {@link
- * SimpleSchemaLoader}'s once it reaches {@link JavaModelMaker} - same immutable POJO, same
- * annotations, same Builder. This asserts that directly: two schemas describing the same shape, one
- * per format, must render to the exact same Java source.
+ * The whole point of {@link AvroSchemaLoader} is that its output is indistinguishable from {@link SimpleSchemaLoader}'s
+ * once it reaches {@link JavaModelMaker} - same immutable POJO, same annotations, same Builder. This asserts that
+ * directly: two schemas describing the same shape, one per format, must render to the exact same Java source.
  */
 class SchemaFormatParityTest {
 
@@ -79,8 +78,7 @@ class SchemaFormatParityTest {
     ModelType fromJson = new SimpleSchemaLoader().load(List.of(json)).getFirst();
     ModelType fromAvro = new AvroSchemaLoader().load(List.of(avro)).getFirst();
 
-    ModelOptions options =
-        ModelOptions.builder().jackson(true).validation(true).withers(true).build();
+    ModelOptions options = ModelOptions.builder().jackson(true).validation(true).withers(true).build();
     String javaFromJson = new JavaModelMaker(options).emit(fromJson).replace("Widget", "Widget2");
     String javaFromAvro = new JavaModelMaker(options).emit(fromAvro);
 

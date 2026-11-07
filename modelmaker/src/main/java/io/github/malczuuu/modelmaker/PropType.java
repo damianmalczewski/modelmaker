@@ -32,8 +32,7 @@ public sealed interface PropType {
    *   <li>{@link #NUMBER} - JSON {@code "number"}, {@code format: "double"} (the default) or absent
    *   <li>{@link #FLOAT} - JSON {@code "number"}, {@code format: "float"}
    *   <li>{@link #BOOLEAN} - JSON {@code "boolean"}
-   *   <li>{@link #BYTES} - JSON {@code "bytes"} / Avro {@code "bytes"}; a {@code byte[]},
-   *       serialized as a base64 string
+   *   <li>{@link #BYTES} - JSON {@code "bytes"} / Avro {@code "bytes"}; a {@code byte[]}, serialized as a base64 string
    * </ul>
    */
   enum ScalarType implements PropType {
@@ -57,8 +56,8 @@ public sealed interface PropType {
     BOOLEAN,
 
     /**
-     * JSON {@code "bytes"} / Avro {@code "bytes"}. Emitted as a {@code byte[]} field with defensive
-     * copies in every accessor, and serialized as a base64 string by Jackson.
+     * JSON {@code "bytes"} / Avro {@code "bytes"}. Emitted as a {@code byte[]} field with defensive copies in every
+     * accessor, and serialized as a base64 string by Jackson.
      */
     BYTES
   }
@@ -114,10 +113,7 @@ public sealed interface PropType {
     }
   }
 
-  /**
-   * Reference to a top-level type (via {@code $ref}) or to an inline nested type by its simple
-   * name.
-   */
+  /** Reference to a top-level type (via {@code $ref}) or to an inline nested type by its simple name. */
   final class RefType implements PropType {
 
     private final String name;
@@ -169,8 +165,8 @@ public sealed interface PropType {
   }
 
   /**
-   * {@code $ref} to a built-in JDK type ({@code java.*} / {@code javax.*}), e.g. {@code
-   * java.time.Instant}. Emitted as its simple name with an import; no {@code @Valid} cascade.
+   * {@code $ref} to a built-in JDK type ({@code java.*} / {@code javax.*}), e.g. {@code java.time.Instant}. Emitted as
+   * its simple name with an import; no {@code @Valid} cascade.
    */
   final class ExternalType implements PropType {
 

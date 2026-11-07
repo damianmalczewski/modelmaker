@@ -27,21 +27,14 @@ class BuilderMutatorRendererTest {
   private static final ModelOptions OPTIONS = ModelOptions.builder().build();
 
   private static ModelType type(Property... properties) {
-    return new ModelType(
-        "Widget", "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
+    return new ModelType("Widget", "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
   }
 
   private static final ModelType WIDGET =
       type(
           property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
           property("note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null),
-          property(
-              "tags",
-              PropType.ArrayType.of(PropType.ScalarType.STRING),
-              false,
-              Constraints.none(),
-              "tags",
-              null));
+          property("tags", PropType.ArrayType.of(PropType.ScalarType.STRING), false, Constraints.none(), "tags", null));
 
   @Test
   void rendersTheSealedInterfaceWithOneSetterPerField() {
@@ -70,16 +63,14 @@ class BuilderMutatorRendererTest {
   void reportsNullableAndFieldTypeImports() {
     RenderResult result = new BuilderMutatorRenderer().init("", WIDGET, OPTIONS).render();
 
-    assertThat(result.getImports())
-        .containsExactlyInAnyOrder("org.jspecify.annotations.Nullable", "java.util.List");
+    assertThat(result.getImports()).containsExactlyInAnyOrder("org.jspecify.annotations.Nullable", "java.util.List");
   }
 
   @Test
   void aFieldLessInterfaceNeedsNoNullableImport() {
     RenderResult result = new BuilderMutatorRenderer().init("", type(), OPTIONS).render();
 
-    assertThat(result.getCode())
-        .isEqualTo("public sealed interface BuilderMutator permits Builder {\n" + "}\n");
+    assertThat(result.getCode()).isEqualTo("public sealed interface BuilderMutator permits Builder {\n" + "}\n");
     assertThat(result.getImports()).isEmpty();
   }
 

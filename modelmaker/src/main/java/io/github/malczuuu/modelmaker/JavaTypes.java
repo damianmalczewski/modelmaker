@@ -22,11 +22,10 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Resolves a {@link PropType} to the Java type name it is emitted as, adding any needed import to a
- * caller-supplied set. Bound to one target package and one {@link ModelOptions} - the settings that
- * decide primitive vs boxed scalars. Container-element annotations ({@code @Valid} and element
- * constraints) are the caller's job - see {@link #listType(PropType.ArrayType, java.util.List,
- * java.util.Set)}.
+ * Resolves a {@link PropType} to the Java type name it is emitted as, adding any needed import to a caller-supplied
+ * set. Bound to one target package and one {@link ModelOptions} - the settings that decide primitive vs boxed scalars.
+ * Container-element annotations ({@code @Valid} and element constraints) are the caller's job - see {@link
+ * #listType(PropType.ArrayType, java.util.List, java.util.Set)}.
  */
 final class JavaTypes {
 
@@ -38,8 +37,8 @@ final class JavaTypes {
   /**
    * Creates a new {@link JavaTypes}.
    *
-   * @param targetPackage the package the resolved model lives in, used to strip same-package {@link
-   *     PropType.RefType} names down to their simple name.
+   * @param targetPackage the package the resolved model lives in, used to strip same-package {@link PropType.RefType}
+   *     names down to their simple name.
    * @param options settings deciding primitive vs boxed scalars.
    */
   JavaTypes(String targetPackage, ModelOptions options) {
@@ -132,13 +131,12 @@ final class JavaTypes {
   }
 
   /**
-   * {@code List<...>}, with the given annotations placed on the element (container-element
-   * position), e.g. {@code List<@Size(min = 1) @Valid Foo>}. Only {@link FieldsRenderer} passes
-   * annotations - every other position renders the plain {@code List<T>}.
+   * {@code List<...>}, with the given annotations placed on the element (container-element position), e.g. {@code
+   * List<@Size(min = 1) @Valid Foo>}. Only {@link FieldsRenderer} passes annotations - every other position renders the
+   * plain {@code List<T>}.
    *
    * @param type the array type to resolve.
-   * @param elementAnnotations pre-rendered annotations (e.g. {@code "@Size(min = 1)"}) for the
-   *     element, or empty.
+   * @param elementAnnotations pre-rendered annotations (e.g. {@code "@Size(min = 1)"}) for the element, or empty.
    * @param imports import set to add any needed type to.
    * @return the rendered {@code List<...>} type.
    */
@@ -189,8 +187,7 @@ final class JavaTypes {
     if (!(obj instanceof JavaTypes other)) {
       return false;
     }
-    return Objects.equals(targetPackage, other.targetPackage)
-        && Objects.equals(options, other.options);
+    return Objects.equals(targetPackage, other.targetPackage) && Objects.equals(options, other.options);
   }
 
   @Override

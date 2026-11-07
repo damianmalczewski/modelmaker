@@ -20,14 +20,12 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Toggles for what {@link JavaModelMaker} puts on the generated model - the Java-side subset of
- * {@code modelmaker { features { } }}, with any per-schema feature overrides already applied. Built
- * through {@link #builder()}.
+ * Toggles for what {@link JavaModelMaker} puts on the generated model - the Java-side subset of {@code modelmaker {
+ * features { } }}, with any per-schema feature overrides already applied. Built through {@link #builder()}.
  *
- * <p>The three annotation-emitting features ({@code jackson}, {@code validation}, {@code openApi})
- * each carry their own config ({@link JacksonConfig}, {@link ValidationConfig}, {@link
- * OpenApiConfig}) - on/off plus field / getter placement. {@code withers} and {@code
- * preferPrimitives} are plain toggles.
+ * <p>The three annotation-emitting features ({@code jackson}, {@code validation}, {@code openApi}) each carry their own
+ * config ({@link JacksonConfig}, {@link ValidationConfig}, {@link OpenApiConfig}) - on/off plus field / getter
+ * placement. {@code withers} and {@code preferPrimitives} are plain toggles.
  */
 public final class ModelOptions {
 
@@ -107,8 +105,8 @@ public final class ModelOptions {
   }
 
   /**
-   * OpenAPI ({@code io.swagger.v3.oas.annotations}) {@code @Schema} configuration - on/off plus
-   * field / getter placement.
+   * OpenAPI ({@code io.swagger.v3.oas.annotations}) {@code @Schema} configuration - on/off plus field / getter
+   * placement.
    *
    * @return the configuration.
    */
@@ -117,8 +115,7 @@ public final class ModelOptions {
   }
 
   /**
-   * Starts a new {@link Builder} pre-filled with this instance's values, for producing a modified
-   * copy.
+   * Starts a new {@link Builder} pre-filled with this instance's values, for producing a modified copy.
    *
    * @return the pre-filled builder.
    */
@@ -174,8 +171,7 @@ public final class ModelOptions {
     private Builder() {}
 
     /**
-     * Always-set scalar fields use {@code int} / {@code double} / {@code boolean} when {@code
-     * true}.
+     * Always-set scalar fields use {@code int} / {@code double} / {@code boolean} when {@code true}.
      *
      * @param value {@code true} to turn it on.
      * @return {@code this}.

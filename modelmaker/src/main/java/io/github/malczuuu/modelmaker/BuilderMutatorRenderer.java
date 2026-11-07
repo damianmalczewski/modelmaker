@@ -20,12 +20,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Renders the {@code BuilderMutator} sealed interface for one model type - every fluent setter, no
- * {@code build()}, every method returning {@code BuilderMutator} so a {@code Mutator} reference can
- * never reach {@code build()}.
+ * Renders the {@code BuilderMutator} sealed interface for one model type - every fluent setter, no {@code build()},
+ * every method returning {@code BuilderMutator} so a {@code Mutator} reference can never reach {@code build()}.
  *
- * <p>Renders just the interface; the enclosing class, the {@code package} declaration and the
- * import list are the composing emitter's job.
+ * <p>Renders just the interface; the enclosing class, the {@code package} declaration and the import list are the
+ * composing emitter's job.
  */
 final class BuilderMutatorRenderer extends AbstractSnippetRenderer {
 

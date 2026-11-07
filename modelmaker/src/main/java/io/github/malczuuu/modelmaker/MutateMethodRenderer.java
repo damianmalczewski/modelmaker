@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Renders the {@code mutate()} instance method for one model type: returns a {@code Builder}
- * pre-filled from every property's current value, via {@code builder().x(x).y(y)...}. {@code
- * init}'s {@code options} argument is ignored - nothing here is feature-gated.
+ * Renders the {@code mutate()} instance method for one model type: returns a {@code Builder} pre-filled from every
+ * property's current value, via {@code builder().x(x).y(y)...}. {@code init}'s {@code options} argument is ignored -
+ * nothing here is feature-gated.
  *
- * <p>Renders just this one method; the enclosing class, its nested {@code Builder} and everything
- * else are the composing emitter's job.
+ * <p>Renders just this one method; the enclosing class, its nested {@code Builder} and everything else are the
+ * composing emitter's job.
  */
 final class MutateMethodRenderer implements SnippetRenderer {
 
@@ -36,8 +36,7 @@ final class MutateMethodRenderer implements SnippetRenderer {
   MutateMethodRenderer() {}
 
   /**
-   * Captures the indent and every property's name; {@code options} is ignored, since nothing here
-   * is feature-gated.
+   * Captures the indent and every property's name; {@code options} is ignored, since nothing here is feature-gated.
    *
    * @param indent leading whitespace prepended to every rendered line.
    * @param type the model type to render.
@@ -63,13 +62,7 @@ final class MutateMethodRenderer implements SnippetRenderer {
     code.append(indent).append("  return builder()");
     for (String name : names) {
       // chain of builder assignments within `mutate` method
-      code.append("\n")
-          .append(indent)
-          .append("      .")
-          .append(name)
-          .append('(')
-          .append(name)
-          .append(')');
+      code.append("\n").append(indent).append("      .").append(name).append('(').append(name).append(')');
     }
     code.append(";\n").append(indent).append("}\n\n");
     return new RenderResult(Set.of(), code.toString());

@@ -21,8 +21,8 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A schema {@code default} value, validated against the property type. Only scalars and arrays of
- * scalars are supported.
+ * A schema {@code default} value, validated against the property type. Only scalars and arrays of scalars are
+ * supported.
  */
 public sealed interface DefaultValue {
 

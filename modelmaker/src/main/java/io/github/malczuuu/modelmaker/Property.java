@@ -39,13 +39,12 @@ public final class Property {
    * @param type resolved property type.
    * @param required whether the JSON key is listed in the type's {@code required} array.
    * @param constraints validation keywords parsed from the property node.
-   * @param jsonName original JSON key, kept for {@code @JsonProperty} and
-   *     {@code @JsonPropertyOrder}.
+   * @param jsonName original JSON key, kept for {@code @JsonProperty} and {@code @JsonPropertyOrder}.
    * @param defaultValue {@code default} value, or {@code null}.
-   * @param description schema {@code description}, emitted as {@code @Schema(description = ...)}
-   *     when the {@code openApi} feature is on; {@code null} when unset.
-   * @param example schema {@code example} rendered as a string, emitted as {@code @Schema(example =
-   *     ...)} when the {@code openApi} feature is on; {@code null} when unset.
+   * @param description schema {@code description}, emitted as {@code @Schema(description = ...)} when the {@code
+   *     openApi} feature is on; {@code null} when unset.
+   * @param example schema {@code example} rendered as a string, emitted as {@code @Schema(example = ...)} when the
+   *     {@code openApi} feature is on; {@code null} when unset.
    * @param sensitive whether the value is masked in {@code toString()}.
    */
   Property(
@@ -106,8 +105,7 @@ public final class Property {
   }
 
   /**
-   * Original JSON key, kept for {@code @JsonProperty} and {@code @JsonPropertyOrder}; defaults to
-   * {@link #getName()}.
+   * Original JSON key, kept for {@code @JsonProperty} and {@code @JsonPropertyOrder}; defaults to {@link #getName()}.
    *
    * @return the JSON key.
    */
@@ -125,8 +123,7 @@ public final class Property {
   }
 
   /**
-   * Schema {@code description}, emitted as {@code @Schema(description = ...)} when the {@code
-   * openApi} feature is on.
+   * Schema {@code description}, emitted as {@code @Schema(description = ...)} when the {@code openApi} feature is on.
    *
    * @return the description, or {@code null} when unset.
    */
@@ -135,8 +132,8 @@ public final class Property {
   }
 
   /**
-   * Schema {@code example} rendered as a string, emitted as {@code @Schema(example = ...)} when the
-   * {@code openApi} feature is on.
+   * Schema {@code example} rendered as a string, emitted as {@code @Schema(example = ...)} when the {@code openApi}
+   * feature is on.
    *
    * @return the example, or {@code null} when unset.
    */
@@ -145,9 +142,9 @@ public final class Property {
   }
 
   /**
-   * Whether the value is masked in the generated {@code toString()}, from the schema's {@code
-   * "sensitive"} keyword. Masking covers the DTO's and the builder's {@code toString()} only -
-   * getters, {@code equals} and {@code hashCode} see the real value.
+   * Whether the value is masked in the generated {@code toString()}, from the schema's {@code "sensitive"} keyword.
+   * Masking covers the DTO's and the builder's {@code toString()} only - getters, {@code equals} and {@code hashCode}
+   * see the real value.
    *
    * @return {@code true} when the value is masked.
    */
@@ -185,8 +182,7 @@ public final class Property {
 
   @Override
   public int hashCode() {
-    return Objects.hash(
-        name, type, required, constraints, jsonName, defaultValue, description, example, sensitive);
+    return Objects.hash(name, type, required, constraints, jsonName, defaultValue, description, example, sensitive);
   }
 
   @Override

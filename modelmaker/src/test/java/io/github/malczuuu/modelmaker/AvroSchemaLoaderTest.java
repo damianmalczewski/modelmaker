@@ -39,13 +39,7 @@ class AvroSchemaLoaderTest {
   private Path schema(String namespace, String name, String body) {
     return write(
         namespace + "." + name + ".avsc",
-        "{ \"type\": \"record\", \"namespace\": \""
-            + namespace
-            + "\", \"name\": \""
-            + name
-            + "\", "
-            + body
-            + " }");
+        "{ \"type\": \"record\", \"namespace\": \"" + namespace + "\", \"name\": \"" + name + "\", " + body + " }");
   }
 
   private Path write(String name, String content) {
@@ -59,10 +53,7 @@ class AvroSchemaLoaderTest {
   }
 
   private static Property prop(ModelType type, String name) {
-    return type.getProperties().stream()
-        .filter(p -> p.getName().equals(name))
-        .findFirst()
-        .orElseThrow();
+    return type.getProperties().stream().filter(p -> p.getName().equals(name)).findFirst().orElseThrow();
   }
 
   @Test
@@ -154,8 +145,7 @@ class AvroSchemaLoaderTest {
             ]
             """);
 
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("field \"a\" is declared twice");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("field \"a\" is declared twice");
   }
 
   @Test
@@ -191,10 +181,8 @@ class AvroSchemaLoaderTest {
     Property status = prop(m, "status");
 
     assertThat(status.getType()).isEqualTo(PropType.ScalarType.STRING);
-    assertThat(status.getConstraints().getPattern())
-        .isEqualTo("^(\\QNEW\\E|\\QPAID\\E|\\QSHIPPED\\E)$");
-    assertThat(status.getConstraints().getPatternMessage())
-        .isEqualTo("must be one of NEW, PAID, SHIPPED");
+    assertThat(status.getConstraints().getPattern()).isEqualTo("^(\\QNEW\\E|\\QPAID\\E|\\QSHIPPED\\E)$");
+    assertThat(status.getConstraints().getPatternMessage()).isEqualTo("must be one of NEW, PAID, SHIPPED");
   }
 
   @Test
@@ -250,11 +238,7 @@ class AvroSchemaLoaderTest {
     ModelType m = loader.load(List.of(f)).getFirst();
 
     assertThat(
-            m.getProperties().stream()
-                .filter(p -> p.getName().equals("id"))
-                .findFirst()
-                .orElseThrow()
-                .getDescription())
+            m.getProperties().stream().filter(p -> p.getName().equals("id")).findFirst().orElseThrow().getDescription())
         .isEqualTo("the account id");
     assertThat(
             m.getProperties().stream()
@@ -288,8 +272,7 @@ class AvroSchemaLoaderTest {
 
     assertThat(order.getFeatureOverrides())
         .isEqualTo(FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build());
-    assertThat(order.getNested().getFirst().getFeatureOverrides())
-        .isEqualTo(FeatureOverrides.none());
+    assertThat(order.getNested().getFirst().getFeatureOverrides()).isEqualTo(FeatureOverrides.none());
   }
 
   @Test
@@ -310,8 +293,7 @@ class AvroSchemaLoaderTest {
             "x.Bad.avsc",
             "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Bad\", \"features\": {"
                 + " \"jackson\": true }, \"fields\": [] }");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("\"features.jackson\" must be an object");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("\"features.jackson\" must be an object");
   }
 
   @Test
@@ -320,23 +302,19 @@ class AvroSchemaLoaderTest {
         schema(
             "x",
             "Order",
-            "\"fields\": [ { \"name\": \"tags\", \"type\": { \"type\": \"array\", \"items\":"
-                + " \"string\" } } ]");
+            "\"fields\": [ { \"name\": \"tags\", \"type\": { \"type\": \"array\", \"items\":" + " \"string\" } } ]");
     ModelType m = loader.load(List.of(f)).getFirst();
 
-    assertThat(prop(m, "tags").getType())
-        .isEqualTo(PropType.ArrayType.of(PropType.ScalarType.STRING));
+    assertThat(prop(m, "tags").getType()).isEqualTo(PropType.ArrayType.of(PropType.ScalarType.STRING));
   }
 
   @Test
   void aNamedTypeReferenceResolvesAcrossFiles() {
     schema("x", "Address", "\"fields\": [ { \"name\": \"city\", \"type\": \"string\" } ]");
-    Path f =
-        schema("x", "Order", "\"fields\": [ { \"name\": \"shipTo\", \"type\": \"x.Address\" } ]");
+    Path f = schema("x", "Order", "\"fields\": [ { \"name\": \"shipTo\", \"type\": \"x.Address\" } ]");
 
     List<ModelType> types = loader.load(List.of(f, dir.resolve("x.Address.avsc")));
-    ModelType order =
-        types.stream().filter(t -> t.getName().equals("Order")).findFirst().orElseThrow();
+    ModelType order = types.stream().filter(t -> t.getName().equals("Order")).findFirst().orElseThrow();
 
     assertThat(prop(order, "shipTo").getType()).isEqualTo(PropType.RefType.of("x.Address"));
   }
@@ -365,8 +343,7 @@ class AvroSchemaLoaderTest {
 
     assertThat(prop(m, "active").getDefaultValue()).isEqualTo(DefaultValue.Bool.of(true));
     assertThat(prop(m, "currency").getDefaultValue()).isEqualTo(DefaultValue.Str.of("USD"));
-    assertThat(prop(m, "roles").getDefaultValue())
-        .isEqualTo(DefaultValue.Arr.of(List.of(DefaultValue.Str.of("user"))));
+    assertThat(prop(m, "roles").getDefaultValue()).isEqualTo(DefaultValue.Arr.of(List.of(DefaultValue.Str.of("user"))));
     assertThat(prop(m, "active").nonNull()).isTrue();
   }
 
@@ -376,10 +353,8 @@ class AvroSchemaLoaderTest {
         schema(
             "x",
             "D",
-            "\"fields\": [ { \"name\": \"a\", \"type\": { \"type\": \"map\", \"values\":"
-                + " \"string\" } } ]");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("\"map\" is not supported");
+            "\"fields\": [ { \"name\": \"a\", \"type\": { \"type\": \"map\", \"values\":" + " \"string\" } } ]");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("\"map\" is not supported");
   }
 
   @Test
@@ -390,24 +365,18 @@ class AvroSchemaLoaderTest {
             "D",
             "\"fields\": [ { \"name\": \"a\", \"type\": { \"type\": \"fixed\", \"name\": \"Md5\","
                 + " \"size\": 16 } } ]");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("\"fixed\" is not supported");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("\"fixed\" is not supported");
   }
 
   @Test
   void rejectsAMultiBranchUnion() {
-    Path f =
-        schema(
-            "x",
-            "D",
-            "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"string\", \"int\"] } ]");
+    Path f = schema("x", "D", "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"string\", \"int\"] } ]");
     assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("unsupported union");
   }
 
   @Test
   void rejectsANonNullableUnion() {
-    Path f =
-        schema("x", "D", "\"fields\": [ { \"name\": \"a\", \"type\": [\"string\", \"int\"] } ]");
+    Path f = schema("x", "D", "\"fields\": [ { \"name\": \"a\", \"type\": [\"string\", \"int\"] } ]");
     assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("unsupported union");
   }
 
@@ -435,16 +404,13 @@ class AvroSchemaLoaderTest {
   @Test
   void rejectsARootThatIsNotAJsonObject() {
     Path f = write("x.Bad.avsc", "[]");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("root must be a JSON object");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("root must be a JSON object");
   }
 
   @Test
   void rejectsARecordMissingFieldsArray() {
-    Path f =
-        write("x.Bad.avsc", "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Bad\" }");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("missing \"fields\" array");
+    Path f = write("x.Bad.avsc", "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Bad\" }");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("missing \"fields\" array");
   }
 
   @Test
@@ -452,10 +418,8 @@ class AvroSchemaLoaderTest {
     Path f =
         write(
             "x.Bad.avsc",
-            "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Bad\", \"fields\": ["
-                + " \"nope\" ] }");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("each field must be an object");
+            "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Bad\", \"fields\": [" + " \"nope\" ] }");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("each field must be an object");
   }
 
   @Test
@@ -478,8 +442,7 @@ class AvroSchemaLoaderTest {
 
   @Test
   void rejectsAnArrayMissingItems() {
-    Path f =
-        schema("x", "D", "\"fields\": [ { \"name\": \"a\", \"type\": { \"type\": \"array\" } } ]");
+    Path f = schema("x", "D", "\"fields\": [ { \"name\": \"a\", \"type\": { \"type\": \"array\" } } ]");
     assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("array needs \"items\"");
   }
 
@@ -491,41 +454,26 @@ class AvroSchemaLoaderTest {
             "D",
             "\"fields\": [ { \"name\": \"a\", \"type\": { \"type\": \"array\", \"items\": {"
                 + " \"type\": \"array\", \"items\": \"string\" } } } ]");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("nested arrays are not supported");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("nested arrays are not supported");
   }
 
   @Test
   void rejectsAnEnumMissingSymbols() {
     Path f =
-        schema(
-            "x",
-            "D",
-            "\"fields\": [ { \"name\": \"a\", \"type\": { \"type\": \"enum\", \"name\": \"E\" } }"
-                + " ]");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("enum needs \"symbols\"");
+        schema("x", "D", "\"fields\": [ { \"name\": \"a\", \"type\": { \"type\": \"enum\", \"name\": \"E\" } }" + " ]");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("enum needs \"symbols\"");
   }
 
   @Test
   void rejectsAStringDefaultOfTheWrongType() {
     Path f =
-        schema(
-            "x",
-            "D",
-            "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"string\"],"
-                + " \"default\": 5 } ]");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("default must be a string");
+        schema("x", "D", "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"string\"]," + " \"default\": 5 } ]");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("default must be a string");
   }
 
   @Test
   void parsesAValidIntegerOrLongDefault() {
-    Path f =
-        schema(
-            "x",
-            "D",
-            "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"int\"], \"default\": 42 } ]");
+    Path f = schema("x", "D", "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"int\"], \"default\": 42 } ]");
     ModelType m = loader.load(List.of(f)).getFirst();
     assertThat(prop(m, "a").getDefaultValue()).isEqualTo(DefaultValue.Num.of("42"));
   }
@@ -533,23 +481,15 @@ class AvroSchemaLoaderTest {
   @Test
   void rejectsAnIntegerDefaultOfTheWrongType() {
     Path f =
-        schema(
-            "x",
-            "D",
-            "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"int\"], \"default\": \"x\" }"
-                + " ]");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("default must be an integer");
+        schema("x", "D", "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"int\"], \"default\": \"x\" }" + " ]");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("default must be an integer");
   }
 
   @Test
   void parsesAValidFloatOrDoubleDefault() {
     Path f =
         schema(
-            "x",
-            "D",
-            "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"double\"], \"default\": 1.5 }"
-                + " ]");
+            "x", "D", "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"double\"], \"default\": 1.5 }" + " ]");
     ModelType m = loader.load(List.of(f)).getFirst();
     assertThat(prop(m, "a").getDefaultValue()).isEqualTo(DefaultValue.Num.of("1.5"));
   }
@@ -558,12 +498,8 @@ class AvroSchemaLoaderTest {
   void rejectsANumberDefaultOfTheWrongType() {
     Path f =
         schema(
-            "x",
-            "D",
-            "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"double\"], \"default\": \"x\""
-                + " } ]");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("default must be a number");
+            "x", "D", "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"double\"], \"default\": \"x\"" + " } ]");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("default must be a number");
   }
 
   @Test
@@ -572,10 +508,8 @@ class AvroSchemaLoaderTest {
         schema(
             "x",
             "D",
-            "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"boolean\"], \"default\":"
-                + " \"x\" } ]");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("default must be a boolean");
+            "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", \"boolean\"], \"default\":" + " \"x\" } ]");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("default must be a boolean");
   }
 
   @Test
@@ -586,8 +520,7 @@ class AvroSchemaLoaderTest {
             "D",
             "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", { \"type\": \"array\","
                 + " \"items\": \"string\" }], \"default\": \"x\" } ]");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("default must be an array");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("default must be an array");
   }
 
   @Test
@@ -611,8 +544,7 @@ class AvroSchemaLoaderTest {
             "D",
             "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", { \"type\": \"array\","
                 + " \"items\": \"string\" }], \"default\": [\"x\", null] } ]");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("array default elements must not be null");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("array default elements must not be null");
   }
 
   @Test
@@ -623,15 +555,13 @@ class AvroSchemaLoaderTest {
             "D",
             "\"fields\": [ { \"name\": \"a\", \"type\": [\"null\", { \"type\": \"record\","
                 + " \"name\": \"E\", \"fields\": [] }], \"default\": {} } ]");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("default is not supported for this type");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("default is not supported for this type");
   }
 
   @Test
   void rejectsATopLevelTypeThatIsNotARecord() {
     Path f = write("x.Bad.avsc", "{ \"type\": \"enum\", \"name\": \"Bad\", \"symbols\": [\"A\"] }");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("top-level \"type\" must be \"record\"");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("top-level \"type\" must be \"record\"");
   }
 
   @Test
@@ -642,12 +572,8 @@ class AvroSchemaLoaderTest {
 
   @Test
   void rejectsAFileNameThatDoesNotMatchNamespaceAndName() {
-    Path f =
-        write(
-            "wrong.avsc",
-            "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Bad\", \"fields\": [] }");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("must be named \"x.Bad.avsc\"");
+    Path f = write("wrong.avsc", "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Bad\", \"fields\": [] }");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("must be named \"x.Bad.avsc\"");
   }
 
   @Test

@@ -22,21 +22,18 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Renders the all-args constructor for one model type (no-arg when it has no properties).
- * Package-private with {@code @JsonCreator}/{@code @JsonProperty} when {@link
- * ModelOptions#getJackson()} is on, so Jackson deserializes through it directly instead of through
- * the {@code Builder}; otherwise private. A defaulted property's parameter falls back to its {@code
- * default} when {@code null}.
+ * Renders the all-args constructor for one model type (no-arg when it has no properties). Package-private with
+ * {@code @JsonCreator}/{@code @JsonProperty} when {@link ModelOptions#getJackson()} is on, so Jackson deserializes
+ * through it directly instead of through the {@code Builder}; otherwise private. A defaulted property's parameter falls
+ * back to its {@code default} when {@code null}.
  *
- * <p>Renders just the constructor; the enclosing class, its fields and everything else are the
- * composing emitter's job.
+ * <p>Renders just the constructor; the enclosing class, its fields and everything else are the composing emitter's job.
  */
 final class ConstructorRenderer extends AbstractSnippetRenderer {
 
   private static final String NULLABLE_IMPORT = "org.jspecify.annotations.Nullable";
   private static final String JSON_CREATOR_IMPORT = "com.fasterxml.jackson.annotation.JsonCreator";
-  private static final String JSON_PROPERTY_IMPORT =
-      "com.fasterxml.jackson.annotation.JsonProperty";
+  private static final String JSON_PROPERTY_IMPORT = "com.fasterxml.jackson.annotation.JsonProperty";
 
   private String typeName = "";
 
@@ -95,15 +92,8 @@ final class ConstructorRenderer extends AbstractSnippetRenderer {
     for (Property p : properties) {
       DefaultValue d = p.getDefaultValue();
       String rhs =
-          d != null
-              ? p.getName() + " != null ? " + p.getName() + " : " + renderDefault(d, p.getType())
-              : p.getName();
-      code.append(indent)
-          .append("  this.")
-          .append(p.getName())
-          .append(" = ")
-          .append(rhs)
-          .append(";\n");
+          d != null ? p.getName() + " != null ? " + p.getName() + " : " + renderDefault(d, p.getType()) : p.getName();
+      code.append(indent).append("  this.").append(p.getName()).append(" = ").append(rhs).append(";\n");
     }
     code.append(indent).append("}\n");
 
@@ -111,9 +101,9 @@ final class ConstructorRenderer extends AbstractSnippetRenderer {
   }
 
   /**
-   * Type of the constructor parameter: a primitive scalar only for a {@code required} value when
-   * {@code preferPrimitives} is on; a defaulted or optional value takes a {@code @Nullable} box so
-   * a {@code null} from an absent field maps to the default.
+   * Type of the constructor parameter: a primitive scalar only for a {@code required} value when {@code
+   * preferPrimitives} is on; a defaulted or optional value takes a {@code @Nullable} box so a {@code null} from an
+   * absent field maps to the default.
    *
    * @param prop the property to type.
    * @param imports import set to add any needed type to.
@@ -128,11 +118,10 @@ final class ConstructorRenderer extends AbstractSnippetRenderer {
   }
 
   /**
-   * Renders a default value literal. {@code type} decides the Java literal suffix a numeric default
-   * needs: {@code L} for a {@link PropType.ScalarType#LONG} field (a bare int literal wouldn't
-   * compile for a value past {@code Integer.MAX_VALUE}), {@code f} for a {@link
-   * PropType.ScalarType#FLOAT} field (a bare decimal literal is a {@code double}, and assigning
-   * that to a {@code float} without the suffix is a lossy-conversion compile error).
+   * Renders a default value literal. {@code type} decides the Java literal suffix a numeric default needs: {@code L}
+   * for a {@link PropType.ScalarType#LONG} field (a bare int literal wouldn't compile for a value past {@code
+   * Integer.MAX_VALUE}), {@code f} for a {@link PropType.ScalarType#FLOAT} field (a bare decimal literal is a {@code
+   * double}, and assigning that to a {@code float} without the suffix is a lossy-conversion compile error).
    *
    * @param value the default to render.
    * @param type the property's (or, recursively, the array element's) type.
@@ -157,9 +146,7 @@ final class ConstructorRenderer extends AbstractSnippetRenderer {
     }
     DefaultValue.Arr arr = (DefaultValue.Arr) value;
     PropType itemType = ((PropType.ArrayType) type).getItems();
-    return "List.of("
-        + arr.getElements().stream().map(e -> renderDefault(e, itemType)).collect(joining(", "))
-        + ")";
+    return "List.of(" + arr.getElements().stream().map(e -> renderDefault(e, itemType)).collect(joining(", ")) + ")";
   }
 
   private static String escapeJava(String s) {

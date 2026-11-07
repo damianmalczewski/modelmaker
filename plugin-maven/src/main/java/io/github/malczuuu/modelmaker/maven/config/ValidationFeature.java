@@ -17,8 +17,7 @@
 package io.github.malczuuu.modelmaker.maven.config;
 
 /**
- * The {@code validation} feature: whether its {@code jakarta.validation} constraints are emitted,
- * and where they sit.
+ * The {@code validation} feature: whether its {@code jakarta.validation} constraints are emitted, and where they sit.
  *
  * <pre>
  * &lt;validation&gt;
@@ -28,8 +27,7 @@ package io.github.malczuuu.modelmaker.maven.config;
  * &lt;/validation&gt;
  * </pre>
  *
- * <p>With both {@code annotateFields} and {@code annotateGetters} on, the annotations are emitted
- * on both.
+ * <p>With both {@code annotateFields} and {@code annotateGetters} on, the annotations are emitted on both.
  */
 public class ValidationFeature {
 
@@ -37,9 +35,7 @@ public class ValidationFeature {
   private boolean annotateFields = false;
   private boolean annotateGetters = true;
 
-  /**
-   * Creates a new {@link ValidationFeature}, turned off and annotating the getters once enabled.
-   */
+  /** Creates a new {@link ValidationFeature}, turned off and annotating the getters once enabled. */
   public ValidationFeature() {}
 
   /**

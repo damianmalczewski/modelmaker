@@ -28,8 +28,7 @@ class ConstructorRendererTest {
   private static final ModelOptions JACKSON = ModelOptions.builder().jackson(true).build();
 
   private static ModelType type(String name, Property... properties) {
-    return new ModelType(
-        name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
+    return new ModelType(name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
   }
 
   private static final ModelType WIDGET =
@@ -122,10 +121,8 @@ class ConstructorRendererTest {
 
     RenderResult result = new ConstructorRenderer().init("", withDefault, OPTIONS).render();
 
-    assertThat(result.getCode())
-        .contains("this.roles = roles != null ? roles : List.of(\"user\");");
-    assertThat(result.getImports())
-        .containsExactlyInAnyOrder("org.jspecify.annotations.Nullable", "java.util.List");
+    assertThat(result.getCode()).contains("this.roles = roles != null ? roles : List.of(\"user\");");
+    assertThat(result.getImports()).containsExactlyInAnyOrder("org.jspecify.annotations.Nullable", "java.util.List");
   }
 
   @Test
@@ -140,15 +137,8 @@ class ConstructorRendererTest {
     ModelType blob =
         type(
             "Blob",
-            property(
-                "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
-            property(
-                "signature",
-                PropType.ScalarType.BYTES,
-                false,
-                Constraints.none(),
-                "signature",
-                null));
+            property("payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
+            property("signature", PropType.ScalarType.BYTES, false, Constraints.none(), "signature", null));
 
     RenderResult result = new ConstructorRenderer().init("", blob, OPTIONS).render();
 

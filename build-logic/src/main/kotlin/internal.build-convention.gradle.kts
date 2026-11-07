@@ -48,7 +48,7 @@ tasks.withType<JavaCompile>().configureEach {
         }
     }
 }
-tasks.named<JavaCompile>("compileJava").configure {
+tasks.named<JavaCompile>("compileJava") {
     options.release = javaTargetVersion
 }
 
@@ -69,7 +69,7 @@ pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
             javaParameters = true
         }
     }
-    tasks.named<KotlinCompile>("compileKotlin").configure {
+    tasks.named<KotlinCompile>("compileKotlin") {
         compilerOptions {
             jvmTarget = JvmTarget.fromTarget(javaTargetVersion.toString())
         }

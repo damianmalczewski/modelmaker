@@ -26,11 +26,10 @@ class ConstraintUtilsTest {
 
   private static List<String> render(Property prop) {
     return ConstraintUtils.constraintAnnotationsOf(prop).stream()
-        .map(
-            it ->
-                it.getArgs().isEmpty()
-                    ? it.getSimpleName()
-                    : it.getSimpleName() + "(" + String.join(", ", it.getArgs()) + ")")
+        .map(it ->
+            it.getArgs().isEmpty()
+                ? it.getSimpleName()
+                : it.getSimpleName() + "(" + String.join(", ", it.getArgs()) + ")")
         .toList();
   }
 
@@ -50,12 +49,9 @@ class ConstraintUtilsTest {
     assertThat(rendered).contains("NotNull(message = \"must not be null\")");
     assertThat(rendered).contains("Valid");
     assertThat(rendered).contains("Size(min = 2, message = \"size must be at least 2\")");
-    assertThat(rendered)
-        .contains(
-            "DecimalMin(value = \"0.5\", message = \"must be greater than or equal to 0.5\")");
+    assertThat(rendered).contains("DecimalMin(value = \"0.5\", message = \"must be greater than or equal to 0.5\")");
     assertThat(rendered.stream().filter(it -> it.startsWith("Pattern")).findFirst().orElseThrow())
-        .isEqualTo(
-            "Pattern(regexp = \"^a\\\"b\\\\c\", message = \"must match \\\"^a\\\"b\\\\c\\\"\")");
+        .isEqualTo("Pattern(regexp = \"^a\\\"b\\\\c\", message = \"must match \\\"^a\\\"b\\\\c\\\"\")");
 
     // @Valid alone, no message
     assertThat(
@@ -73,11 +69,10 @@ class ConstraintUtilsTest {
         ConstraintUtils.elementConstraintAnnotationsOf(
                 Constraints.builder().minLength(1).maxLength(255).pattern("^x").build())
             .stream()
-            .map(
-                it ->
-                    it.getArgs().isEmpty()
-                        ? it.getSimpleName()
-                        : it.getSimpleName() + "(" + String.join(", ", it.getArgs()) + ")")
+            .map(it ->
+                it.getArgs().isEmpty()
+                    ? it.getSimpleName()
+                    : it.getSimpleName() + "(" + String.join(", ", it.getArgs()) + ")")
             .toList();
 
     assertThat(rendered)

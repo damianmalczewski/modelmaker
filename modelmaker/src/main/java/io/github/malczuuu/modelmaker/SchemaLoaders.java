@@ -26,13 +26,13 @@ import java.util.Objects;
 public final class SchemaLoaders {
 
   /**
-   * Creates a {@link SchemaLoader} that dispatches by file extension: {@code *.json} to a {@link
-   * SimpleSchemaLoader}, {@code *.avsc} to an {@link AvroSchemaLoader}. This is the loader a
-   * build-tool integration (or any other caller with a mixed source directory) should use; {@link
-   * SimpleSchemaLoader} and {@link AvroSchemaLoader} both stay usable standalone too.
+   * Creates a {@link SchemaLoader} that dispatches by file extension: {@code *.json} to a {@link SimpleSchemaLoader},
+   * {@code *.avsc} to an {@link AvroSchemaLoader}. This is the loader a build-tool integration (or any other caller
+   * with a mixed source directory) should use; {@link SimpleSchemaLoader} and {@link AvroSchemaLoader} both stay usable
+   * standalone too.
    *
-   * <p>Avro support is experimental and may be removed - see {@link AvroSchemaLoader}. Schemas in
-   * this project's own format keep loading through this method either way.
+   * <p>Avro support is experimental and may be removed - see {@link AvroSchemaLoader}. Schemas in this project's own
+   * format keep loading through this method either way.
    *
    * @return a new delegating {@link SchemaLoader}.
    */
@@ -43,9 +43,9 @@ public final class SchemaLoaders {
   private SchemaLoaders() {}
 
   /**
-   * {@link SchemaLoader} that routes each file to the delegate whose {@link
-   * SchemaLoader#canLoad(String)} accepts its extension. Each format resolves its own named-type
-   * references only within its own file set - there is no cross-format reference resolution.
+   * {@link SchemaLoader} that routes each file to the delegate whose {@link SchemaLoader#canLoad(String)} accepts its
+   * extension. Each format resolves its own named-type references only within its own file set - there is no
+   * cross-format reference resolution.
    *
    * <p>Package-private; created through {@link SchemaLoaders#createDelegatingSchemaLoader()}.
    */
@@ -54,11 +54,10 @@ public final class SchemaLoaders {
     private final List<SchemaLoader> loaders;
 
     /**
-     * Creates a new {@link DelegatingSchemaLoader}, delegating to the given loaders, tried in
-     * order.
+     * Creates a new {@link DelegatingSchemaLoader}, delegating to the given loaders, tried in order.
      *
-     * @param loaders the delegates; the first one whose {@link SchemaLoader#canLoad(String)}
-     *     accepts a file's extension parses it.
+     * @param loaders the delegates; the first one whose {@link SchemaLoader#canLoad(String)} accepts a file's extension
+     *     parses it.
      */
     DelegatingSchemaLoader(SchemaLoader... loaders) {
       this.loaders = List.of(loaders);

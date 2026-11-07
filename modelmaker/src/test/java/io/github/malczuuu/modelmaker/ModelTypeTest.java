@@ -30,9 +30,7 @@ class ModelTypeTest {
         "com.example.dto",
         "A widget.",
         List.of(property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null)),
-        List.of(
-            new ModelType(
-                "Nested", "com.example.dto", null, List.of(), List.of(), FeatureOverrides.none())),
+        List.of(new ModelType("Nested", "com.example.dto", null, List.of(), List.of(), FeatureOverrides.none())),
         FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build());
   }
 
@@ -86,8 +84,6 @@ class ModelTypeTest {
         .contains("name=Widget")
         .contains("packageName=com.example.dto")
         .contains("description=A widget.")
-        .contains(
-            "featureOverrides="
-                + FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build());
+        .contains("featureOverrides=" + FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build());
   }
 }

@@ -60,26 +60,18 @@ class ConstraintsTest {
 
   @Test
   void notEqualWhenEmailDiffers() {
-    assertThat(Constraints.builder().email(true).build())
-        .isNotEqualTo(Constraints.builder().email(false).build());
+    assertThat(Constraints.builder().email(true).build()).isNotEqualTo(Constraints.builder().email(false).build());
   }
 
   @Test
   void notEqualWhenMinItemsDiffers() {
-    assertThat(Constraints.builder().minItems(1).build())
-        .isNotEqualTo(Constraints.builder().minItems(2).build());
+    assertThat(Constraints.builder().minItems(1).build()).isNotEqualTo(Constraints.builder().minItems(2).build());
   }
 
   @Test
   void notEqualWhenElementConstraintsDiffer() {
-    assertThat(
-            Constraints.builder()
-                .elementConstraints(Constraints.builder().minLength(1).build())
-                .build())
-        .isNotEqualTo(
-            Constraints.builder()
-                .elementConstraints(Constraints.builder().minLength(2).build())
-                .build());
+    assertThat(Constraints.builder().elementConstraints(Constraints.builder().minLength(1).build()).build())
+        .isNotEqualTo(Constraints.builder().elementConstraints(Constraints.builder().minLength(2).build()).build());
   }
 
   @Test

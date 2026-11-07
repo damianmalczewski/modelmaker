@@ -59,8 +59,7 @@ class DelegatingSchemaLoaderTest {
 
     List<ModelType> types = loader.load(List.of(json, avro));
 
-    assertThat(types.stream().map(ModelType::getName))
-        .containsExactlyInAnyOrder("Widget", "Gadget");
+    assertThat(types.stream().map(ModelType::getName)).containsExactlyInAnyOrder("Widget", "Gadget");
   }
 
   @Test
@@ -86,8 +85,7 @@ class DelegatingSchemaLoaderTest {
   @Test
   void rejectsAFileWithNoExtensionAtAll() {
     Path f = write("Widget", "irrelevant");
-    assertThatThrownBy(() -> loader.load(List.of(f)))
-        .hasMessageContaining("unsupported file extension \"\"");
+    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("unsupported file extension \"\"");
   }
 
   @Test
@@ -108,8 +106,7 @@ class DelegatingSchemaLoaderTest {
             "{ \"$modelmaker\": \"v1.0\", \"title\": \"x.Widget\", \"type\": \"object\","
                 + " \"properties\": { \"id\": { \"type\": \"string\" } } }");
 
-    assertThat(loader.load(List.of(json)).stream().map(ModelType::getName))
-        .containsExactly("Widget");
+    assertThat(loader.load(List.of(json)).stream().map(ModelType::getName)).containsExactly("Widget");
   }
 
   @Test
@@ -120,8 +117,7 @@ class DelegatingSchemaLoaderTest {
             "{ \"type\": \"record\", \"namespace\": \"x\", \"name\": \"Gadget\", \"fields\": ["
                 + " { \"name\": \"id\", \"type\": \"string\" } ] }");
 
-    assertThat(loader.load(List.of(avro)).stream().map(ModelType::getName))
-        .containsExactly("Gadget");
+    assertThat(loader.load(List.of(avro)).stream().map(ModelType::getName)).containsExactly("Gadget");
   }
 
   @Test

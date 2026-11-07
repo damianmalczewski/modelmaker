@@ -23,18 +23,16 @@ import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Parses the top-level {@code "features"} object shared by both schema formats. Each entry is
- * itself an object: {@code jackson} takes {@code { enabled, annotateFields, annotateGetters,
- * includeNonNull }}, {@code validation} / {@code openApi} the same minus {@code includeNonNull};
- * {@code withers} / {@code preferPrimitives} take {@code { enabled }}. An unset key falls through
- * to the project default.
+ * Parses the top-level {@code "features"} object shared by both schema formats. Each entry is itself an object: {@code
+ * jackson} takes {@code { enabled, annotateFields, annotateGetters, includeNonNull }}, {@code validation} / {@code
+ * openApi} the same minus {@code includeNonNull}; {@code withers} / {@code preferPrimitives} take {@code { enabled }}.
+ * An unset key falls through to the project default.
  */
 final class FeatureOverridesParser {
 
   private static final Set<String> ANNOTATION_FEATURES = Set.of("jackson", "validation", "openApi");
   private static final Set<String> TOGGLE_FEATURES = Set.of("withers", "preferPrimitives");
-  private static final Set<String> ANNOTATION_KEYS =
-      Set.of("enabled", "annotateFields", "annotateGetters");
+  private static final Set<String> ANNOTATION_KEYS = Set.of("enabled", "annotateFields", "annotateGetters");
   private static final Set<String> JACKSON_KEYS =
       Set.of("enabled", "annotateFields", "annotateGetters", "includeNonNull");
   private static final Set<String> TOGGLE_KEYS = Set.of("enabled");
@@ -44,8 +42,7 @@ final class FeatureOverridesParser {
   /**
    * Creates a new parser.
    *
-   * @param fail builds the loader's format-error exception from a message (the loader adds the file
-   *     context).
+   * @param fail builds the loader's format-error exception from a message (the loader adds the file context).
    */
   FeatureOverridesParser(Function<String, RuntimeException> fail) {
     this.fail = fail;
@@ -55,8 +52,7 @@ final class FeatureOverridesParser {
    * Parses one {@code "features"} object.
    *
    * @param features the object, or {@code null} when {@code "features"} is absent.
-   * @return the parsed overrides ({@link FeatureOverrides#none()} when {@code features} is {@code
-   *     null}).
+   * @return the parsed overrides ({@link FeatureOverrides#none()} when {@code features} is {@code null}).
    */
   FeatureOverrides parse(@Nullable JsonObject features) {
     if (features == null) {
@@ -69,11 +65,8 @@ final class FeatureOverridesParser {
     }
     return FeatureOverrides.builder()
         .jackson(jacksonOverride(features))
-        .validation(
-            annotationOverride(
-                features, "validation", ValidationOverride.none(), ValidationOverride::new))
-        .openApi(
-            annotationOverride(features, "openApi", OpenApiOverride.none(), OpenApiOverride::new))
+        .validation(annotationOverride(features, "validation", ValidationOverride.none(), ValidationOverride::new))
+        .openApi(annotationOverride(features, "openApi", OpenApiOverride.none(), OpenApiOverride::new))
         .withers(toggleOverride(features, "withers"))
         .preferPrimitives(toggleOverride(features, "preferPrimitives"))
         .build();
@@ -82,10 +75,7 @@ final class FeatureOverridesParser {
   /** Builds one feature's typed override from three {@code @Nullable Boolean} flags. */
   @FunctionalInterface
   private interface OverrideFactory<T> {
-    T create(
-        @Nullable Boolean enabled,
-        @Nullable Boolean annotateFields,
-        @Nullable Boolean annotateGetters);
+    T create(@Nullable Boolean enabled, @Nullable Boolean annotateFields, @Nullable Boolean annotateGetters);
   }
 
   /** {@code jackson} carries one key more than the other annotation features. */
@@ -101,8 +91,7 @@ final class FeatureOverridesParser {
         boolFlag(obj, "jackson", "includeNonNull"));
   }
 
-  private <T> T annotationOverride(
-      JsonObject features, String feature, T none, OverrideFactory<T> factory) {
+  private <T> T annotationOverride(JsonObject features, String feature, T none, OverrideFactory<T> factory) {
     if (member(features, feature) == null) {
       return none;
     }
@@ -123,8 +112,7 @@ final class FeatureOverridesParser {
   private JsonObject featureObject(JsonObject features, String feature, Set<String> allowedKeys) {
     JsonElement node = member(features, feature);
     if (node == null || !node.isJsonObject()) {
-      throw fail.apply(
-          "\"features." + feature + "\" must be an object, e.g. { \"enabled\": true }");
+      throw fail.apply("\"features." + feature + "\" must be an object, e.g. { \"enabled\": true }");
     }
     JsonObject obj = node.getAsJsonObject();
     for (String key : obj.keySet()) {

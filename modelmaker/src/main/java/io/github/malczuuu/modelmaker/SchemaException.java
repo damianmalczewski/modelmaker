@@ -22,24 +22,23 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Thrown when a schema cannot be loaded - malformed JSON, a missing or unsupported keyword, a
- * property name that does not normalize to a Java identifier, an unresolvable {@code $ref}, and so
- * on.
+ * Thrown when a schema cannot be loaded - malformed JSON, a missing or unsupported keyword, a property name that does
+ * not normalize to a Java identifier, an unresolvable {@code $ref}, and so on.
  *
- * <p>Instances come from the loaders: the constructors are package-private, as nothing outside this
- * package is in a position to report a schema problem.
+ * <p>Instances come from the loaders: the constructors are package-private, as nothing outside this package is in a
+ * position to report a schema problem.
  *
- * <p>{@link #getFile()} names the schema file the problem was found in, when it is attributable to
- * one. A load that turns up problems in several files throws one exception whose {@link
- * #getErrors()} lists them all, its {@link #getFile()} being {@code null}.
+ * <p>{@link #getFile()} names the schema file the problem was found in, when it is attributable to one. A load that
+ * turns up problems in several files throws one exception whose {@link #getErrors()} lists them all, its {@link
+ * #getFile()} being {@code null}.
  */
 public class SchemaException extends RuntimeException {
 
   @Serial private static final long serialVersionUID = 1L;
 
   /**
-   * Name of the schema file the problem was found in, or {@code null} when it is not attributable
-   * to one. Part of this exception's serialized form.
+   * Name of the schema file the problem was found in, or {@code null} when it is not attributable to one. Part of this
+   * exception's serialized form.
    *
    * @serial
    */
@@ -69,16 +68,16 @@ public class SchemaException extends RuntimeException {
   /**
    * The schema file this problem was found in.
    *
-   * @return the file name, or {@code null} when the problem spans files (see {@link #getErrors()})
-   *     or is not attributable to one.
+   * @return the file name, or {@code null} when the problem spans files (see {@link #getErrors()}) or is not
+   *     attributable to one.
    */
   public @Nullable String getFile() {
     return file;
   }
 
   /**
-   * Bundles several problems into one exception: the first when there is only one, otherwise a new
-   * exception listing every message, with each problem attached as a suppressed exception.
+   * Bundles several problems into one exception: the first when there is only one, otherwise a new exception listing
+   * every message, with each problem attached as a suppressed exception.
    *
    * @param errors the collected problems, at least one.
    * @return the exception to throw.
@@ -99,8 +98,8 @@ public class SchemaException extends RuntimeException {
   /**
    * The individual problems this exception reports.
    *
-   * @return the collected problems for an exception aggregating several, otherwise a single-element
-   *     list holding this exception.
+   * @return the collected problems for an exception aggregating several, otherwise a single-element list holding this
+   *     exception.
    */
   public List<SchemaException> getErrors() {
     List<SchemaException> errors = new ArrayList<>();

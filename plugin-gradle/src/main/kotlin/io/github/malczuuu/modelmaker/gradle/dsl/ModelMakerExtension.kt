@@ -101,8 +101,7 @@ public abstract class ModelMakerExtension @Inject constructor(objects: ObjectFac
    * }
    * ```
    *
-   * Unlike the [features] flags, `kotlin.enabled` is project-wide only - it cannot be overridden
-   * per schema.
+   * Unlike the [features] flags, `kotlin.enabled` is project-wide only - it cannot be overridden per schema.
    *
    * @param configuration action applied to the Kotlin generation options
    */
@@ -127,8 +126,7 @@ public abstract class ModelMakerExtension @Inject constructor(objects: ObjectFac
    * }
    * ```
    *
-   * Every flag can also be overridden per schema through a top-level `"features"` object in the
-   * schema file.
+   * Every flag can also be overridden per schema through a top-level `"features"` object in the schema file.
    *
    * @param configuration action applied to the feature flags
    */

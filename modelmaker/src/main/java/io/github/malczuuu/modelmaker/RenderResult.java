@@ -21,9 +21,9 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Output of a single {@code *SnippetRenderer}: a chunk of generated source ({@link #getCode()})
- * plus the fully-qualified type names it references ({@link #getImports()}), which the composing
- * emitter collects into the file's import list.
+ * Output of a single {@code *SnippetRenderer}: a chunk of generated source ({@link #getCode()}) plus the
+ * fully-qualified type names it references ({@link #getImports()}), which the composing emitter collects into the
+ * file's import list.
  */
 final class RenderResult {
 
