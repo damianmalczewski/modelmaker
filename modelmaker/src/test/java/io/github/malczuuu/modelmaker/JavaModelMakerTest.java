@@ -42,7 +42,8 @@ class JavaModelMakerTest {
             "Plain",
             "com.example.dto",
             null,
-            List.of(property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null)),
+            List.of(
+                property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null)),
             List.of(),
             FeatureOverrides.builder().jackson(JacksonOverride.enabled(false)).build());
 
@@ -87,7 +88,8 @@ class JavaModelMakerTest {
 
   @Test
   void emitRejectsANullType() {
-    assertThatNullPointerException().isThrownBy(() -> new JavaModelMaker(opts().build()).emit(null));
+    assertThatNullPointerException()
+        .isThrownBy(() -> new JavaModelMaker(opts().build()).emit(null));
   }
 
   private final ModelType address =
@@ -95,7 +97,8 @@ class JavaModelMakerTest {
           "Address",
           "com.example.dto",
           "An address.",
-          List.of(property("city", PropType.ScalarType.STRING, true, Constraints.none(), "city", null)),
+          List.of(
+              property("city", PropType.ScalarType.STRING, true, Constraints.none(), "city", null)),
           List.of(),
           FeatureOverrides.none());
 
@@ -106,7 +109,12 @@ class JavaModelMakerTest {
           null,
           List.of(
               property(
-                  "id", PropType.ScalarType.STRING, true, Constraints.builder().pattern("^X\\d+$").build(), "id", null),
+                  "id",
+                  PropType.ScalarType.STRING,
+                  true,
+                  Constraints.builder().pattern("^X\\d+$").build(),
+                  "id",
+                  null),
               property(
                   "age",
                   PropType.ScalarType.INTEGER,
@@ -114,7 +122,8 @@ class JavaModelMakerTest {
                   Constraints.builder().minimum(0L).maximum(120L).build(),
                   "age",
                   null),
-              property("home", PropType.RefType.of("Address"), true, Constraints.none(), "home", null),
+              property(
+                  "home", PropType.RefType.of("Address"), true, Constraints.none(), "home", null),
               property(
                   "tags",
                   PropType.ArrayType.of(PropType.ScalarType.STRING),
@@ -131,14 +140,23 @@ class JavaModelMakerTest {
           "com.example.dto",
           null,
           List.of(
-              property("ref", PropType.RefType.of("Address"), true, Constraints.none(), "ref", null),
-              property("line", PropType.RefType.of("Line"), true, Constraints.none(), "line", null)),
+              property(
+                  "ref", PropType.RefType.of("Address"), true, Constraints.none(), "ref", null),
+              property(
+                  "line", PropType.RefType.of("Line"), true, Constraints.none(), "line", null)),
           List.of(
               new ModelType(
                   "Line",
                   "",
                   "An inline nested object.",
-                  List.of(property("sku", PropType.ScalarType.STRING, true, Constraints.none(), "sku", null)),
+                  List.of(
+                      property(
+                          "sku",
+                          PropType.ScalarType.STRING,
+                          true,
+                          Constraints.none(),
+                          "sku",
+                          null)),
                   List.of(),
                   FeatureOverrides.none())),
           FeatureOverrides.none());
@@ -150,7 +168,8 @@ class JavaModelMakerTest {
           null,
           List.of(
               property("on", PropType.ScalarType.BOOLEAN, true, Constraints.none(), "on", null),
-              property("count", PropType.ScalarType.INTEGER, true, Constraints.none(), "count", null)),
+              property(
+                  "count", PropType.ScalarType.INTEGER, true, Constraints.none(), "count", null)),
           List.of(),
           FeatureOverrides.none());
 
@@ -173,17 +192,21 @@ class JavaModelMakerTest {
     assertThat(out).contains("public String toString() {");
     assertThat(out).contains("\"Person[\"");
     assertThat(out).contains("+ \"]\"");
-    assertThat(out).contains("@Pattern(regexp = \"^X\\\\d+$\", message = \"must match \\\"^X\\\\d+$\\\"\")");
+    assertThat(out)
+        .contains("@Pattern(regexp = \"^X\\\\d+$\", message = \"must match \\\"^X\\\\d+$\\\"\")");
     assertThat(out).contains("@Min(value = 0, message = \"must be greater than or equal to 0\")");
     assertThat(out).contains("@Valid");
   }
 
   @Test
   void javaMarksGeneratedFilesWithABannerAndNoAnnotation() {
-    String out = new JavaModelMaker(opts().jackson(false).validation(false).build()).emit(withNested);
+    String out =
+        new JavaModelMaker(opts().jackson(false).validation(false).build()).emit(withNested);
 
     // No @Generated: it would force a modular consumer to `requires java.compiler`.
-    assertThat(out).doesNotContain("javax.annotation.processing.Generated").doesNotContain("@Generated");
+    assertThat(out)
+        .doesNotContain("javax.annotation.processing.Generated")
+        .doesNotContain("@Generated");
     assertThat(out)
         .contains(
             ";\n\n// Generated by ModelMaker (io.github.malczuuu.modelmaker). Do not edit"
@@ -200,18 +223,26 @@ class JavaModelMakerTest {
     assertThat(withoutIt).doesNotContain("@JsonInclude");
 
     String withIt =
-        new JavaModelMaker(opts().jackson(JacksonConfig.builder().enabled(true).includeNonNull(true).build()).build())
+        new JavaModelMaker(
+                opts()
+                    .jackson(JacksonConfig.builder().enabled(true).includeNonNull(true).build())
+                    .build())
             .emit(person);
 
     assertThat(withIt)
         .contains("import com.fasterxml.jackson.annotation.JsonInclude;")
-        .contains("@JsonIgnoreProperties(ignoreUnknown = true)\n" + "@JsonInclude(JsonInclude.Include.NON_NULL)");
+        .contains(
+            "@JsonIgnoreProperties(ignoreUnknown = true)\n"
+                + "@JsonInclude(JsonInclude.Include.NON_NULL)");
   }
 
   @Test
   void javaEmitsJsonIncludeOnNestedTypesToo() {
     String out =
-        new JavaModelMaker(opts().jackson(JacksonConfig.builder().enabled(true).includeNonNull(true).build()).build())
+        new JavaModelMaker(
+                opts()
+                    .jackson(JacksonConfig.builder().enabled(true).includeNonNull(true).build())
+                    .build())
             .emit(withNested);
 
     assertThat(out)
@@ -224,7 +255,10 @@ class JavaModelMakerTest {
   @Test
   void javaSkipsJsonIncludeWhenJacksonItselfIsOff() {
     String out =
-        new JavaModelMaker(opts().jackson(JacksonConfig.builder().enabled(false).includeNonNull(true).build()).build())
+        new JavaModelMaker(
+                opts()
+                    .jackson(JacksonConfig.builder().enabled(false).includeNonNull(true).build())
+                    .build())
             .emit(person);
 
     assertThat(out).doesNotContain("@JsonInclude");
@@ -235,7 +269,8 @@ class JavaModelMakerTest {
     String out = new JavaModelMaker(opts().build()).emit(person);
     assertThat(out).contains("public Person withId(String id) {");
     assertThat(out).contains("public Person withAge(@Nullable Integer age) {");
-    assertThat(out).contains("return new Person(Objects.requireNonNull(id), this.age, this.home, this.tags);");
+    assertThat(out)
+        .contains("return new Person(Objects.requireNonNull(id), this.age, this.home, this.tags);");
     assertThat(out).contains("return new Person(this.id, age, this.home, this.tags);");
   }
 
@@ -267,7 +302,12 @@ class JavaModelMakerTest {
             null,
             List.of(
                 property(
-                    "since", PropType.ExternalType.of("java.time.Instant"), true, Constraints.none(), "since", null),
+                    "since",
+                    PropType.ExternalType.of("java.time.Instant"),
+                    true,
+                    Constraints.none(),
+                    "since",
+                    null),
                 property(
                     "ids",
                     PropType.ArrayType.of(PropType.ExternalType.of("java.util.UUID")),
@@ -295,7 +335,8 @@ class JavaModelMakerTest {
             "com.example.dto",
             null,
             List.of(
-                property("home", PropType.RefType.of("Address"), true, Constraints.none(), "home", null),
+                property(
+                    "home", PropType.RefType.of("Address"), true, Constraints.none(), "home", null),
                 property(
                     "extras",
                     PropType.ArrayType.of(PropType.RefType.of("Address")),
@@ -333,7 +374,8 @@ class JavaModelMakerTest {
                     PropType.ArrayType.of(PropType.ScalarType.STRING),
                     false,
                     Constraints.builder()
-                        .elementConstraints(Constraints.builder().minLength(1).maxLength(255).build())
+                        .elementConstraints(
+                            Constraints.builder().minLength(1).maxLength(255).build())
                         .build(),
                     "tags",
                     null)),
@@ -361,7 +403,12 @@ class JavaModelMakerTest {
             null,
             List.of(
                 property(
-                    "tags", PropType.ArrayType.of(PropType.ScalarType.STRING), true, Constraints.none(), "tags", null),
+                    "tags",
+                    PropType.ArrayType.of(PropType.ScalarType.STRING),
+                    true,
+                    Constraints.none(),
+                    "tags",
+                    null),
                 property(
                     "notes",
                     PropType.ArrayType.of(PropType.ScalarType.STRING),
@@ -376,7 +423,8 @@ class JavaModelMakerTest {
 
     assertThat(out).contains("import java.util.Collections;");
     assertThat(out).contains("    return Collections.unmodifiableList(tags);\n");
-    assertThat(out).contains("    return notes != null ? Collections.unmodifiableList(notes) : null;\n");
+    assertThat(out)
+        .contains("    return notes != null ? Collections.unmodifiableList(notes) : null;\n");
   }
 
   @Test
@@ -403,13 +451,22 @@ class JavaModelMakerTest {
                   "the account identifier",
                   "A-42"),
               property(
-                  "nickname", PropType.ScalarType.STRING, false, Constraints.none(), "nickname", null, null, null)),
+                  "nickname",
+                  PropType.ScalarType.STRING,
+                  false,
+                  Constraints.none(),
+                  "nickname",
+                  null,
+                  null,
+                  null)),
           List.of(),
           FeatureOverrides.none());
 
   @Test
   void openApiEmitsSchemaOnTheClassAndOnDocumentedFieldsOnly() {
-    String out = new JavaModelMaker(opts().jackson(false).validation(false).openApi(true).build()).emit(documented);
+    String out =
+        new JavaModelMaker(opts().jackson(false).validation(false).openApi(true).build())
+            .emit(documented);
 
     assertThat(out).contains("import io.swagger.v3.oas.annotations.media.Schema;");
     assertThat(out).contains("@Schema(description = \"A billing account.\")");
@@ -423,7 +480,9 @@ class JavaModelMakerTest {
 
   @Test
   void openApiOffEmitsNoSchemaAnnotations() {
-    String out = new JavaModelMaker(opts().jackson(false).validation(false).openApi(false).build()).emit(documented);
+    String out =
+        new JavaModelMaker(opts().jackson(false).validation(false).openApi(false).build())
+            .emit(documented);
 
     assertThat(out).doesNotContain("@Schema");
     assertThat(out).doesNotContain("io.swagger");
@@ -471,12 +530,14 @@ class JavaModelMakerTest {
 
     String forcedOff =
         onByDefault.emit(
-            person.withFeatureOverrides(FeatureOverrides.builder().jackson(JacksonOverride.enabled(false)).build()));
+            person.withFeatureOverrides(
+                FeatureOverrides.builder().jackson(JacksonOverride.enabled(false)).build()));
     assertThat(forcedOff).doesNotContain("@JsonCreator");
 
     String forcedOn =
         offByDefault.emit(
-            person.withFeatureOverrides(FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build()));
+            person.withFeatureOverrides(
+                FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build()));
     assertThat(forcedOn).contains("@JsonCreator");
   }
 
@@ -503,10 +564,14 @@ class JavaModelMakerTest {
     JavaModelMaker onByDefault = new JavaModelMaker(opts().withers(true).build());
     JavaModelMaker offByDefault = new JavaModelMaker(opts().withers(false).build());
 
-    String forcedOff = onByDefault.emit(person.withFeatureOverrides(FeatureOverrides.builder().withers(false).build()));
+    String forcedOff =
+        onByDefault.emit(
+            person.withFeatureOverrides(FeatureOverrides.builder().withers(false).build()));
     assertThat(forcedOff).doesNotContain("withId");
 
-    String forcedOn = offByDefault.emit(person.withFeatureOverrides(FeatureOverrides.builder().withers(true).build()));
+    String forcedOn =
+        offByDefault.emit(
+            person.withFeatureOverrides(FeatureOverrides.builder().withers(true).build()));
     assertThat(forcedOn).contains("public Person withId(String id) {");
   }
 
@@ -516,11 +581,13 @@ class JavaModelMakerTest {
     JavaModelMaker offByDefault = new JavaModelMaker(opts().preferPrimitives(false).build());
 
     String forcedOff =
-        onByDefault.emit(flag.withFeatureOverrides(FeatureOverrides.builder().preferPrimitives(false).build()));
+        onByDefault.emit(
+            flag.withFeatureOverrides(FeatureOverrides.builder().preferPrimitives(false).build()));
     assertThat(forcedOff).contains("private final Boolean on;");
 
     String forcedOn =
-        offByDefault.emit(flag.withFeatureOverrides(FeatureOverrides.builder().preferPrimitives(true).build()));
+        offByDefault.emit(
+            flag.withFeatureOverrides(FeatureOverrides.builder().preferPrimitives(true).build()));
     assertThat(forcedOn).contains("private final boolean on;");
   }
 
@@ -536,7 +603,8 @@ class JavaModelMakerTest {
 
     String overridden =
         emitter.emit(
-            person.withFeatureOverrides(FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build()));
+            person.withFeatureOverrides(
+                FeatureOverrides.builder().jackson(JacksonOverride.enabled(true)).build()));
     assertThat(overridden).contains("@JsonCreator");
 
     String next = emitter.emit(address);
@@ -550,7 +618,14 @@ class JavaModelMakerTest {
             "Row",
             "com.example.dto",
             null,
-            List.of(property("userId", PropType.ScalarType.STRING, true, Constraints.none(), "user_id", null)),
+            List.of(
+                property(
+                    "userId",
+                    PropType.ScalarType.STRING,
+                    true,
+                    Constraints.none(),
+                    "user_id",
+                    null)),
             List.of(),
             FeatureOverrides.none());
 
@@ -620,7 +695,13 @@ class JavaModelMakerTest {
   @Test
   void aPropertyLessTypeStillGetsANoArgCtorAndABuilder() {
     ModelType empty =
-        new ModelType("Empty", "com.example.dto", "An empty type.", List.of(), List.of(), FeatureOverrides.none());
+        new ModelType(
+            "Empty",
+            "com.example.dto",
+            "An empty type.",
+            List.of(),
+            List.of(),
+            FeatureOverrides.none());
     String java = new JavaModelMaker(opts().build()).emit(empty);
 
     assertThat(java).doesNotContain("/**");
@@ -716,9 +797,20 @@ class JavaModelMakerTest {
             "x",
             null,
             List.of(
-                property("big", PropType.ScalarType.LONG, true, Constraints.none(), "big", DefaultValue.Num.of("42")),
                 property(
-                    "small", PropType.ScalarType.FLOAT, true, Constraints.none(), "small", DefaultValue.Num.of("3.5"))),
+                    "big",
+                    PropType.ScalarType.LONG,
+                    true,
+                    Constraints.none(),
+                    "big",
+                    DefaultValue.Num.of("42")),
+                property(
+                    "small",
+                    PropType.ScalarType.FLOAT,
+                    true,
+                    Constraints.none(),
+                    "small",
+                    DefaultValue.Num.of("3.5"))),
             List.of(),
             FeatureOverrides.none());
 
@@ -759,7 +851,8 @@ class JavaModelMakerTest {
     assertThat(out).contains("private final String status;");
     assertThat(out)
         .contains(
-            "@Pattern(regexp = \"^(\\\\QNEW\\\\E|\\\\QPAID\\\\E)$\", " + "message = \"must be one of NEW, PAID\")");
+            "@Pattern(regexp = \"^(\\\\QNEW\\\\E|\\\\QPAID\\\\E)$\", "
+                + "message = \"must be one of NEW, PAID\")");
     assertThat(out).doesNotContain("enum Status");
     assertThat(out).doesNotContain("public enum");
   }
@@ -772,8 +865,20 @@ class JavaModelMakerTest {
             "x",
             null,
             List.of(
-                property("payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
-                property("signature", PropType.ScalarType.BYTES, false, Constraints.none(), "signature", null)),
+                property(
+                    "payload",
+                    PropType.ScalarType.BYTES,
+                    true,
+                    Constraints.none(),
+                    "payload",
+                    null),
+                property(
+                    "signature",
+                    PropType.ScalarType.BYTES,
+                    false,
+                    Constraints.none(),
+                    "signature",
+                    null)),
             List.of(),
             FeatureOverrides.none());
 
@@ -794,8 +899,10 @@ class JavaModelMakerTest {
                 + "    return signature != null ? signature.clone() : null;\n"
                 + "  }");
     // wither: the caller's replacement array is copied
-    assertThat(out).contains("return new Blob(Objects.requireNonNull(payload).clone(), this.signature);");
-    assertThat(out).contains("return new Blob(this.payload, signature != null ? signature.clone() : null);");
+    assertThat(out)
+        .contains("return new Blob(Objects.requireNonNull(payload).clone(), this.signature);");
+    assertThat(out)
+        .contains("return new Blob(this.payload, signature != null ? signature.clone() : null);");
     // builder: defensive copy in
     assertThat(out).contains("this.payload = payload != null ? payload.clone() : null;");
     // equals / hashCode compare by content; toString prints base64
@@ -816,7 +923,14 @@ class JavaModelMakerTest {
             "Blob",
             "x",
             null,
-            List.of(property("payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null)),
+            List.of(
+                property(
+                    "payload",
+                    PropType.ScalarType.BYTES,
+                    true,
+                    Constraints.none(),
+                    "payload",
+                    null)),
             List.of(),
             FeatureOverrides.none());
 

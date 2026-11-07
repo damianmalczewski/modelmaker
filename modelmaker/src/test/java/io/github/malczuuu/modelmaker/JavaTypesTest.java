@@ -95,7 +95,8 @@ class JavaTypesTest {
 
   @Test
   void aRefInAnotherPackageIsLeftFullyQualified() {
-    assertThat(types(ALL_OFF).boxed(PropType.RefType.of("com.other.Thing"), imports)).isEqualTo("com.other.Thing");
+    assertThat(types(ALL_OFF).boxed(PropType.RefType.of("com.other.Thing"), imports))
+        .isEqualTo("com.other.Thing");
     assertThat(imports).isEmpty();
   }
 
@@ -126,7 +127,9 @@ class JavaTypesTest {
   @Test
   void aNestedArrayNests() {
     String name =
-        types(ALL_OFF).boxed(PropType.ArrayType.of(PropType.ArrayType.of(PropType.ScalarType.STRING)), imports);
+        types(ALL_OFF)
+            .boxed(
+                PropType.ArrayType.of(PropType.ArrayType.of(PropType.ScalarType.STRING)), imports);
 
     assertThat(name).isEqualTo("List<List<String>>");
   }
@@ -144,7 +147,8 @@ class JavaTypesTest {
   void listTypePlacesGivenAnnotationsOnTheElement() {
     PropType.ArrayType type = PropType.ArrayType.of(PropType.RefType.of("com.example.dto.Address"));
 
-    assertThat(types(ALL_OFF).listType(type, List.of("@Valid"), imports)).isEqualTo("List<@Valid Address>");
+    assertThat(types(ALL_OFF).listType(type, List.of("@Valid"), imports))
+        .isEqualTo("List<@Valid Address>");
     assertThat(
             types(ALL_OFF)
                 .listType(
@@ -157,7 +161,9 @@ class JavaTypesTest {
 
   @Test
   void anArrayOfExternalTypesImportsTheElement() {
-    String name = types(ALL_OFF).boxed(PropType.ArrayType.of(PropType.ExternalType.of("java.util.UUID")), imports);
+    String name =
+        types(ALL_OFF)
+            .boxed(PropType.ArrayType.of(PropType.ExternalType.of("java.util.UUID")), imports);
 
     assertThat(name).isEqualTo("List<UUID>");
     assertThat(imports).containsExactlyInAnyOrder("java.util.List", "java.util.UUID");
@@ -173,7 +179,8 @@ class JavaTypesTest {
 
   @Test
   void notEqualWhenTargetPackageDiffers() {
-    assertThat(new JavaTypes("com.example.dto", ALL_OFF)).isNotEqualTo(new JavaTypes("com.other", ALL_OFF));
+    assertThat(new JavaTypes("com.example.dto", ALL_OFF))
+        .isNotEqualTo(new JavaTypes("com.other", ALL_OFF));
   }
 
   @Test

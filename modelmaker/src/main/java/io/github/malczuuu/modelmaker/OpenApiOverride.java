@@ -21,9 +21,9 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Per-schema override of a {@link OpenApiConfig}, parsed from a schema file's top-level {@code "features"} object. Each
- * flag is {@code null} when the schema does not set it - {@link OpenApiConfig#withOverride} then keeps the project
- * default.
+ * Per-schema override of a {@link OpenApiConfig}, parsed from a schema file's top-level {@code
+ * "features"} object. Each flag is {@code null} when the schema does not set it - {@link
+ * OpenApiConfig#withOverride} then keeps the project default.
  */
 public final class OpenApiOverride {
 
@@ -40,7 +40,10 @@ public final class OpenApiOverride {
    * @param annotateFields the {@code annotateFields} override, or {@code null}.
    * @param annotateGetters the {@code annotateGetters} override, or {@code null}.
    */
-  OpenApiOverride(@Nullable Boolean enabled, @Nullable Boolean annotateFields, @Nullable Boolean annotateGetters) {
+  OpenApiOverride(
+      @Nullable Boolean enabled,
+      @Nullable Boolean annotateFields,
+      @Nullable Boolean annotateGetters) {
     this.enabled = enabled;
     this.annotateFields = annotateFields;
     this.annotateGetters = annotateGetters;

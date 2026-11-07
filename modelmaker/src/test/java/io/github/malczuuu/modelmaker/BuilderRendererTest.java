@@ -28,7 +28,8 @@ class BuilderRendererTest {
   private static final ModelOptions OPTIONS = ModelOptions.builder().build();
 
   private static ModelType type(String name, Property... properties) {
-    return new ModelType(name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
+    return new ModelType(
+        name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
   }
 
   private static final ModelType WIDGET =
@@ -89,10 +90,13 @@ class BuilderRendererTest {
 
   @Test
   void reportsObjectsImportOnlyWhenAFieldIsRequired() {
-    assertThat(new BuilderRenderer().init("", WIDGET, OPTIONS).render().getImports()).contains("java.util.Objects");
+    assertThat(new BuilderRenderer().init("", WIDGET, OPTIONS).render().getImports())
+        .contains("java.util.Objects");
 
     ModelType optionalOnly =
-        type("Widget", property("note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
+        type(
+            "Widget",
+            property("note", PropType.ScalarType.STRING, false, Constraints.none(), "note", null));
     assertThat(new BuilderRenderer().init("", optionalOnly, OPTIONS).render().getImports())
         .doesNotContain("java.util.Objects");
   }
@@ -113,8 +117,19 @@ class BuilderRendererTest {
         type(
             "Bag",
             property(
-                "tags", PropType.ArrayType.of(PropType.ScalarType.STRING), false, Constraints.none(), "tags", null),
-            property("ids", PropType.ArrayType.of(PropType.ScalarType.STRING), true, Constraints.none(), "ids", null));
+                "tags",
+                PropType.ArrayType.of(PropType.ScalarType.STRING),
+                false,
+                Constraints.none(),
+                "tags",
+                null),
+            property(
+                "ids",
+                PropType.ArrayType.of(PropType.ScalarType.STRING),
+                true,
+                Constraints.none(),
+                "ids",
+                null));
 
     RenderResult result = new BuilderRenderer().init("", type, OPTIONS).render();
 
@@ -140,7 +155,10 @@ class BuilderRendererTest {
   @Test
   void bytesSettersDefensivelyCopyAndToStringUsesBase64() {
     ModelType blob =
-        type("Blob", property("payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null));
+        type(
+            "Blob",
+            property(
+                "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null));
 
     RenderResult result = new BuilderRenderer().init("", blob, OPTIONS).render();
 
@@ -149,8 +167,11 @@ class BuilderRendererTest {
         .contains(
             "public Builder payload(@Nullable byte[] payload) {\n"
                 + "    this.payload = payload != null ? payload.clone() : null;\n")
-        .contains("+ \"payload=\"" + " + (payload != null ? Base64.getEncoder().encodeToString(payload) : \"null\")")
-        .contains("return new Blob(\n        Objects.requireNonNull(payload, \"payload is required\"));");
+        .contains(
+            "+ \"payload=\""
+                + " + (payload != null ? Base64.getEncoder().encodeToString(payload) : \"null\")")
+        .contains(
+            "return new Blob(\n        Objects.requireNonNull(payload, \"payload is required\"));");
     assertThat(result.getImports()).contains("java.util.Base64");
   }
 
@@ -160,7 +181,8 @@ class BuilderRendererTest {
         type(
             "Widget",
             property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
-            sensitiveProperty("token", PropType.ScalarType.STRING, true, Constraints.none(), "token", null));
+            sensitiveProperty(
+                "token", PropType.ScalarType.STRING, true, Constraints.none(), "token", null));
 
     RenderResult result = new BuilderRenderer().init("", widget, OPTIONS).render();
 

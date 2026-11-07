@@ -21,21 +21,22 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Shared assembly of the per-property annotations that {@link FieldsRenderer} and {@link GettersRenderer} place on
- * their declaration - which are emitted, and where, depends on each feature config's {@code enabled} / {@code
- * annotateFields} / {@code annotateGetters} flags.
+ * Shared assembly of the per-property annotations that {@link FieldsRenderer} and {@link
+ * GettersRenderer} place on their declaration - which are emitted, and where, depends on each
+ * feature config's {@code enabled} / {@code annotateFields} / {@code annotateGetters} flags.
  */
 final class PropertyAnnotations {
 
-  private static final String JSON_PROPERTY_IMPORT = "com.fasterxml.jackson.annotation.JsonProperty";
+  private static final String JSON_PROPERTY_IMPORT =
+      "com.fasterxml.jackson.annotation.JsonProperty";
   private static final String VALID_IMPORT = "jakarta.validation.Valid";
 
   private PropertyAnnotations() {}
 
   /**
-   * Annotation lines placed directly before a field or getter declaration for {@code prop}: the OpenAPI
-   * {@code @Schema}, the Jackson {@code @JsonProperty}, then the {@code jakarta.validation} constraints - each included
-   * only when that feature emits at this site.
+   * Annotation lines placed directly before a field or getter declaration for {@code prop}: the
+   * OpenAPI {@code @Schema}, the Jackson {@code @JsonProperty}, then the {@code jakarta.validation}
+   * constraints - each included only when that feature emits at this site.
    *
    * @param prop the property.
    * @param openApi whether OpenAPI emits at this site.
@@ -68,8 +69,9 @@ final class PropertyAnnotations {
   }
 
   /**
-   * Container-element annotations for a {@code List}-typed {@code prop} - {@code @Valid} for a generated-DTO element,
-   * then the element's value constraints - or empty when {@code validation} does not emit at this site.
+   * Container-element annotations for a {@code List}-typed {@code prop} - {@code @Valid} for a
+   * generated-DTO element, then the element's value constraints - or empty when {@code validation}
+   * does not emit at this site.
    *
    * @param prop the array property.
    * @param array its type.
@@ -88,7 +90,8 @@ final class PropertyAnnotations {
       out.add("@Valid");
     }
     for (AnnotationSpec spec :
-        ConstraintUtils.elementConstraintAnnotationsOf(prop.getConstraints().getElementConstraints())) {
+        ConstraintUtils.elementConstraintAnnotationsOf(
+            prop.getConstraints().getElementConstraints())) {
       imports.add(spec.getImportName());
       out.add(spec.render());
     }

@@ -60,7 +60,9 @@ class GenerateJavaMojoTest {
 
     Path generated = outputDir.resolve("com/example/dto/Person.java");
     assertThat(generated).exists();
-    assertThat(Files.readString(generated)).contains("public final class Person {").doesNotContain("@JsonProperty");
+    assertThat(Files.readString(generated))
+        .contains("public final class Person {")
+        .doesNotContain("@JsonProperty");
     assertThat(project.getCompileSourceRoots()).contains(outputDir.toAbsolutePath().toString());
   }
 
@@ -136,7 +138,8 @@ class GenerateJavaMojoTest {
     mojo.execute();
 
     assertThat(outputDir).doesNotExist();
-    assertThat(project.getCompileSourceRoots()).doesNotContain(outputDir.toAbsolutePath().toString());
+    assertThat(project.getCompileSourceRoots())
+        .doesNotContain(outputDir.toAbsolutePath().toString());
   }
 
   private GenerateJavaMojo mojo(Features features) {

@@ -28,7 +28,8 @@ class GettersRendererTest {
   private static final ModelOptions JACKSON = ModelOptions.builder().jackson(true).build();
 
   private static ModelType type(String name, Property... properties) {
-    return new ModelType(name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
+    return new ModelType(
+        name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
   }
 
   private static final ModelType WIDGET =
@@ -63,13 +64,21 @@ class GettersRendererTest {
   @Test
   void jacksonOnAddsAJsonPropertyAnnotationWithTheOriginalJsonName() {
     ModelType type =
-        type("Widget", property("userId", PropType.ScalarType.STRING, true, Constraints.none(), "user_id", null));
+        type(
+            "Widget",
+            property(
+                "userId", PropType.ScalarType.STRING, true, Constraints.none(), "user_id", null));
 
     RenderResult result = new GettersRenderer().init("", type, JACKSON).render();
 
     assertThat(result.getCode())
-        .isEqualTo("@JsonProperty(\"user_id\")\n" + "public String getUserId() {\n" + "  return userId;\n" + "}\n\n");
-    assertThat(result.getImports()).containsExactly("com.fasterxml.jackson.annotation.JsonProperty");
+        .isEqualTo(
+            "@JsonProperty(\"user_id\")\n"
+                + "public String getUserId() {\n"
+                + "  return userId;\n"
+                + "}\n\n");
+    assertThat(result.getImports())
+        .containsExactly("com.fasterxml.jackson.annotation.JsonProperty");
   }
 
   @Test
@@ -77,26 +86,42 @@ class GettersRendererTest {
     ModelType type =
         type(
             "Person",
-            property("id", PropType.ScalarType.STRING, true, Constraints.builder().pattern("^X$").build(), "id", null),
+            property(
+                "id",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.builder().pattern("^X$").build(),
+                "id",
+                null),
             property(
                 "tags",
                 PropType.ArrayType.of(PropType.ScalarType.STRING),
                 false,
-                Constraints.builder().elementConstraints(Constraints.builder().minLength(1).build()).build(),
+                Constraints.builder()
+                    .elementConstraints(Constraints.builder().minLength(1).build())
+                    .build(),
                 "tags",
                 null));
     ModelOptions validation =
         ModelOptions.builder()
-            .validation(ValidationConfig.builder().enabled(true).annotateFields(false).annotateGetters(true).build())
+            .validation(
+                ValidationConfig.builder()
+                    .enabled(true)
+                    .annotateFields(false)
+                    .annotateGetters(true)
+                    .build())
             .build();
 
     RenderResult result = new GettersRenderer().init("", type, validation).render();
 
     assertThat(result.getCode())
         .contains("@NotNull(message = \"must not be null\")")
-        .contains("@Pattern(regexp = \"^X$\", message = \"must match \\\"^X$\\\"\")\n" + "public String getId() {")
         .contains(
-            "public @Nullable List<@Size(min = 1, message = \"size must be at least 1\") String>" + " getTags() {");
+            "@Pattern(regexp = \"^X$\", message = \"must match \\\"^X$\\\"\")\n"
+                + "public String getId() {")
+        .contains(
+            "public @Nullable List<@Size(min = 1, message = \"size must be at least 1\") String>"
+                + " getTags() {");
     assertThat(result.getImports()).contains("jakarta.validation.constraints.Size");
   }
 
@@ -104,10 +129,24 @@ class GettersRendererTest {
   void openApiOnGettersPrependsSchemaAnnotation() {
     ModelType type =
         type(
-            "Person", property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null, "the id", null));
+            "Person",
+            property(
+                "id",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.none(),
+                "id",
+                null,
+                "the id",
+                null));
     ModelOptions openApi =
         ModelOptions.builder()
-            .openApi(OpenApiConfig.builder().enabled(true).annotateFields(false).annotateGetters(true).build())
+            .openApi(
+                OpenApiConfig.builder()
+                    .enabled(true)
+                    .annotateFields(false)
+                    .annotateGetters(true)
+                    .build())
             .build();
 
     RenderResult result = new GettersRenderer().init("", type, openApi).render();
@@ -123,11 +162,27 @@ class GettersRendererTest {
     ModelType type =
         type(
             "Person",
-            property("id", PropType.ScalarType.STRING, true, Constraints.builder().pattern("^X$").build(), "id", null));
+            property(
+                "id",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.builder().pattern("^X$").build(),
+                "id",
+                null));
     ModelOptions fieldsOnly =
         ModelOptions.builder()
-            .jackson(JacksonConfig.builder().enabled(true).annotateFields(false).annotateGetters(false).build())
-            .validation(ValidationConfig.builder().enabled(true).annotateFields(false).annotateGetters(false).build())
+            .jackson(
+                JacksonConfig.builder()
+                    .enabled(true)
+                    .annotateFields(false)
+                    .annotateGetters(false)
+                    .build())
+            .validation(
+                ValidationConfig.builder()
+                    .enabled(true)
+                    .annotateFields(false)
+                    .annotateGetters(false)
+                    .build())
             .build();
 
     RenderResult result = new GettersRenderer().init("", type, fieldsOnly).render();
@@ -141,7 +196,12 @@ class GettersRendererTest {
         type(
             "Bag",
             property(
-                "tags", PropType.ArrayType.of(PropType.ScalarType.STRING), true, Constraints.none(), "tags", null));
+                "tags",
+                PropType.ArrayType.of(PropType.ScalarType.STRING),
+                true,
+                Constraints.none(),
+                "tags",
+                null));
 
     RenderResult result = new GettersRenderer().init("", type, OPTIONS).render();
 
@@ -155,11 +215,17 @@ class GettersRendererTest {
         type(
             "Bag",
             property(
-                "tags", PropType.ArrayType.of(PropType.ScalarType.STRING), false, Constraints.none(), "tags", null));
+                "tags",
+                PropType.ArrayType.of(PropType.ScalarType.STRING),
+                false,
+                Constraints.none(),
+                "tags",
+                null));
 
     RenderResult result = new GettersRenderer().init("", type, OPTIONS).render();
 
-    assertThat(result.getCode()).contains("  return tags != null ? Collections.unmodifiableList(tags) : null;\n");
+    assertThat(result.getCode())
+        .contains("  return tags != null ? Collections.unmodifiableList(tags) : null;\n");
     assertThat(result.getImports()).contains("java.util.Collections");
   }
 
@@ -175,8 +241,15 @@ class GettersRendererTest {
     ModelType blob =
         type(
             "Blob",
-            property("payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
-            property("signature", PropType.ScalarType.BYTES, false, Constraints.none(), "signature", null));
+            property(
+                "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
+            property(
+                "signature",
+                PropType.ScalarType.BYTES,
+                false,
+                Constraints.none(),
+                "signature",
+                null));
 
     RenderResult result = new GettersRenderer().init("", blob, OPTIONS).render();
 

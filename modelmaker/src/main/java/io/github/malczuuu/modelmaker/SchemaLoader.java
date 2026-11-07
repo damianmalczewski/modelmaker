@@ -26,7 +26,8 @@ public sealed interface SchemaLoader
   /**
    * Whether this loader handles files with the given extension.
    *
-   * @param extension a file extension, lowercase and without the leading {@code "."}, e.g. {@code "json"}.
+   * @param extension a file extension, lowercase and without the leading {@code "."}, e.g. {@code
+   *     "json"}.
    * @return {@code true} when this loader's {@link #load(List)} accepts files with that extension.
    */
   boolean canLoad(String extension);
@@ -34,7 +35,8 @@ public sealed interface SchemaLoader
   /**
    * Parses {@code files} into models, with all {@code $ref}s resolved and validated.
    *
-   * @param files schema files to parse; processing order is by file name, independent of the list order.
+   * @param files schema files to parse; processing order is by file name, independent of the list
+   *     order.
    * @return one {@link ModelType} per file.
    * @throws SchemaException when a schema cannot be loaded.
    */

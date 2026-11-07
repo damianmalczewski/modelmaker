@@ -54,7 +54,8 @@ class ModelMakerPluginFunctionalTest {
     assertThat(java).doesNotContain("@JsonProperty")
     assertThat(java).doesNotContain("@NotNull")
 
-    val classpath = project.runner("dependencies", "--configuration", "compileClasspath").build().output
+    val classpath =
+        project.runner("dependencies", "--configuration", "compileClasspath").build().output
     assertThat(classpath).doesNotContain("jackson")
     assertThat(classpath).doesNotContain("jakarta.validation")
     assertThat(classpath).contains("org.jspecify:jspecify")
@@ -180,7 +181,8 @@ class ModelMakerPluginFunctionalTest {
     project.writeStandardBuild(dependencies = "implementation(\"org.jspecify:jspecify:1.0.0\")")
     project.writeSchemas()
 
-    val classpath = project.runner("dependencies", "--configuration", "compileClasspath").build().output
+    val classpath =
+        project.runner("dependencies", "--configuration", "compileClasspath").build().output
     assertThat(classpath).contains("org.jspecify:jspecify:1.0.0")
     assertThat(classpath).doesNotContain("1.0.1")
   }
@@ -203,7 +205,8 @@ class ModelMakerPluginFunctionalTest {
     project.writeStandardBuild()
     project.writeSchemas()
     project.runner("compileJava").build()
-    assertThat(project.generatedJava("com/example/dto/Customer.java").readText()).doesNotContain("withHome")
+    assertThat(project.generatedJava("com/example/dto/Customer.java").readText())
+        .doesNotContain("withHome")
 
     project.appendToBuildScript("modelmaker { features { withers { enabled = true } } }")
     project.runner("compileJava").build()
@@ -284,13 +287,21 @@ class ModelMakerPluginFunctionalTest {
 
     project.runner("generateModelJava", "--build-cache").build()
     assertThat(
-            project.runner("generateModelJava", "--build-cache").build().task(":generateModelJava")?.outcome,
+            project
+                .runner("generateModelJava", "--build-cache")
+                .build()
+                .task(":generateModelJava")
+                ?.outcome,
         )
         .isEqualTo(TaskOutcome.UP_TO_DATE)
 
     project.runner("clean", "--build-cache").build()
     assertThat(
-            project.runner("generateModelJava", "--build-cache").build().task(":generateModelJava")?.outcome,
+            project
+                .runner("generateModelJava", "--build-cache")
+                .build()
+                .task(":generateModelJava")
+                ?.outcome,
         )
         .isEqualTo(TaskOutcome.FROM_CACHE)
   }
@@ -332,7 +343,8 @@ class ModelMakerPluginFunctionalTest {
 
     project.runner("build").build()
 
-    assertThat(project.generatedJava("com/example/dto/Customer.java").readText()).doesNotContain("@JsonInclude")
+    assertThat(project.generatedJava("com/example/dto/Customer.java").readText())
+        .doesNotContain("@JsonInclude")
   }
 
   @Test
@@ -432,7 +444,8 @@ class ModelMakerPluginFunctionalTest {
     val result = project.runner("compileJava").build()
 
     assertThat(result.task(":compileJava")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
-    assertThat(project.generatedJava("com/example/dto/Customer.java").readText()).doesNotContain("@Generated")
+    assertThat(project.generatedJava("com/example/dto/Customer.java").readText())
+        .doesNotContain("@Generated")
   }
 
   @Test
@@ -471,7 +484,11 @@ class ModelMakerPluginFunctionalTest {
     File(project.dir, "src/main/model/java").deleteRecursively()
 
     assertThat(
-            project.runner("generateModelJava", "--build-cache").build().task(":generateModelJava")?.outcome,
+            project
+                .runner("generateModelJava", "--build-cache")
+                .build()
+                .task(":generateModelJava")
+                ?.outcome,
         )
         .isEqualTo(TaskOutcome.FROM_CACHE)
     assertThat(project.srcJava("com/example/dto/Customer.java")).exists()
@@ -572,7 +589,8 @@ class ModelMakerPluginFunctionalTest {
 
     val result = project.runner("generateModelKotlin").build()
     val tasks = result.tasks.map { it.path }
-    assertThat(tasks.indexOf(":generateModelJava")).isLessThan(tasks.indexOf(":generateModelKotlin"))
+    assertThat(tasks.indexOf(":generateModelJava"))
+        .isLessThan(tasks.indexOf(":generateModelKotlin"))
   }
 
   @Test

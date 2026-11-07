@@ -27,7 +27,8 @@ class WithersRendererTest {
   private static final ModelOptions OPTIONS = ModelOptions.builder().build();
 
   private static ModelType type(String name, Property... properties) {
-    return new ModelType(name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
+    return new ModelType(
+        name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
   }
 
   private static final ModelType WIDGET =
@@ -48,7 +49,8 @@ class WithersRendererTest {
                 + "public Widget withNote(@Nullable String note) {\n"
                 + "  return new Widget(this.id, note);\n"
                 + "}\n\n");
-    assertThat(result.getImports()).containsExactlyInAnyOrder("java.util.Objects", "org.jspecify.annotations.Nullable");
+    assertThat(result.getImports())
+        .containsExactlyInAnyOrder("java.util.Objects", "org.jspecify.annotations.Nullable");
   }
 
   @Test
@@ -62,13 +64,17 @@ class WithersRendererTest {
   @Test
   void aPreferredPrimitiveRequiredValueSkipsTheNullCheck() {
     ModelType type =
-        type("Config", property("count", PropType.ScalarType.INTEGER, true, Constraints.none(), "count", null));
+        type(
+            "Config",
+            property(
+                "count", PropType.ScalarType.INTEGER, true, Constraints.none(), "count", null));
     ModelOptions primitives = ModelOptions.builder().preferPrimitives(true).build();
 
     RenderResult result = new WithersRenderer().init("", type, primitives).render();
 
     assertThat(result.getCode())
-        .isEqualTo("public Config withCount(int count) {\n" + "  return new Config(count);\n" + "}\n\n");
+        .isEqualTo(
+            "public Config withCount(int count) {\n" + "  return new Config(count);\n" + "}\n\n");
     assertThat(result.getImports()).isEmpty();
   }
 
@@ -84,8 +90,15 @@ class WithersRendererTest {
     ModelType blob =
         type(
             "Blob",
-            property("payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
-            property("signature", PropType.ScalarType.BYTES, false, Constraints.none(), "signature", null));
+            property(
+                "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
+            property(
+                "signature",
+                PropType.ScalarType.BYTES,
+                false,
+                Constraints.none(),
+                "signature",
+                null));
 
     RenderResult result = new WithersRenderer().init("", blob, OPTIONS).render();
 

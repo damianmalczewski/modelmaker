@@ -20,12 +20,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Renders the {@code withXyz(...)} copy methods for one model type, one per property. Each returns a new instance built
- * through the all-args constructor with just that one field replaced; a non-null, non-primitive replacement value is
- * {@code Objects.requireNonNull}-checked.
+ * Renders the {@code withXyz(...)} copy methods for one model type, one per property. Each returns
+ * a new instance built through the all-args constructor with just that one field replaced; a
+ * non-null, non-primitive replacement value is {@code Objects.requireNonNull}-checked.
  *
- * <p>Renders just the withers; the enclosing class, its constructor and everything else are the composing emitter's job
- * - including whether to call this renderer at all, gated by {@link ModelOptions#isWithers()}.
+ * <p>Renders just the withers; the enclosing class, its constructor and everything else are the
+ * composing emitter's job - including whether to call this renderer at all, gated by {@link
+ * ModelOptions#isWithers()}.
  */
 final class WithersRenderer extends AbstractSnippetRenderer {
 
@@ -94,7 +95,12 @@ final class WithersRenderer extends AbstractSnippetRenderer {
           .append(' ')
           .append(p.getName())
           .append(") {\n");
-      code.append(indent).append("  return new ").append(typeName).append('(').append(args).append(");\n");
+      code.append(indent)
+          .append("  return new ")
+          .append(typeName)
+          .append('(')
+          .append(args)
+          .append(");\n");
       code.append(indent).append("}\n\n");
     }
     return new RenderResult(imports, code.toString());
@@ -117,8 +123,8 @@ final class WithersRenderer extends AbstractSnippetRenderer {
   }
 
   /**
-   * Type of the wither parameter: non-null when the value is always set, and a primitive scalar only when {@link
-   * ModelOptions#isPreferPrimitives()} is on.
+   * Type of the wither parameter: non-null when the value is always set, and a primitive scalar
+   * only when {@link ModelOptions#isPreferPrimitives()} is on.
    *
    * @param prop the property to type.
    * @param imports import set to add any needed type to.

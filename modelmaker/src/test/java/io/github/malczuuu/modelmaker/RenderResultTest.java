@@ -41,7 +41,8 @@ class RenderResultTest {
 
   @Test
   void notEqualWhenImportsDiffer() {
-    RenderResult other = new RenderResult(Set.of("java.util.Set"), "private final List<String> tags;\n");
+    RenderResult other =
+        new RenderResult(Set.of("java.util.Set"), "private final List<String> tags;\n");
 
     assertThat(full()).isNotEqualTo(other);
   }
@@ -54,6 +55,10 @@ class RenderResultTest {
   @Test
   void toStringReportsEveryField() {
     assertThat(full().toString())
-        .isEqualTo("RenderResult[" + "imports=[java.util.List]" + ", code=private final List<String> tags;\n" + "]");
+        .isEqualTo(
+            "RenderResult["
+                + "imports=[java.util.List]"
+                + ", code=private final List<String> tags;\n"
+                + "]");
   }
 }

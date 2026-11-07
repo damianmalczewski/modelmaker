@@ -20,8 +20,8 @@ import org.gradle.api.Action
 import org.gradle.api.tasks.Nested
 
 /**
- * The generation features, configured via `modelmaker { features { } }`. Each feature has its own spec type so it can
- * grow independent options later.
+ * The generation features, configured via `modelmaker { features { } }`. Each feature has its own
+ * spec type so it can grow independent options later.
  *
  * ```
  * features {
@@ -33,15 +33,16 @@ import org.gradle.api.tasks.Nested
  * }
  * ```
  *
- * `jackson` / `validation` / `openApi` carry on/off plus field / getter placement; `withers` / `preferPrimitives` are
- * plain on/off. Every flag can be overridden per schema through a top-level `"features"` object in the schema file.
+ * `jackson` / `validation` / `openApi` carry on/off plus field / getter placement; `withers` /
+ * `preferPrimitives` are plain on/off. Every flag can be overridden per schema through a top-level
+ * `"features"` object in the schema file.
  *
  * @property jackson Jackson annotations (`@JsonCreator`, `@JsonProperty`, ...).
  * @property validation `jakarta.validation` constraint annotations and `@Valid` cascades.
  * @property openApi OpenAPI `@Schema` annotations (`io.swagger.v3.oas.annotations.media.Schema`).
  * @property withers a `withXyz(value)` single-field copy method per property.
- * @property preferPrimitives always-set scalar fields use the primitive type (`int`, `double`, `boolean`) instead of
- *   the boxed default.
+ * @property preferPrimitives always-set scalar fields use the primitive type (`int`, `double`,
+ *   `boolean`) instead of the boxed default.
  */
 @ModelMakerDslMarker
 public abstract class ModelMakerFeaturesSpec {

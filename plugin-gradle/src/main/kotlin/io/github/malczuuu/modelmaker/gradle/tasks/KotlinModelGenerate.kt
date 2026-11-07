@@ -40,31 +40,34 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.newInstance
 
 /**
- * Reads the lightweight JSON schema files (and Avro `.avsc` record schemas) under [sourceDirectory] and writes one
- * `<Name>Extensions.kt` per schema into [kotlinOutputDirectory]: a `mutate { }` extension function over the
- * corresponding Java DTO's `Builder` (see [JavaModelGenerate]).
+ * Reads the lightweight JSON schema files (and Avro `.avsc` record schemas) under [sourceDirectory]
+ * and writes one `<Name>Extensions.kt` per schema into [kotlinOutputDirectory]: a `mutate { }`
+ * extension function over the corresponding Java DTO's `Builder` (see [JavaModelGenerate]).
  *
- * When [generationEnabled] is on and the Kotlin JVM plugin is applied to the project it (re)writes every extensions
- * file, otherwise it purges [kotlinOutputDirectory] and stops - so switching `kotlin.enabled` off, or removing the
- * Kotlin JVM plugin, cleans up previously generated `.kt` files rather than leaving them stale.
+ * When [generationEnabled] is on and the Kotlin JVM plugin is applied to the project it (re)writes
+ * every extensions file, otherwise it purges [kotlinOutputDirectory] and stops - so switching
+ * `kotlin.enabled` off, or removing the Kotlin JVM plugin, cleans up previously generated `.kt`
+ * files rather than leaving them stale.
  *
- * Not incremental: [kotlinOutputDirectory] is wiped on every run, rebuilt only when generating. Cacheable, with
- * [schemaFiles] tracked relative, so a cache hit restores the whole output without re-emitting.
+ * Not incremental: [kotlinOutputDirectory] is wiped on every run, rebuilt only when generating.
+ * Cacheable, with [schemaFiles] tracked relative, so a cache hit restores the whole output without
+ * re-emitting.
  *
  * @param objects factory creating this task's `kotlin { }` block
  */
 @CacheableTask
-public abstract class KotlinModelGenerate @Inject constructor(objects: ObjectFactory) : DefaultTask() {
+public abstract class KotlinModelGenerate @Inject constructor(objects: ObjectFactory) :
+    DefaultTask() {
 
   /**
-   * Directory scanned recursively for `*.json` and `*.avsc` schema files. Need not exist - a build without schemas is
-   * not an error.
+   * Directory scanned recursively for `*.json` and `*.avsc` schema files. Need not exist - a build
+   * without schemas is not an error.
    */
   @get:Internal public abstract val sourceDirectory: DirectoryProperty
 
   /**
-   * The schema files under [sourceDirectory] - the tracked input of this task. See [schemaFilesIn] for why the tracked
-   * input is the filtered file tree rather than the directory itself.
+   * The schema files under [sourceDirectory] - the tracked input of this task. See [schemaFilesIn]
+   * for why the tracked input is the filtered file tree rather than the directory itself.
    */
   @get:InputFiles
   @get:IgnoreEmptyDirectories
@@ -73,25 +76,25 @@ public abstract class KotlinModelGenerate @Inject constructor(objects: ObjectFac
     get() = schemaFilesIn(sourceDirectory)
 
   /**
-   * Where the generated Kotlin extensions are written; cleared before each run, and left absent (not just empty) when
-   * generation is disabled.
+   * Where the generated Kotlin extensions are written; cleared before each run, and left absent
+   * (not just empty) when generation is disabled.
    */
   @get:OutputDirectory public abstract val kotlinOutputDirectory: DirectoryProperty
 
   private val kotlinSpec: ModelMakerKotlinSpec = objects.newInstance()
 
   /**
-   * Whether this task generates, defaulting to `modelmaker { kotlin { } }`'s `enabled` value (see [inheritKotlin])
-   * unless overridden through [kotlin]. Named `generationEnabled`, not `enabled`, to not collide with
-   * [org.gradle.api.Task.getEnabled].
+   * Whether this task generates, defaulting to `modelmaker { kotlin { } }`'s `enabled` value (see
+   * [inheritKotlin]) unless overridden through [kotlin]. Named `generationEnabled`, not `enabled`,
+   * to not collide with [org.gradle.api.Task.getEnabled].
    */
   @get:Input
   public val generationEnabled: Provider<Boolean>
     get() = kotlinSpec.enabled
 
   /**
-   * Configures Kotlin-specific generation, overriding the `modelmaker { kotlin { } }` defaults for this task only, see
-   * [ModelMakerKotlinSpec]:
+   * Configures Kotlin-specific generation, overriding the `modelmaker { kotlin { } }` defaults for
+   * this task only, see [ModelMakerKotlinSpec]:
    * ```
    * tasks.named<KotlinModelGenerate>("generateModelKotlin") {
    *   kotlin {
@@ -107,8 +110,9 @@ public abstract class KotlinModelGenerate @Inject constructor(objects: ObjectFac
   }
 
   /**
-   * Defaults this task's `enabled` flag to the `modelmaker { kotlin { } }` one. Called by the plugin right after the
-   * task is registered, so an explicit [kotlin] call on the task always overrides it.
+   * Defaults this task's `enabled` flag to the `modelmaker { kotlin { } }` one. Called by the
+   * plugin right after the task is registered, so an explicit [kotlin] call on the task always
+   * overrides it.
    *
    * @param enabled `modelmaker.kotlin.enabled`
    */
@@ -117,9 +121,9 @@ public abstract class KotlinModelGenerate @Inject constructor(objects: ObjectFac
   }
 
   /**
-   * Whether the Kotlin JVM plugin is applied to the project. Not part of the `kotlin { }` DSL - it's a fact about the
-   * project, not a user toggle - so it's set once by the plugin (`ModelMakerPlugin`) rather than defaulted/overridden
-   * like [generationEnabled].
+   * Whether the Kotlin JVM plugin is applied to the project. Not part of the `kotlin { }` DSL -
+   * it's a fact about the project, not a user toggle - so it's set once by the plugin
+   * (`ModelMakerPlugin`) rather than defaulted/overridden like [generationEnabled].
    */
   @get:Input public abstract val kotlinPluginApplied: Property<Boolean>
 

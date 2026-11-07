@@ -17,8 +17,8 @@
 package io.github.malczuuu.modelmaker.maven.config;
 
 /**
- * The {@code preferPrimitives} feature - a plain on/off toggle. Always-set scalar fields use the primitive type ({@code
- * int}, {@code double}, {@code boolean}) instead of the boxed one.
+ * The {@code preferPrimitives} feature - a plain on/off toggle. Always-set scalar fields use the
+ * primitive type ({@code int}, {@code double}, {@code boolean}) instead of the boxed one.
  *
  * <pre>
  * &lt;preferPrimitives&gt;

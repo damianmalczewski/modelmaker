@@ -21,15 +21,17 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Per-schema overrides of {@code modelmaker { features { } }}, parsed from a schema file's top-level {@code "features"}
- * object. The {@code jackson} / {@code validation} / {@code openApi} overrides are {@link JacksonOverride} / {@link
- * ValidationOverride} / {@link OpenApiOverride} (each flag {@code null} when unset); {@code withers} / {@code
- * preferPrimitives} are {@code null} when unset. Built through {@link #builder()} or {@link #none()}.
+ * Per-schema overrides of {@code modelmaker { features { } }}, parsed from a schema file's
+ * top-level {@code "features"} object. The {@code jackson} / {@code validation} / {@code openApi}
+ * overrides are {@link JacksonOverride} / {@link ValidationOverride} / {@link OpenApiOverride}
+ * (each flag {@code null} when unset); {@code withers} / {@code preferPrimitives} are {@code null}
+ * when unset. Built through {@link #builder()} or {@link #none()}.
  */
 public final class FeatureOverrides {
 
   private static final FeatureOverrides NONE =
-      new FeatureOverrides(JacksonOverride.none(), ValidationOverride.none(), OpenApiOverride.none(), null, null);
+      new FeatureOverrides(
+          JacksonOverride.none(), ValidationOverride.none(), OpenApiOverride.none(), null, null);
 
   private final JacksonOverride jackson;
   private final ValidationOverride validation;

@@ -42,27 +42,29 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.newInstance
 
 /**
- * Reads the lightweight JSON schema files (and Avro `.avsc` record schemas) under [sourceDirectory] and writes one
- * immutable Java DTO per schema into [javaOutputDirectory].
+ * Reads the lightweight JSON schema files (and Avro `.avsc` record schemas) under [sourceDirectory]
+ * and writes one immutable Java DTO per schema into [javaOutputDirectory].
  *
- * Not incremental: [javaOutputDirectory] is wiped and rebuilt on every run. Cacheable, with [schemaFiles] tracked
- * relative, so a cache hit restores the whole output without re-emitting.
+ * Not incremental: [javaOutputDirectory] is wiped and rebuilt on every run. Cacheable, with
+ * [schemaFiles] tracked relative, so a cache hit restores the whole output without re-emitting.
  *
  * @param objects factory creating this task's `features { }` block
  */
 @CacheableTask
-public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFactory) : DefaultTask() {
+public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFactory) :
+    DefaultTask() {
 
   /**
-   * Directory scanned recursively for `*.json` and `*.avsc` schema files. Need not exist - a build without schemas is
-   * not an error.
+   * Directory scanned recursively for `*.json` and `*.avsc` schema files. Need not exist - a build
+   * without schemas is not an error.
    */
   @get:Internal public abstract val sourceDirectory: DirectoryProperty
 
   /**
    * The schema files under [sourceDirectory] - the tracked input of this task.
    *
-   * See [schemaFilesIn] for why the tracked input is the filtered file tree rather than the directory itself.
+   * See [schemaFilesIn] for why the tracked input is the filtered file tree rather than the
+   * directory itself.
    */
   @get:InputFiles
   @get:IgnoreEmptyDirectories
@@ -74,15 +76,15 @@ public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFacto
   @get:OutputDirectory public abstract val javaOutputDirectory: DirectoryProperty
 
   /**
-   * The features this task emits with, defaulting to the `modelmaker { features { } }` values (see [inheritFeatures])
-   * unless overridden through [features]. Each is also overridable per schema via a `"features"` object in the schema
-   * file.
+   * The features this task emits with, defaulting to the `modelmaker { features { } }` values (see
+   * [inheritFeatures]) unless overridden through [features]. Each is also overridable per schema
+   * via a `"features"` object in the schema file.
    */
   @get:Nested public val featuresSpec: ModelMakerFeaturesSpec = objects.newInstance()
 
   /**
-   * Configures which features this task emits, overriding the `modelmaker { features { } }` defaults for this task
-   * only, see [ModelMakerFeaturesSpec]:
+   * Configures which features this task emits, overriding the `modelmaker { features { } }`
+   * defaults for this task only, see [ModelMakerFeaturesSpec]:
    * ```
    * tasks.named<JavaModelGenerate>("generateModelJava") {
    *   features {
@@ -98,8 +100,9 @@ public abstract class JavaModelGenerate @Inject constructor(objects: ObjectFacto
   }
 
   /**
-   * Defaults this task's feature flags to the `modelmaker { features { } }` ones. Called by the plugin right after the
-   * task is registered, so an explicit [features] call on the task always overrides it.
+   * Defaults this task's feature flags to the `modelmaker { features { } }` ones. Called by the
+   * plugin right after the task is registered, so an explicit [features] call on the task always
+   * overrides it.
    *
    * @param features the `modelmaker { features { } }` spec
    */

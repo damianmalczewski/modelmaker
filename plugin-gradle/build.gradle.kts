@@ -10,7 +10,8 @@ plugins {
 
 internalBuild {
     displayName = "ModelMaker Gradle Plugin"
-    description = "Gradle plugin of the ModelMaker project, generating Java model classes from schema files."
+    description =
+        "Gradle plugin of the ModelMaker project, generating Java model classes from schema files."
 }
 
 dependencies {

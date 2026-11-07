@@ -21,8 +21,8 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
- * One annotation to place on a generated field or getter. {@code args} are pre-rendered {@code {name} = {value}}
- * strings.
+ * One annotation to place on a generated field or getter. {@code args} are pre-rendered {@code
+ * {name} = {value}} strings.
  */
 final class AnnotationSpec {
 
@@ -76,7 +76,9 @@ final class AnnotationSpec {
    * @return the rendered annotation.
    */
   String render() {
-    return args.isEmpty() ? "@" + simpleName : "@" + simpleName + "(" + String.join(", ", args) + ")";
+    return args.isEmpty()
+        ? "@" + simpleName
+        : "@" + simpleName + "(" + String.join(", ", args) + ")";
   }
 
   @Override
@@ -99,6 +101,10 @@ final class AnnotationSpec {
 
   @Override
   public String toString() {
-    return "AnnotationSpec[" + ("simpleName=" + simpleName) + (", importName=" + importName) + (", args=" + args) + "]";
+    return "AnnotationSpec["
+        + ("simpleName=" + simpleName)
+        + (", importName=" + importName)
+        + (", args=" + args)
+        + "]";
   }
 }

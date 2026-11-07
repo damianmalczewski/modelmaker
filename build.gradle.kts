@@ -23,9 +23,14 @@ dependencies {
 
     when (val module = providers.gradleProperty("releaseModule").orNull) {
         null -> Unit
+
         "modelmaker" -> nmcpAggregation(project(":modelmaker"))
+
         "plugin-maven" -> nmcpAggregation(project(":modelmaker-maven-plugin"))
-        else -> throw GradleException("Unknown releaseModule '$module', expected 'modelmaker' or 'plugin-maven'")
+
+        else -> throw GradleException(
+            "Unknown releaseModule '$module', expected 'modelmaker' or 'plugin-maven'",
+        )
     }
 }
 
@@ -35,7 +40,7 @@ spotless {
         targetExclude("examples/**", "**/build/**", "**/package-info.java", "**/module-info.java")
 
         licenseHeaderFile("${rootProject.rootDir}/gradle/license-header.txt")
-        googleJavaFormat().maxLineLength(120)
+        googleJavaFormat().maxLineLength(100)
         formatAnnotations()
         forbidWildcardImports()
         endWithNewline()
@@ -69,7 +74,7 @@ spotless {
 
         licenseHeaderFile("${rootProject.rootDir}/gradle/license-header.txt")
         ktfmt().metaStyle().configure {
-            it.setMaxWidth(120)
+            it.setMaxWidth(100)
             it.setRemoveUnusedImports(true)
         }
         endWithNewline()
@@ -80,7 +85,7 @@ spotless {
         targetExclude("**/build/**")
 
         ktlint().editorConfigOverride(
-            mapOf("max_line_length" to "120"),
+            mapOf("max_line_length" to "100"),
         )
         endWithNewline()
         lineEndings = LineEnding.UNIX

@@ -24,7 +24,12 @@ class FeatureOverridesTest {
 
   /** primitives off, withers on, jackson on, validation off, openApi off. */
   private static ModelOptions base() {
-    return ModelOptions.builder().preferPrimitives(false).withers(true).jackson(true).validation(false).build();
+    return ModelOptions.builder()
+        .preferPrimitives(false)
+        .withers(true)
+        .jackson(true)
+        .validation(false)
+        .build();
   }
 
   @Test
@@ -38,7 +43,8 @@ class FeatureOverridesTest {
 
   @Test
   void aSetEnabledOverrideReplacesOnlyThatFeature() {
-    ModelOptions result = FeatureOverrides.builder().jackson(JacksonOverride.enabled(false)).build().applyOn(base());
+    ModelOptions result =
+        FeatureOverrides.builder().jackson(JacksonOverride.enabled(false)).build().applyOn(base());
 
     assertThat(result.getJackson().isEnabled()).isFalse(); // overridden
     assertThat(result.getValidation().isEnabled()).isFalse(); // untouched
@@ -49,7 +55,10 @@ class FeatureOverridesTest {
   @Test
   void aPlacementOverrideLeavesEnabledAtTheBase() {
     ModelOptions result =
-        FeatureOverrides.builder().jackson(new JacksonOverride(null, true, null, null)).build().applyOn(base());
+        FeatureOverrides.builder()
+            .jackson(new JacksonOverride(null, true, null, null))
+            .build()
+            .applyOn(base());
 
     assertThat(result.getJackson().isEnabled()).isTrue(); // base
     assertThat(result.getJackson().isAnnotateFields()).isTrue(); // overridden
@@ -96,7 +105,8 @@ class FeatureOverridesTest {
 
   @Test
   void partialOverrideMixesOverrideAndBase() {
-    ModelOptions result = FeatureOverrides.builder().withers(false).preferPrimitives(true).build().applyOn(base());
+    ModelOptions result =
+        FeatureOverrides.builder().withers(false).preferPrimitives(true).build().applyOn(base());
 
     assertThat(result.isWithers()).isFalse(); // override
     assertThat(result.isPreferPrimitives()).isTrue(); // override
@@ -106,7 +116,8 @@ class FeatureOverridesTest {
 
   @Test
   void aNoneOverrideIsTreatedAsUnset() {
-    ModelOptions result = FeatureOverrides.builder().jackson(JacksonOverride.none()).build().applyOn(base());
+    ModelOptions result =
+        FeatureOverrides.builder().jackson(JacksonOverride.none()).build().applyOn(base());
 
     assertThat(result.getJackson()).isEqualTo(base().getJackson());
   }

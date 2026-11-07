@@ -22,9 +22,9 @@ import io.github.malczuuu.modelmaker.OpenApiConfig;
 import io.github.malczuuu.modelmaker.ValidationConfig;
 
 /**
- * The {@code <features>} block of the plugin configuration - the Maven face of {@code modelmaker { features { } }}.
- * Every feature is off by default, and each is overridable per schema file through that file's own {@code "features"}
- * object.
+ * The {@code <features>} block of the plugin configuration - the Maven face of {@code modelmaker {
+ * features { } }}. Every feature is off by default, and each is overridable per schema file through
+ * that file's own {@code "features"} object.
  */
 public class Features {
 

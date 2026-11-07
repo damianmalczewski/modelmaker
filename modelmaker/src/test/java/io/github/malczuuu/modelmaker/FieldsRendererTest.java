@@ -28,18 +28,29 @@ class FieldsRendererTest {
 
   private static ModelOptions validationOnFields() {
     return ModelOptions.builder()
-        .validation(ValidationConfig.builder().enabled(true).annotateFields(true).annotateGetters(false).build())
+        .validation(
+            ValidationConfig.builder()
+                .enabled(true)
+                .annotateFields(true)
+                .annotateGetters(false)
+                .build())
         .build();
   }
 
   private static ModelOptions openApiOnFields() {
     return ModelOptions.builder()
-        .openApi(OpenApiConfig.builder().enabled(true).annotateFields(true).annotateGetters(false).build())
+        .openApi(
+            OpenApiConfig.builder()
+                .enabled(true)
+                .annotateFields(true)
+                .annotateGetters(false)
+                .build())
         .build();
   }
 
   private static ModelType type(String name, Property... properties) {
-    return new ModelType(name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
+    return new ModelType(
+        name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
   }
 
   private static final ModelType WIDGET =
@@ -52,7 +63,8 @@ class FieldsRendererTest {
   void rendersOnePrivateFinalFieldPerProperty() {
     RenderResult result = new FieldsRenderer().init("", WIDGET, OPTIONS).render();
 
-    assertThat(result.getCode()).isEqualTo("private final String id;\n\nprivate final @Nullable String note;\n\n");
+    assertThat(result.getCode())
+        .isEqualTo("private final String id;\n\nprivate final @Nullable String note;\n\n");
     assertThat(result.getImports()).containsExactly("org.jspecify.annotations.Nullable");
   }
 
@@ -70,12 +82,18 @@ class FieldsRendererTest {
         type(
             "Bag",
             property(
-                "tags", PropType.ArrayType.of(PropType.ScalarType.STRING), false, Constraints.none(), "tags", null));
+                "tags",
+                PropType.ArrayType.of(PropType.ScalarType.STRING),
+                false,
+                Constraints.none(),
+                "tags",
+                null));
 
     RenderResult result = new FieldsRenderer().init("", type, OPTIONS).render();
 
     assertThat(result.getCode()).contains("private final @Nullable List<String> tags;");
-    assertThat(result.getImports()).containsExactlyInAnyOrder("org.jspecify.annotations.Nullable", "java.util.List");
+    assertThat(result.getImports())
+        .containsExactlyInAnyOrder("org.jspecify.annotations.Nullable", "java.util.List");
   }
 
   @Test
@@ -84,7 +102,12 @@ class FieldsRendererTest {
         type(
             "Person",
             property(
-                "id", PropType.ScalarType.STRING, true, Constraints.builder().pattern("^X\\d+$").build(), "id", null));
+                "id",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.builder().pattern("^X\\d+$").build(),
+                "id",
+                null));
     ModelOptions validation = validationOnFields();
 
     RenderResult result = new FieldsRenderer().init("", type, validation).render();
@@ -100,7 +123,15 @@ class FieldsRendererTest {
     ModelType type =
         type(
             "Person",
-            property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null, "the identifier", "P123"));
+            property(
+                "id",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.none(),
+                "id",
+                null,
+                "the identifier",
+                "P123"));
     ModelOptions openApi = openApiOnFields();
 
     RenderResult result = new FieldsRenderer().init("", type, openApi).render();
@@ -115,7 +146,10 @@ class FieldsRendererTest {
 
   @Test
   void openApiOnEmitsNoSchemaAnnotationWithoutDescriptionOrExample() {
-    ModelType type = type("Person", property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null));
+    ModelType type =
+        type(
+            "Person",
+            property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null));
     ModelOptions openApi = openApiOnFields();
 
     RenderResult result = new FieldsRenderer().init("", type, openApi).render();
@@ -129,7 +163,15 @@ class FieldsRendererTest {
     ModelType type =
         type(
             "Person",
-            property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null, "the identifier", null));
+            property(
+                "id",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.none(),
+                "id",
+                null,
+                "the identifier",
+                null));
 
     RenderResult result = new FieldsRenderer().init("", type, OPTIONS).render();
 
@@ -142,7 +184,12 @@ class FieldsRendererTest {
         type(
             "Person",
             property(
-                "id", PropType.ScalarType.STRING, true, Constraints.builder().pattern("^X\\d+$").build(), "id", null));
+                "id",
+                PropType.ScalarType.STRING,
+                true,
+                Constraints.builder().pattern("^X\\d+$").build(),
+                "id",
+                null));
 
     RenderResult result = new FieldsRenderer().init("", type, OPTIONS).render();
 
@@ -205,13 +252,17 @@ class FieldsRendererTest {
                 "tags",
                 PropType.ArrayType.of(PropType.ScalarType.STRING),
                 false,
-                Constraints.builder().elementConstraints(Constraints.builder().minLength(1).build()).build(),
+                Constraints.builder()
+                    .elementConstraints(Constraints.builder().minLength(1).build())
+                    .build(),
                 "tags",
                 null));
 
     RenderResult result = new FieldsRenderer().init("", type, OPTIONS).render();
 
-    assertThat(result.getCode()).doesNotContain("@Size").contains("private final @Nullable List<String> tags;");
+    assertThat(result.getCode())
+        .doesNotContain("@Size")
+        .contains("private final @Nullable List<String> tags;");
   }
 
   @Test
@@ -226,12 +277,20 @@ class FieldsRendererTest {
     ModelType blob =
         type(
             "Blob",
-            property("payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
-            property("signature", PropType.ScalarType.BYTES, false, Constraints.none(), "signature", null));
+            property(
+                "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
+            property(
+                "signature",
+                PropType.ScalarType.BYTES,
+                false,
+                Constraints.none(),
+                "signature",
+                null));
 
     RenderResult result = new FieldsRenderer().init("", blob, OPTIONS).render();
 
     assertThat(result.getCode())
-        .isEqualTo("private final byte[] payload;\n\nprivate final @Nullable byte[] signature;\n\n");
+        .isEqualTo(
+            "private final byte[] payload;\n\nprivate final @Nullable byte[] signature;\n\n");
   }
 }

@@ -20,8 +20,9 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
- * {@code jakarta.validation} annotation configuration: whether the feature is on, and where its annotations sit
- * (fields, getters, or both). Built through {@link #builder()}; read back through {@code ModelOptions}.
+ * {@code jakarta.validation} annotation configuration: whether the feature is on, and where its
+ * annotations sit (fields, getters, or both). Built through {@link #builder()}; read back through
+ * {@code ModelOptions}.
  */
 public final class ValidationConfig {
 
@@ -38,8 +39,8 @@ public final class ValidationConfig {
   }
 
   /**
-   * The default configuration - disabled, getter placement ({@code enabled=false}, {@code annotateFields=false}, {@code
-   * annotateGetters=true}).
+   * The default configuration - disabled, getter placement ({@code enabled=false}, {@code
+   * annotateFields=false}, {@code annotateGetters=true}).
    *
    * @return the shared default instance.
    */
@@ -102,7 +103,8 @@ public final class ValidationConfig {
   }
 
   /**
-   * Applies a per-schema {@link ValidationOverride} over this config; unset override flags keep this instance's value.
+   * Applies a per-schema {@link ValidationOverride} over this config; unset override flags keep
+   * this instance's value.
    *
    * @param override the override.
    * @return the resolved config.

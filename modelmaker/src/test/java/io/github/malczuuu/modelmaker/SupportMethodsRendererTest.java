@@ -28,7 +28,8 @@ class SupportMethodsRendererTest {
   private static final ModelOptions OPTIONS = ModelOptions.builder().build();
 
   private static ModelType type(String name, Property... properties) {
-    return new ModelType(name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
+    return new ModelType(
+        name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
   }
 
   private static final ModelType WIDGET =
@@ -43,13 +44,16 @@ class SupportMethodsRendererTest {
         type(
             "Widget",
             property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
-            sensitiveProperty("token", PropType.ScalarType.STRING, true, Constraints.none(), "token", null));
+            sensitiveProperty(
+                "token", PropType.ScalarType.STRING, true, Constraints.none(), "token", null));
 
     RenderResult result = new SupportMethodsRenderer().init("", widget, OPTIONS).render();
 
     assertThat(result.getCode()).contains("\", token=***\"").doesNotContain("\", token=\" + token");
     // equals / hashCode keep comparing the real value.
-    assertThat(result.getCode()).contains("Objects.equals(token, other.token)").contains("Objects.hash(id, token)");
+    assertThat(result.getCode())
+        .contains("Objects.equals(token, other.token)")
+        .contains("Objects.hash(id, token)");
   }
 
   @Test
@@ -80,7 +84,8 @@ class SupportMethodsRendererTest {
                 + "    + \", note=\" + note\n"
                 + "    + \"]\";\n"
                 + "}\n");
-    assertThat(result.getImports()).containsExactlyInAnyOrder("java.util.Objects", "org.jspecify.annotations.Nullable");
+    assertThat(result.getImports())
+        .containsExactlyInAnyOrder("java.util.Objects", "org.jspecify.annotations.Nullable");
   }
 
   @Test
@@ -97,7 +102,8 @@ class SupportMethodsRendererTest {
   void alwaysReportsObjectsAndNullableRegardlessOfProperties() {
     RenderResult result = new SupportMethodsRenderer().init("", type("Empty"), OPTIONS).render();
 
-    assertThat(result.getImports()).containsExactlyInAnyOrder("java.util.Objects", "org.jspecify.annotations.Nullable");
+    assertThat(result.getImports())
+        .containsExactlyInAnyOrder("java.util.Objects", "org.jspecify.annotations.Nullable");
   }
 
   @Test
@@ -127,7 +133,10 @@ class SupportMethodsRendererTest {
   void comparesOptionalScalarFieldsWithObjectsEqualsEvenWhenPreferPrimitivesIsOn() {
     ModelOptions preferPrimitives = ModelOptions.builder().preferPrimitives(true).build();
     ModelType type =
-        type("Widget", property("count", PropType.ScalarType.INTEGER, false, Constraints.none(), "count", null));
+        type(
+            "Widget",
+            property(
+                "count", PropType.ScalarType.INTEGER, false, Constraints.none(), "count", null));
 
     RenderResult result = new SupportMethodsRenderer().init("", type, preferPrimitives).render();
 
@@ -147,7 +156,8 @@ class SupportMethodsRendererTest {
         type(
             "Blob",
             property("id", PropType.ScalarType.STRING, true, Constraints.none(), "id", null),
-            property("payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
+            property(
+                "payload", PropType.ScalarType.BYTES, true, Constraints.none(), "payload", null),
             property("sig", PropType.ScalarType.BYTES, false, Constraints.none(), "sig", null));
 
     RenderResult result = new SupportMethodsRenderer().init("", blob, OPTIONS).render();
@@ -157,7 +167,8 @@ class SupportMethodsRendererTest {
         .contains("&& Arrays.equals(sig, other.sig);")
         .contains("return Objects.hash(id, Arrays.hashCode(payload), Arrays.hashCode(sig));")
         .contains("+ \", payload=\" + Base64.getEncoder().encodeToString(payload)")
-        .contains("+ \", sig=\" + (sig != null ? Base64.getEncoder().encodeToString(sig) : \"null\")");
+        .contains(
+            "+ \", sig=\" + (sig != null ? Base64.getEncoder().encodeToString(sig) : \"null\")");
     assertThat(result.getImports()).contains("java.util.Arrays", "java.util.Base64");
   }
 }

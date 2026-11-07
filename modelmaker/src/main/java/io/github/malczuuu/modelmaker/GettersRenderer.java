@@ -20,11 +20,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Renders the {@code getXyz()} getters for one model type, one per property, each preceded by the annotations of any
- * feature whose config {@code emitsOnGetters()}. A collection-valued getter returns {@code
- * Collections.unmodifiableList} of the field so a caller cannot mutate the DTO through it.
+ * Renders the {@code getXyz()} getters for one model type, one per property, each preceded by the
+ * annotations of any feature whose config {@code emitsOnGetters()}. A collection-valued getter
+ * returns {@code Collections.unmodifiableList} of the field so a caller cannot mutate the DTO
+ * through it.
  *
- * <p>Renders just the getters; the enclosing class, its fields and everything else are the composing emitter's job.
+ * <p>Renders just the getters; the enclosing class, its fields and everything else are the
+ * composing emitter's job.
  */
 final class GettersRenderer extends AbstractSnippetRenderer {
 
@@ -47,7 +49,8 @@ final class GettersRenderer extends AbstractSnippetRenderer {
     boolean jackson = options.getJackson().emitsOnGetters();
     boolean validation = options.getValidation().emitsOnGetters();
     for (Property p : properties) {
-      for (String a : PropertyAnnotations.declarationAnnotations(p, openApi, jackson, validation, imports)) {
+      for (String a :
+          PropertyAnnotations.declarationAnnotations(p, openApi, jackson, validation, imports)) {
         code.append(indent).append(a).append('\n');
       }
       code.append(indent)
@@ -63,10 +66,10 @@ final class GettersRenderer extends AbstractSnippetRenderer {
   }
 
   /**
-   * Type of the getter return value: non-null when the value is always set, and a primitive scalar only when {@link
-   * ModelOptions#isPreferPrimitives()} is on. A {@code List} return type carries its element's {@code
-   * jakarta.validation} constraints (and {@code @Valid} for a DTO element) in the container-element position when
-   * {@code validation} annotates getters.
+   * Type of the getter return value: non-null when the value is always set, and a primitive scalar
+   * only when {@link ModelOptions#isPreferPrimitives()} is on. A {@code List} return type carries
+   * its element's {@code jakarta.validation} constraints (and {@code @Valid} for a DTO element) in
+   * the container-element position when {@code validation} annotates getters.
    *
    * @param prop the property to type.
    * @param validation whether {@code jakarta.validation} emits on getters.
@@ -76,7 +79,10 @@ final class GettersRenderer extends AbstractSnippetRenderer {
   private String returnType(Property prop, boolean validation, Set<String> imports) {
     if (prop.getType() instanceof PropType.ArrayType array) {
       String list =
-          types.listType(array, PropertyAnnotations.elementAnnotations(prop, array, validation, imports), imports);
+          types.listType(
+              array,
+              PropertyAnnotations.elementAnnotations(prop, array, validation, imports),
+              imports);
       if (prop.nonNull()) {
         return list;
       }
@@ -95,8 +101,9 @@ final class GettersRenderer extends AbstractSnippetRenderer {
   }
 
   /**
-   * Getter return expression: a collection-valued field is wrapped in {@code Collections.unmodifiableList} so a caller
-   * cannot mutate the DTO through the getter; a {@code @Nullable} collection stays {@code null} when unset.
+   * Getter return expression: a collection-valued field is wrapped in {@code
+   * Collections.unmodifiableList} so a caller cannot mutate the DTO through the getter; a
+   * {@code @Nullable} collection stays {@code null} when unset.
    *
    * @param prop the property being returned.
    * @param imports import set to add {@code java.util.Collections} to when needed.

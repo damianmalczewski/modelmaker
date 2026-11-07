@@ -49,9 +49,12 @@ class ConstraintUtilsTest {
     assertThat(rendered).contains("NotNull(message = \"must not be null\")");
     assertThat(rendered).contains("Valid");
     assertThat(rendered).contains("Size(min = 2, message = \"size must be at least 2\")");
-    assertThat(rendered).contains("DecimalMin(value = \"0.5\", message = \"must be greater than or equal to 0.5\")");
+    assertThat(rendered)
+        .contains(
+            "DecimalMin(value = \"0.5\", message = \"must be greater than or equal to 0.5\")");
     assertThat(rendered.stream().filter(it -> it.startsWith("Pattern")).findFirst().orElseThrow())
-        .isEqualTo("Pattern(regexp = \"^a\\\"b\\\\c\", message = \"must match \\\"^a\\\"b\\\\c\\\"\")");
+        .isEqualTo(
+            "Pattern(regexp = \"^a\\\"b\\\\c\", message = \"must match \\\"^a\\\"b\\\\c\\\"\")");
 
     // @Valid alone, no message
     assertThat(

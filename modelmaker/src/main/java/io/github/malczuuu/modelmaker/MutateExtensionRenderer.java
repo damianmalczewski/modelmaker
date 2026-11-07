@@ -19,11 +19,12 @@ package io.github.malczuuu.modelmaker;
 import java.util.Set;
 
 /**
- * Renders the Kotlin {@code mutate { }} extension for one model type - a {@code receiver.mutate { block }} function
- * over the Java DTO's {@code BuilderMutator}, so {@code build()} stays out of the block.
+ * Renders the Kotlin {@code mutate { }} extension for one model type - a {@code receiver.mutate {
+ * block }} function over the Java DTO's {@code BuilderMutator}, so {@code build()} stays out of the
+ * block.
  *
- * <p>Renders just that one function; the {@code package} declaration, the import list and the do-not-edit banner are
- * the composing emitter's job.
+ * <p>Renders just that one function; the {@code package} declaration, the import list and the
+ * do-not-edit banner are the composing emitter's job.
  */
 final class MutateExtensionRenderer implements SnippetRenderer {
 
@@ -34,9 +35,10 @@ final class MutateExtensionRenderer implements SnippetRenderer {
   MutateExtensionRenderer() {}
 
   /**
-   * Configures this renderer. Not an override of {@link SnippetRenderer#init(String, ModelType, ModelOptions)} - this
-   * renders Kotlin, not a Java DTO, so there is no {@link ModelType} / {@link ModelOptions} to take, and that method is
-   * left at its no-op default. This is the real configuration method instead.
+   * Configures this renderer. Not an override of {@link SnippetRenderer#init(String, ModelType,
+   * ModelOptions)} - this renders Kotlin, not a Java DTO, so there is no {@link ModelType} / {@link
+   * ModelOptions} to take, and that method is left at its no-op default. This is the real
+   * configuration method instead.
    *
    * @param indent leading whitespace prepended to every rendered line.
    * @param type the receiver type, dot-qualified for a nested type (e.g. {@code Order.Line}).

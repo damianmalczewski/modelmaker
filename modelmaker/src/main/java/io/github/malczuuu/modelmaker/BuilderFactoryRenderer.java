@@ -19,12 +19,12 @@ package io.github.malczuuu.modelmaker;
 import java.util.Set;
 
 /**
- * Renders the {@code builder()} static factory method for one model type: {@code public static Builder builder() {
- * return new Builder(); }}. The same for every type, so {@code init}'s {@code type} and {@code options} arguments are
- * ignored - only the indent matters.
+ * Renders the {@code builder()} static factory method for one model type: {@code public static
+ * Builder builder() { return new Builder(); }}. The same for every type, so {@code init}'s {@code
+ * type} and {@code options} arguments are ignored - only the indent matters.
  *
- * <p>Renders just this one method; the enclosing class, its nested {@code Builder} and everything else are the
- * composing emitter's job.
+ * <p>Renders just this one method; the enclosing class, its nested {@code Builder} and everything
+ * else are the composing emitter's job.
  */
 final class BuilderFactoryRenderer implements SnippetRenderer {
 
@@ -34,8 +34,8 @@ final class BuilderFactoryRenderer implements SnippetRenderer {
   BuilderFactoryRenderer() {}
 
   /**
-   * Records the indent; {@code type} and {@code options} are ignored, since {@code builder()} renders identically for
-   * every model type.
+   * Records the indent; {@code type} and {@code options} are ignored, since {@code builder()}
+   * renders identically for every model type.
    *
    * @param indent leading whitespace prepended to every rendered line.
    * @param type ignored.
@@ -56,7 +56,9 @@ final class BuilderFactoryRenderer implements SnippetRenderer {
   @Override
   public RenderResult render() {
     String code =
-        (indent + "public static Builder builder() {\n") + (indent + "  return new Builder();\n") + (indent + "}\n");
+        (indent + "public static Builder builder() {\n")
+            + (indent + "  return new Builder();\n")
+            + (indent + "}\n");
     return new RenderResult(Set.of(), code);
   }
 }

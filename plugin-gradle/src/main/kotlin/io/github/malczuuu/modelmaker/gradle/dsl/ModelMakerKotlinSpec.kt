@@ -19,11 +19,11 @@ package io.github.malczuuu.modelmaker.gradle.dsl
 import org.gradle.api.provider.Property
 
 /**
- * Kotlin-specific settings, configured via `modelmaker { kotlin { } }`. Only takes effect when the Kotlin JVM plugin
- * (`org.jetbrains.kotlin.jvm`) is applied to the project.
+ * Kotlin-specific settings, configured via `modelmaker { kotlin { } }`. Only takes effect when the
+ * Kotlin JVM plugin (`org.jetbrains.kotlin.jvm`) is applied to the project.
  *
- * @property enabled emit a `<Name>Extensions.kt` per schema, adding a `mutate { }` extension function over the Java
- *   DTO's `Builder`.
+ * @property enabled emit a `<Name>Extensions.kt` per schema, adding a `mutate { }` extension
+ *   function over the Java DTO's `Builder`.
  */
 @ModelMakerDslMarker
 public abstract class ModelMakerKotlinSpec {

@@ -44,7 +44,8 @@ class ModelOptionsTest {
 
   @Test
   void anExplicitConfigIsKept() {
-    OpenApiConfig cfg = OpenApiConfig.builder().enabled(true).annotateFields(true).annotateGetters(false).build();
+    OpenApiConfig cfg =
+        OpenApiConfig.builder().enabled(true).annotateFields(true).annotateGetters(false).build();
 
     ModelOptions o = ModelOptions.builder().openApi(cfg).build();
 
@@ -60,7 +61,12 @@ class ModelOptionsTest {
             .preferPrimitives(true)
             .withers(true)
             .jackson(true)
-            .validation(ValidationConfig.builder().enabled(true).annotateFields(true).annotateGetters(true).build())
+            .validation(
+                ValidationConfig.builder()
+                    .enabled(true)
+                    .annotateFields(true)
+                    .annotateGetters(true)
+                    .build())
             .build();
 
     assertThat(o.mutate().build()).isEqualTo(o);
@@ -82,7 +88,12 @@ class ModelOptionsTest {
         .isNotEqualTo(ModelOptions.builder().jackson(true).withers(true).build())
         .isNotEqualTo(
             ModelOptions.builder()
-                .jackson(JacksonConfig.builder().enabled(true).annotateFields(true).annotateGetters(true).build())
+                .jackson(
+                    JacksonConfig.builder()
+                        .enabled(true)
+                        .annotateFields(true)
+                        .annotateGetters(true)
+                        .build())
                 .build());
   }
 

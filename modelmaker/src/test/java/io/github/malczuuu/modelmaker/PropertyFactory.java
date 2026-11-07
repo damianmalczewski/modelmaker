@@ -44,7 +44,8 @@ final class PropertyFactory {
       @Nullable DefaultValue defaultValue,
       @Nullable String description,
       @Nullable String example) {
-    return new Property(name, type, required, constraints, jsonName, defaultValue, description, example, false);
+    return new Property(
+        name, type, required, constraints, jsonName, defaultValue, description, example, false);
   }
 
   /** A property masked in {@code toString()}. */
@@ -55,6 +56,7 @@ final class PropertyFactory {
       Constraints constraints,
       String jsonName,
       @Nullable DefaultValue defaultValue) {
-    return new Property(name, type, required, constraints, jsonName, defaultValue, null, null, true);
+    return new Property(
+        name, type, required, constraints, jsonName, defaultValue, null, null, true);
   }
 }

@@ -36,11 +36,17 @@ class SimpleSchemaLoaderTest {
 
   @TempDir Path dir;
 
-  /** Writes {@code <title>.json} so the file name matches the schema title, as the loader requires. */
+  /**
+   * Writes {@code <title>.json} so the file name matches the schema title, as the loader requires.
+   */
   private Path schema(String title, String body) {
     return write(
         title + ".json",
-        "{ \"$modelmaker\": \"v1.0\", \"title\": \"" + title + "\", \"type\": \"object\", " + body + " }");
+        "{ \"$modelmaker\": \"v1.0\", \"title\": \""
+            + title
+            + "\", \"type\": \"object\", "
+            + body
+            + " }");
   }
 
   private Path write(String name, String content) {
@@ -62,7 +68,10 @@ class SimpleSchemaLoaderTest {
   }
 
   private static Property prop(ModelType type, String name) {
-    return type.getProperties().stream().filter(p -> p.getName().equals(name)).findFirst().orElseThrow();
+    return type.getProperties().stream()
+        .filter(p -> p.getName().equals(name))
+        .findFirst()
+        .orElseThrow();
   }
 
   private static List<String> propNames(ModelType type) {
@@ -87,14 +96,16 @@ class SimpleSchemaLoaderTest {
             }
             """);
 
-    List<ModelType> types = loader.load(List.of(person, dir.resolve("com.example.dto.Address.json")));
+    List<ModelType> types =
+        loader.load(List.of(person, dir.resolve("com.example.dto.Address.json")));
     ModelType p = single(types, t -> t.getName().equals("Person"));
 
     assertThat(p.getName()).isEqualTo("Person");
     assertThat(p.getPackageName()).isEqualTo("com.example.dto");
     assertThat(propNames(p)).containsExactly("id", "age", "home", "tags");
     assertThat(prop(p, "home").getType()).isEqualTo(PropType.RefType.of("com.example.dto.Address"));
-    assertThat(prop(p, "tags").getType()).isEqualTo(PropType.ArrayType.of(PropType.ScalarType.STRING));
+    assertThat(prop(p, "tags").getType())
+        .isEqualTo(PropType.ArrayType.of(PropType.ScalarType.STRING));
   }
 
   @Test
@@ -164,7 +175,8 @@ class SimpleSchemaLoaderTest {
     ModelType order = loader.load(List.of(f)).getFirst();
 
     assertThat(order.getNested().stream().map(ModelType::getName)).containsExactly("ShipAddress");
-    assertThat(order.getProperties().getFirst().getType()).isEqualTo(PropType.RefType.of("ShipAddress"));
+    assertThat(order.getProperties().getFirst().getType())
+        .isEqualTo(PropType.RefType.of("ShipAddress"));
   }
 
   @Test
@@ -174,7 +186,8 @@ class SimpleSchemaLoaderTest {
             "com.example.dto.U",
             "\"properties\": { \"ship_to\": { \"type\": \"object\", \"properties\": { \"a\": {"
                 + " \"type\": \"string\" } } } }");
-    assertThat(loader.load(List.of(f)).getFirst().getNested().getFirst().getName()).isEqualTo("ShipTo");
+    assertThat(loader.load(List.of(f)).getFirst().getNested().getFirst().getName())
+        .isEqualTo("ShipTo");
   }
 
   @Test
@@ -208,7 +221,8 @@ class SimpleSchemaLoaderTest {
             """);
     ModelType m = loader.load(List.of(f)).getFirst();
     assertThat(prop(m, "d").getConstraints().getPattern()).isEqualTo("^\\d{4}-\\d{2}-\\d{2}$");
-    assertThat(prop(m, "d").getConstraints().getPatternMessage()).isEqualTo("must be a date in yyyy-MM-dd format");
+    assertThat(prop(m, "d").getConstraints().getPatternMessage())
+        .isEqualTo("must be a date in yyyy-MM-dd format");
     assertThat(prop(m, "u").getConstraints().getPatternMessage()).isEqualTo("must be a UUID");
   }
 
@@ -258,14 +272,16 @@ class SimpleSchemaLoaderTest {
     assertThat(prop(m, "active").getDefaultValue()).isEqualTo(DefaultValue.Bool.of(true));
     assertThat(prop(m, "currency").getDefaultValue()).isEqualTo(DefaultValue.Str.of("USD"));
     assertThat(prop(m, "ratio").getDefaultValue()).isEqualTo(DefaultValue.Num.of("1.0"));
-    assertThat(prop(m, "roles").getDefaultValue()).isEqualTo(DefaultValue.Arr.of(List.of(DefaultValue.Str.of("user"))));
+    assertThat(prop(m, "roles").getDefaultValue())
+        .isEqualTo(DefaultValue.Arr.of(List.of(DefaultValue.Str.of("user"))));
     m.getProperties().forEach(it -> assertThat(it.nonNull()).isTrue());
   }
 
   @Test
   void reportsEveryBrokenSchemaInOneGo() {
     Path first = write("x.A.json", "{ \"$modelmaker\": \"v1.0\", \"type\": \"object\" }");
-    Path second = schema("x.B", "\"properties\": { \"n\": { \"type\": \"integer\", \"default\": \"x\" } }");
+    Path second =
+        schema("x.B", "\"properties\": { \"n\": { \"type\": \"integer\", \"default\": \"x\" } }");
     Path third = schema("x.C", "\"properties\": { \"s\": { \"type\": \"nope\" } }");
 
     assertThatThrownBy(() -> loader.load(List.of(first, second, third)))
@@ -298,7 +314,8 @@ class SimpleSchemaLoaderTest {
     Path f =
         schema(
             "x.B",
-            "\"properties\": { \"a\": { \"$ref\": \"x.Missing\" }, \"b\": { \"$ref\":" + " \"x.AlsoMissing\" } }");
+            "\"properties\": { \"a\": { \"$ref\": \"x.Missing\" }, \"b\": { \"$ref\":"
+                + " \"x.AlsoMissing\" } }");
 
     assertThatThrownBy(() -> loader.load(List.of(f)))
         .isInstanceOf(SchemaException.class)
@@ -324,7 +341,10 @@ class SimpleSchemaLoaderTest {
 
   @Test
   void treatsANonBooleanSensitiveKeywordAsUnset() {
-    Path f = schema("x.Token", "\"properties\": { \"secret\": { \"type\": \"string\", \"sensitive\": \"yes\" } }");
+    Path f =
+        schema(
+            "x.Token",
+            "\"properties\": { \"secret\": { \"type\": \"string\", \"sensitive\": \"yes\" } }");
 
     List<ModelType> types = loader.load(List.of(f));
 
@@ -342,8 +362,10 @@ class SimpleSchemaLoaderTest {
 
   @Test
   void rejectsADefaultOfTheWrongType() {
-    Path f = schema("x.D", "\"properties\": { \"n\": { \"type\": \"integer\", \"default\": \"x\" } }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("default must be an integer");
+    Path f =
+        schema("x.D", "\"properties\": { \"n\": { \"type\": \"integer\", \"default\": \"x\" } }");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("default must be an integer");
   }
 
   @Test
@@ -384,8 +406,10 @@ class SimpleSchemaLoaderTest {
 
   @Test
   void rejectsADefaultOnABytesProperty() {
-    Path f = schema("x.D", "\"properties\": { \"b\": { \"type\": \"bytes\", \"default\": \"AA==\" } }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("default is not supported for \"bytes\"");
+    Path f =
+        schema("x.D", "\"properties\": { \"b\": { \"type\": \"bytes\", \"default\": \"AA==\" } }");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("default is not supported for \"bytes\"");
   }
 
   @Test
@@ -398,19 +422,24 @@ class SimpleSchemaLoaderTest {
   @Test
   void rejectsAStringDefaultOfTheWrongType() {
     Path f = schema("x.D", "\"properties\": { \"s\": { \"type\": \"string\", \"default\": 5 } }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("default must be a string");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("default must be a string");
   }
 
   @Test
   void rejectsANumberDefaultOfTheWrongType() {
-    Path f = schema("x.D", "\"properties\": { \"r\": { \"type\": \"number\", \"default\": \"x\" } }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("default must be a number");
+    Path f =
+        schema("x.D", "\"properties\": { \"r\": { \"type\": \"number\", \"default\": \"x\" } }");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("default must be a number");
   }
 
   @Test
   void rejectsABooleanDefaultOfTheWrongType() {
-    Path f = schema("x.D", "\"properties\": { \"b\": { \"type\": \"boolean\", \"default\": \"x\" } }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("default must be a boolean");
+    Path f =
+        schema("x.D", "\"properties\": { \"b\": { \"type\": \"boolean\", \"default\": \"x\" } }");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("default must be a boolean");
   }
 
   @Test
@@ -420,7 +449,8 @@ class SimpleSchemaLoaderTest {
             "x.D",
             "\"properties\": { \"a\": { \"type\": \"array\", \"items\": { \"type\": \"string\" },"
                 + " \"default\": \"x\" } }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("default must be an array");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("default must be an array");
   }
 
   @Test
@@ -448,20 +478,24 @@ class SimpleSchemaLoaderTest {
     Path f =
         write(
             "x.Bad.json",
-            "{ \"$modelmaker\": \"v1.0\", \"title\": \"x.Bad\", \"type\": \"array\"," + " \"properties\": {} }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("top-level \"type\" must be \"object\"");
+            "{ \"$modelmaker\": \"v1.0\", \"title\": \"x.Bad\", \"type\": \"array\","
+                + " \"properties\": {} }");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("top-level \"type\" must be \"object\"");
   }
 
   @Test
   void rejectsAMissingPropertiesObject() {
     Path f = schema("x.Bad", "\"required\": []");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("missing \"properties\" object");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("missing \"properties\" object");
   }
 
   @Test
   void rejectsAPropertyMissingTypeAndRef() {
     Path f = schema("x.Bad", "\"properties\": { \"a\": {} }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("needs \"type\" or \"$ref\"");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("needs \"type\" or \"$ref\"");
   }
 
   @Test
@@ -477,7 +511,8 @@ class SimpleSchemaLoaderTest {
             "x.Bad",
             "\"properties\": { \"a\": { \"type\": \"array\", \"items\": { \"type\": \"array\","
                 + " \"items\": { \"type\": \"string\" } } } }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("nested arrays are not supported");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("nested arrays are not supported");
   }
 
   @Test
@@ -492,7 +527,8 @@ class SimpleSchemaLoaderTest {
   @Test
   void rejectsAnUnknownType() {
     Path f = schema("x.Bad", "\"properties\": { \"a\": { \"type\": \"date\" } }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("unsupported type \"date\"");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("unsupported type \"date\"");
   }
 
   @Test
@@ -505,7 +541,9 @@ class SimpleSchemaLoaderTest {
                 + " \"withers\": { \"enabled\": true }, \"preferPrimitives\": { \"enabled\": false"
                 + " }, \"openApi\": { \"enabled\": true } }, \"properties\": {}");
     Path jacksonOnly =
-        schema("x.JacksonOnly", "\"features\": { \"jackson\": { \"enabled\": true } }, \"properties\": {}");
+        schema(
+            "x.JacksonOnly",
+            "\"features\": { \"jackson\": { \"enabled\": true } }, \"properties\": {}");
     Path none = schema("x.None", "\"properties\": {}");
 
     List<ModelType> types = loader.load(List.of(all, jacksonOnly, none));
@@ -529,19 +567,29 @@ class SimpleSchemaLoaderTest {
     Path f =
         schema(
             "x.Account",
-            "\"features\": { \"jackson\": { \"enabled\": true, \"includeNonNull\": true } }," + " \"properties\": {}");
+            "\"features\": { \"jackson\": { \"enabled\": true, \"includeNonNull\": true } },"
+                + " \"properties\": {}");
 
     List<ModelType> types = loader.load(List.of(f));
 
-    assertThat(types.getFirst().getFeatureOverrides().getJackson().getIncludeNonNull()).contains(Boolean.TRUE);
+    assertThat(types.getFirst().getFeatureOverrides().getJackson().getIncludeNonNull())
+        .contains(Boolean.TRUE);
     assertThat(
-            types.getFirst().getFeatureOverrides().applyOn(ModelOptions.defaults()).getJackson().emitsIncludeNonNull())
+            types
+                .getFirst()
+                .getFeatureOverrides()
+                .applyOn(ModelOptions.defaults())
+                .getJackson()
+                .emitsIncludeNonNull())
         .isTrue();
   }
 
   @Test
   void rejectsAnUnknownJacksonFeatureKey() {
-    Path f = schema("x.Account", "\"features\": { \"jackson\": { \"includeNulls\": true } }, \"properties\": {}");
+    Path f =
+        schema(
+            "x.Account",
+            "\"features\": { \"jackson\": { \"includeNulls\": true } }, \"properties\": {}");
 
     assertThatThrownBy(() -> loader.load(List.of(f)))
         .isInstanceOf(SchemaException.class)
@@ -574,7 +622,9 @@ class SimpleSchemaLoaderTest {
 
   @Test
   void rejectsANonBooleanFeaturesFlag() {
-    Path f = schema("x.Bad", "\"features\": { \"jackson\": { \"enabled\": \"yes\" } }, \"properties\": {}");
+    Path f =
+        schema(
+            "x.Bad", "\"features\": { \"jackson\": { \"enabled\": \"yes\" } }, \"properties\": {}");
     assertThatThrownBy(() -> loader.load(List.of(f)))
         .hasMessageContaining("\"features.jackson.enabled\" must be a boolean");
   }
@@ -582,18 +632,24 @@ class SimpleSchemaLoaderTest {
   @Test
   void rejectsABooleanShorthandFeaturesEntry() {
     Path f = schema("x.Bad", "\"features\": { \"jackson\": true }, \"properties\": {}");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("\"features.jackson\" must be an object");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("\"features.jackson\" must be an object");
   }
 
   @Test
   void rejectsAnUnknownFeaturesEntry() {
-    Path f = schema("x.Bad", "\"features\": { \"jacksom\": { \"enabled\": true } }, \"properties\": {}");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("unknown \"features\" entry \"jacksom\"");
+    Path f =
+        schema("x.Bad", "\"features\": { \"jacksom\": { \"enabled\": true } }, \"properties\": {}");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("unknown \"features\" entry \"jacksom\"");
   }
 
   @Test
   void rejectsAnUnknownKeyInsideAFeatureEntry() {
-    Path f = schema("x.Bad", "\"features\": { \"withers\": { \"annotateFields\": true } }, \"properties\": {}");
+    Path f =
+        schema(
+            "x.Bad",
+            "\"features\": { \"withers\": { \"annotateFields\": true } }, \"properties\": {}");
     assertThatThrownBy(() -> loader.load(List.of(f)))
         .hasMessageContaining("unknown \"features.withers\" entry \"annotateFields\"");
   }
@@ -613,15 +669,20 @@ class SimpleSchemaLoaderTest {
                 + " \"array\", \"items\": { \"$ref\": \"java.util.UUID\" } } }");
 
     ModelType t = loader.load(List.of(f)).getFirst();
-    assertThat(t.getProperties().getFirst().getType()).isEqualTo(PropType.ExternalType.of("java.time.Instant"));
+    assertThat(t.getProperties().getFirst().getType())
+        .isEqualTo(PropType.ExternalType.of("java.time.Instant"));
     assertThat(t.getProperties().get(1).getType())
         .isEqualTo(PropType.ArrayType.of(PropType.ExternalType.of("java.util.UUID")));
   }
 
   @Test
   void rejectsAMissingSchemaVersion() {
-    Path f = write("Bad.json", "{ \"title\": \"Bad.Bad\", \"type\": \"object\", \"properties\": {}" + " }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("missing \"$modelmaker\"");
+    Path f =
+        write(
+            "Bad.json",
+            "{ \"title\": \"Bad.Bad\", \"type\": \"object\", \"properties\": {}" + " }");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("missing \"$modelmaker\"");
   }
 
   @Test
@@ -629,13 +690,17 @@ class SimpleSchemaLoaderTest {
     Path f =
         write(
             "Bad.json",
-            "{ \"$modelmaker\": \"v2.0\", \"title\": \"Bad.Bad\", \"type\": \"object\"," + " \"properties\": {} }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("unsupported \"$modelmaker\": \"v2.0\"");
+            "{ \"$modelmaker\": \"v2.0\", \"title\": \"Bad.Bad\", \"type\": \"object\","
+                + " \"properties\": {} }");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("unsupported \"$modelmaker\": \"v2.0\"");
   }
 
   @Test
   void rejectsAMissingTitle() {
-    Path f = write("Bad.json", "{ \"$modelmaker\": \"v1.0\", \"type\": \"object\", \"properties\": {} }");
+    Path f =
+        write(
+            "Bad.json", "{ \"$modelmaker\": \"v1.0\", \"type\": \"object\", \"properties\": {} }");
     assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("missing \"title\"");
   }
 
@@ -644,8 +709,10 @@ class SimpleSchemaLoaderTest {
     Path f =
         write(
             "Bad.json",
-            "{ \"$modelmaker\": \"v1.0\", \"title\": \"Bad\", \"type\": \"object\", \"properties\":" + " {} }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("fully-qualified class name");
+            "{ \"$modelmaker\": \"v1.0\", \"title\": \"Bad\", \"type\": \"object\", \"properties\":"
+                + " {} }");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("fully-qualified class name");
   }
 
   @Test
@@ -655,7 +722,8 @@ class SimpleSchemaLoaderTest {
             "wrong.json",
             "{ \"$modelmaker\": \"v1.0\", \"title\": \"com.example.Foo\", \"type\": \"object\","
                 + " \"properties\": {} }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("must be named \"com.example.Foo.json\"");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("must be named \"com.example.Foo.json\"");
   }
 
   @Test
@@ -665,7 +733,8 @@ class SimpleSchemaLoaderTest {
             "x.Bad",
             "\"properties\": { \"a\": { \"type\": \"object\", \"title\": \"a.b\", \"properties\": {"
                 + " \"c\": { \"type\": \"string\" } } } }");
-    assertThatThrownBy(() -> loader.load(List.of(f))).hasMessageContaining("must be a plain class name");
+    assertThatThrownBy(() -> loader.load(List.of(f)))
+        .hasMessageContaining("must be a plain class name");
   }
 
   @Test
@@ -684,8 +753,10 @@ class SimpleSchemaLoaderTest {
     Property status = prop(m, "status");
 
     assertThat(status.getType()).isEqualTo(PropType.ScalarType.STRING);
-    assertThat(status.getConstraints().getPattern()).isEqualTo("^(\\QNEW\\E|\\QPAID\\E|\\QSHIPPED\\E)$");
-    assertThat(status.getConstraints().getPatternMessage()).isEqualTo("must be one of NEW, PAID, SHIPPED");
+    assertThat(status.getConstraints().getPattern())
+        .isEqualTo("^(\\QNEW\\E|\\QPAID\\E|\\QSHIPPED\\E)$");
+    assertThat(status.getConstraints().getPatternMessage())
+        .isEqualTo("must be one of NEW, PAID, SHIPPED");
   }
 
   @Test
@@ -703,7 +774,8 @@ class SimpleSchemaLoaderTest {
 
   @Test
   void anEmptyEnumIsIgnored() {
-    Path f = schema("x.Order", "\"properties\": { \"status\": { \"type\": \"string\", \"enum\": [] } }");
+    Path f =
+        schema("x.Order", "\"properties\": { \"status\": { \"type\": \"string\", \"enum\": [] } }");
     Constraints c = prop(loader.load(List.of(f)).getFirst(), "status").getConstraints();
 
     assertThat(c.getPattern()).isNull();
@@ -731,7 +803,9 @@ class SimpleSchemaLoaderTest {
 
   @Test
   void rejectsAnUnsupportedIntegerFormat() {
-    Path f = schema("x.N", "\"properties\": { \"a\": { \"type\": \"integer\", \"format\": \"short\" } }");
+    Path f =
+        schema(
+            "x.N", "\"properties\": { \"a\": { \"type\": \"integer\", \"format\": \"short\" } }");
     assertThatThrownBy(() -> loader.load(List.of(f)))
         .hasMessageContaining("unsupported format \"short\" for type \"integer\"");
   }
@@ -757,7 +831,8 @@ class SimpleSchemaLoaderTest {
 
   @Test
   void rejectsAnUnsupportedNumberFormat() {
-    Path f = schema("x.N", "\"properties\": { \"a\": { \"type\": \"number\", \"format\": \"half\" } }");
+    Path f =
+        schema("x.N", "\"properties\": { \"a\": { \"type\": \"number\", \"format\": \"half\" } }");
     assertThatThrownBy(() -> loader.load(List.of(f)))
         .hasMessageContaining("unsupported format \"half\" for type \"number\"");
   }

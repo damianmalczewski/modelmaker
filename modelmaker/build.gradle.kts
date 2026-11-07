@@ -8,7 +8,8 @@ plugins {
 
 internalBuild {
     displayName = "ModelMaker"
-    description = "Shared core of the ModelMaker project, generating Java model classes from schema files."
+    description =
+        "Shared core of the ModelMaker project, generating Java model classes from schema files."
     kover = true
 }
 

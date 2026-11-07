@@ -19,7 +19,10 @@ package io.github.malczuuu.modelmaker;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
-/** Validation keywords carried by a property, all optional. Built through {@link #builder()} or {@link #none()}. */
+/**
+ * Validation keywords carried by a property, all optional. Built through {@link #builder()} or
+ * {@link #none()}.
+ */
 public final class Constraints {
 
   private static final Constraints NONE =
@@ -183,12 +186,12 @@ public final class Constraints {
   }
 
   /**
-   * Constraints applied to each element of an {@code array} property (from the facets inside its {@code items} schema),
-   * emitted as container-element annotations on the field. Its own {@link #getMinItems()} / {@link #getMaxItems()} and
-   * {@code #getElementConstraints()} are always unset.
+   * Constraints applied to each element of an {@code array} property (from the facets inside its
+   * {@code items} schema), emitted as container-element annotations on the field. Its own {@link
+   * #getMinItems()} / {@link #getMaxItems()} and {@code #getElementConstraints()} are always unset.
    *
-   * @return the element constraints, or {@code null} when the property is not an array or its {@code items} carried no
-   *     facets.
+   * @return the element constraints, or {@code null} when the property is not an array or its
+   *     {@code items} carried no facets.
    */
   public @Nullable Constraints getElementConstraints() {
     return elementConstraints;
@@ -347,7 +350,8 @@ public final class Constraints {
     }
 
     /**
-     * Sets the {@code @DecimalMin} bound for a {@code number} or a {@code format: "decimal"} string.
+     * Sets the {@code @DecimalMin} bound for a {@code number} or a {@code format: "decimal"}
+     * string.
      *
      * @param value the bound.
      * @return {@code this}.
@@ -358,7 +362,8 @@ public final class Constraints {
     }
 
     /**
-     * Sets the {@code @DecimalMax} bound for a {@code number} or a {@code format: "decimal"} string.
+     * Sets the {@code @DecimalMax} bound for a {@code number} or a {@code format: "decimal"}
+     * string.
      *
      * @param value the bound.
      * @return {@code this}.

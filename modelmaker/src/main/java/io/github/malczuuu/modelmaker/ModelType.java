@@ -21,8 +21,9 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
- * One model class to be generated - a top-level schema or an inline nested type. Produced by {@link SchemaLoader}; only
- * {@link #getName()} and {@link #getPackageName()} are part of the public surface.
+ * One model class to be generated - a top-level schema or an inline nested type. Produced by {@link
+ * SchemaLoader}; only {@link #getName()} and {@link #getPackageName()} are part of the public
+ * surface.
  */
 public final class ModelType {
 
@@ -104,9 +105,9 @@ public final class ModelType {
   }
 
   /**
-   * The top-level schema's {@code "features"} object, each flag overriding the matching {@code modelmaker.features}
-   * default for this file only. Only meaningful on a top-level type - a nested type always carries the default
-   * overrides.
+   * The top-level schema's {@code "features"} object, each flag overriding the matching {@code
+   * modelmaker.features} default for this file only. Only meaningful on a top-level type - a nested
+   * type always carries the default overrides.
    *
    * @return the feature overrides.
    */

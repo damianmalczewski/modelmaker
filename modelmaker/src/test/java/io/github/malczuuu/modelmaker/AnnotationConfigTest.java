@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 /**
- * {@link JacksonConfig}, {@link ValidationConfig} and {@link OpenApiConfig} share their whole shape; exercised here
- * through {@link JacksonConfig}, plus the cross-type checks that matter.
+ * {@link JacksonConfig}, {@link ValidationConfig} and {@link OpenApiConfig} share their whole
+ * shape; exercised here through {@link JacksonConfig}, plus the cross-type checks that matter.
  */
 class AnnotationConfigTest {
 
@@ -44,18 +44,21 @@ class AnnotationConfigTest {
     assertThat(fieldsOnly.emitsOnFields()).isTrue();
     assertThat(fieldsOnly.emitsOnGetters()).isFalse();
 
-    JacksonConfig both = JacksonConfig.builder().enabled(true).annotateFields(true).annotateGetters(true).build();
+    JacksonConfig both =
+        JacksonConfig.builder().enabled(true).annotateFields(true).annotateGetters(true).build();
     assertThat(both.emitsOnFields()).isTrue();
     assertThat(both.emitsOnGetters()).isTrue();
 
-    JacksonConfig disabled = JacksonConfig.builder().enabled(false).annotateFields(true).annotateGetters(true).build();
+    JacksonConfig disabled =
+        JacksonConfig.builder().enabled(false).annotateFields(true).annotateGetters(true).build();
     assertThat(disabled.emitsOnFields()).isFalse();
     assertThat(disabled.emitsOnGetters()).isFalse();
   }
 
   @Test
   void withOverrideAppliesOnlySetFlags() {
-    JacksonConfig base = JacksonConfig.builder().enabled(true).annotateFields(false).annotateGetters(true).build();
+    JacksonConfig base =
+        JacksonConfig.builder().enabled(true).annotateFields(false).annotateGetters(true).build();
 
     JacksonConfig result = base.withOverride(new JacksonOverride(null, true, null, null));
 
@@ -67,15 +70,36 @@ class AnnotationConfigTest {
 
   @Test
   void equalityAndToStringAreTypeSpecific() {
-    assertThat(JacksonConfig.builder().enabled(true).annotateFields(false).annotateGetters(true).build())
-        .isEqualTo(JacksonConfig.builder().enabled(true).annotateFields(false).annotateGetters(true).build())
-        .hasSameHashCodeAs(JacksonConfig.builder().enabled(true).annotateFields(false).annotateGetters(true).build())
-        .isNotEqualTo(JacksonConfig.builder().enabled(false).annotateFields(false).annotateGetters(true).build())
+    assertThat(
+            JacksonConfig.builder()
+                .enabled(true)
+                .annotateFields(false)
+                .annotateGetters(true)
+                .build())
+        .isEqualTo(
+            JacksonConfig.builder()
+                .enabled(true)
+                .annotateFields(false)
+                .annotateGetters(true)
+                .build())
+        .hasSameHashCodeAs(
+            JacksonConfig.builder()
+                .enabled(true)
+                .annotateFields(false)
+                .annotateGetters(true)
+                .build())
+        .isNotEqualTo(
+            JacksonConfig.builder()
+                .enabled(false)
+                .annotateFields(false)
+                .annotateGetters(true)
+                .build())
         .isNotEqualTo(null)
         .isNotEqualTo("JacksonConfig");
 
     assertThat(JacksonConfig.defaults().toString())
-        .isEqualTo("JacksonConfig[enabled=false, annotateFields=false, annotateGetters=true, includeNonNull=false]");
+        .isEqualTo(
+            "JacksonConfig[enabled=false, annotateFields=false, annotateGetters=true, includeNonNull=false]");
     assertThat(OpenApiConfig.defaults().toString())
         .isEqualTo("OpenApiConfig[enabled=false, annotateFields=false, annotateGetters=true]");
   }

@@ -27,7 +27,8 @@ class MutateMethodRendererTest {
   private static final ModelOptions OPTIONS = ModelOptions.builder().build();
 
   private static ModelType type(String name, Property... properties) {
-    return new ModelType(name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
+    return new ModelType(
+        name, "com.example.dto", null, List.of(properties), List.of(), FeatureOverrides.none());
   }
 
   private static final ModelType WIDGET =
@@ -66,6 +67,7 @@ class MutateMethodRendererTest {
 
   @Test
   void implementsTheRendererContract() {
-    assertThat(new MutateMethodRenderer().init("", WIDGET, OPTIONS)).isInstanceOf(SnippetRenderer.class);
+    assertThat(new MutateMethodRenderer().init("", WIDGET, OPTIONS))
+        .isInstanceOf(SnippetRenderer.class);
   }
 }

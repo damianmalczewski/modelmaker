@@ -8,7 +8,8 @@ plugins {
 
 internalBuild {
     displayName = "ModelMaker Maven Plugin"
-    description = "Maven plugin of the ModelMaker project, generating Java model classes from schema files."
+    description =
+        "Maven plugin of the ModelMaker project, generating Java model classes from schema files."
 }
 
 dependencies {

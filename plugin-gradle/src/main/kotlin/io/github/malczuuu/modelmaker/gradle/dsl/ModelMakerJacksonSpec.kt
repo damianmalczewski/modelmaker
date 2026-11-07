@@ -36,8 +36,9 @@ import org.gradle.api.tasks.Input
  * @property enabled whether the feature emits any annotations.
  * @property annotateFields place the annotations on the generated fields.
  * @property annotateGetters place the annotations on the generated getters.
- * @property includeNonNull emit `@JsonInclude(JsonInclude.Include.NON_NULL)` on the generated class, so a property left
- *   unset is omitted from the serialized JSON instead of written as `null`.
+ * @property includeNonNull emit `@JsonInclude(JsonInclude.Include.NON_NULL)` on the generated
+ *   class, so a property left unset is omitted from the serialized JSON instead of written as
+ *   `null`.
  */
 @ModelMakerDslMarker
 public abstract class ModelMakerJacksonSpec {

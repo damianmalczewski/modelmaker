@@ -17,14 +17,15 @@
 package io.github.malczuuu.modelmaker;
 
 /**
- * Renders a {@link ModelType} tree, parsed from one schema file, to a generated source file's text. Implemented per
- * target language - see {@link JavaModelMaker} and {@link KotlinExtensionMaker}. Not sealed - implement it for a target
- * language of your own.
+ * Renders a {@link ModelType} tree, parsed from one schema file, to a generated source file's text.
+ * Implemented per target language - see {@link JavaModelMaker} and {@link KotlinExtensionMaker}.
+ * Not sealed - implement it for a target language of your own.
  */
 public sealed interface ModelMaker permits JavaModelMaker, KotlinExtensionMaker {
 
   /**
-   * Renders {@code type} (and, recursively, its {@link ModelType#getNested()} types) to source code.
+   * Renders {@code type} (and, recursively, its {@link ModelType#getNested()} types) to source
+   * code.
    *
    * @param type the schema-derived model to emit.
    * @return the generated file's full source text, including its {@code package} declaration.
